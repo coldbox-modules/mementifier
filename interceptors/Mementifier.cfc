@@ -12,16 +12,8 @@ component{
 	function configure(){
 	}
 
-	/*********************************** QUICK EVENTS ***********************************/
+	/*********************************** WIREBOX EVENTS ***********************************/
 
-	/**
-	 * Listen to entity loadings by Quick
-	 *
-	 * @interceptData
-	 */
-	function quickPostLoad( interceptData ){
-		processMemento( arguments.interceptData.entity );
-	}
 
 	/*********************************** CBORM EVENTS ***********************************/
 
@@ -144,9 +136,13 @@ component{
 					item = item.listFirst( "." );
 				}
 
-				// Retrieve Value for transformation
-				if( variables.keyExists( "get#item#" ) ){
-					var thisValue = invoke( variables, "get#item#" ) ?: this.memento.defaults[ item ] ?: "";
+				// Retrieve Value for transformation: ACF Incompats Suck on elvis operator
+				if( structKeyExists( this, "get#item#" ) ){
+					var thisValue = invoke( this, "get#item#" );
+					// Verify Nullness
+					thisValue = isNull( thisValue ) ? (
+						structKeyExists( this.memento.defaults, item ) ? this.memento.defaults[ item ] : ""
+					) : thisValue;
 				} else {
 					// Calling for non-existent properties, exit out
 					return;

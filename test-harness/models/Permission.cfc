@@ -1,9 +1,9 @@
 /**
- * A ForgeBox Permission
+ * A Permission
  */
 component 	persistent="true"
 			table="permissions"
-			extends="forgebox.models.BaseEntity"
+			extends="BaseEntity"
 			cachename="Permission"
 			cacheuse="read-write"
 {

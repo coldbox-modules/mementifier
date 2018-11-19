@@ -1,9 +1,9 @@
 /**
- * A ForgeBox User
+ * A User
  */
 component 	persistent="true"
 			table="users"
-			extends="forgebox.models.BaseEntity"
+			extends="BaseEntity"
 			db_sortBy="lname"{
 
 	/* *********************************************************************
@@ -155,14 +155,9 @@ component 	persistent="true"
 			"githubURL",
 			"linkedinURL",
 			"facebookURL",
-			"numberOfEntries",
 			"lastLogin",
 			"isConfirmed",
-			"avatarLink",
-			// Relationships
-			"entries",
-			"collaborations"
-
+			"avatarLink"
 		],
 		// Default Exclusions
 		defaultExcludes = [
@@ -210,14 +205,6 @@ component 	persistent="true"
 		if( !len( getAPIToken() ) ){
 			generateAPIToken();
 		}
-	}
-
-	/**
-	* Get if the user is subscribed to ForgeBox Pro.
-	* Right now, every one is. ;-)
-	*/
-	boolean function getIsSubscribed() {
-		return true;
 	}
 
 	/**

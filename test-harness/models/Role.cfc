@@ -1,10 +1,10 @@
 /**
-* ForgeBox Role
+* A Role
 */
 component 	persistent="true"
 			table="roles"
 			db_sortBy="role"
-			extends="forgebox.models.BaseEntity"
+			extends="BaseEntity"
 			cachename="Role"
 			cacheuse="read-write"
 {
