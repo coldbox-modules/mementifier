@@ -46,7 +46,7 @@ install:
 
 before_script:
   # create test database
-  - mysql -u root -e 'create database coolblog;'
+  - mysql -u root -e 'create database mementifier;'
   # import database
   #- mysql -u root < test-harness/tests/resources/coolblog.sql
   #- echo "Database created and loaded with test data"
