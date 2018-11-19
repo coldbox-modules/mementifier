@@ -33,7 +33,7 @@ component {
 
 		// Custom Declared Interceptors
 		interceptors = [
-			{ class="mementifier.interceptors.mementifier" }
+			{ class="#moduleMapping#.interceptors.mementifier" }
 		];
 	}
 

@@ -1,6 +1,6 @@
 # Mementifier
 
-Welcome to the `mementifier`.  This module will listen to traditional ORM events and inject some transformation goodness to your objects.
+Welcome to the `mementifier` module.  This module will listen to traditional ORM events and inject some transformation goodness to your objects.
 
 ## Usage
 
