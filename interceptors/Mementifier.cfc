@@ -14,6 +14,12 @@ component{
 
 	/*********************************** WIREBOX EVENTS ***********************************/
 
+	/**
+	 * Listen to object creations
+	 */
+	function afterInstanceCreation( interceptData ){
+		processMemento( arguments.interceptData.target );
+	}
 
 	/*********************************** CBORM EVENTS ***********************************/
 
@@ -47,7 +53,7 @@ component{
 		if(
 			structKeyExists( arguments.entity, "memento" )
 			&&
-			isStruct( arguments.entity.memento )
+			!structKeyExists( arguments.entity, "$mementifierSettings" )
 		){
 			// Inject utility
 			arguments.entity.$injectMixin = variables.$injectMixin;

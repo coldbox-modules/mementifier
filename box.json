@@ -1,5 +1,5 @@
 {
-    "name":"mementifier",
+    "name":"Mementifier : The State Maker!",
     "version":"1.0.0",
     "location":"https://downloads.ortussolutions.com/ortussolutions/coldbox-modules/mementifier/@build.version@/mementifier-@build.version@.zip",
     "author":"Ortus Solutions, Corp",
@@ -10,7 +10,7 @@
         "url":"https://github.com/coldbox-modules/mementifier"
     },
     "bugs":"https://github.com/coldbox-modules/mementifier/issues",
-    "shortDescription":"This module creates memento states from entities",
+    "shortDescription":"This module creates memento/state representations from business objects",
     "slug":"mementifier",
     "type":"modules",
     "keywords":"entity state, memento objects",
