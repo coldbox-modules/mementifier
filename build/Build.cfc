@@ -175,8 +175,8 @@ component{
 
         command( 'docbox generate' )
             .params(
-                "source"               =  "models",
-                "mapping"              =  "models",
+                "source"               =  "interceptors",
+                "mapping"              =  "interceptors",
                 "strategy-projectTitle" = "#arguments.projectName# v#arguments.version#",
                 "strategy-outputDir"   = arguments.outputDir
             )

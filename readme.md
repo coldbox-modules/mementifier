@@ -1,14 +1,18 @@
-# Mementifier
+# Mementifier : The State Maker!
 
-Welcome to the `mementifier` module.  This module will listen to traditional ORM events and inject some transformation goodness to your objects.
+Welcome to the `mementifier` module.  This module will transform your business objects into native ColdFusion (CFML) data structures with :rocket: speed.  It will inject itself into ORM objects and/or business objects alike and give them a nice `getMemento()` function to transform their properties and relationships (state) into a consumable structure or array of structures, etc.  No more building transformations by hand! No more inconsistencies! No more repeating yourself!
+
+> Memento pattern is used to restore state of an object to a previous state or to produce the state of the object.
+
+You can combine this module with `cffractal` (https://forgebox.io/view/cffractal) and build consistent and fast :rocket: object graph transformations.
 
 ## Usage
 
-The memementifier will listen to orm new and load operations.  Once it detects an entity and if contains a `this.memento` definition, it will inject a `getMemento()` method into the entity.  This method will allow you to transform the entity and its relationship into native struct/array/native formats instead of the object graph.  
+The memementifier will listen to WireBox object creations and ORM events in order to inject itself into target objects.  The target object must contain a `this.memento` structure in order for the `mementifier` to inject a `getMemento()` method into the target.  This method will allow you to transform the entity and its relationships into native struct/array/native formats.  
 
 ### `this.memento` Marker
 
-Each entity must be marked with a `this.memento` struct with the following available keys:
+Each entity must be marked with a `this.memento` struct with the following (optional) available keys:
 
 ```js
 this.mememento = {
@@ -25,7 +29,158 @@ this.mememento = {
 }
 ```
 
-## Settings
+#### Default Includes
+
+This array is a collection of the properties and/or relationships to add to the resulting memento of the object by default.  The `mementifier` will call the public `getter` method for the property to retrieve its value. If the returning value is `null` then the value will be an `empty` string.
+
+```js
+defaultIncludes = [
+	"firstName",
+	"lastName",
+	// Relationships
+	"role.roleName",
+	"role.roleID",
+	"permissions",
+	"children"
+]
+```
+
+##### Custom Includes
+
+You can also define here properties that are NOT part of the object graph, but determined/constructed at runtime.  Let's say your `User` object needs to have an `avatarLink` in it's memento.  Then you can add a `avatarLink` to the array and create the appropriate `getAvatarLink()` method.  Then the `mementifier` will call your getter and add it to the resulting memento.
+
+```js
+defaultIncludes = [
+	"firstName",
+	"lastName",
+	"avatarLink"
+]
+
+/**
+* Get the avatar link for this user.
+*/
+string function getAvatarLink( numeric size=40 ){
+	return variables.avatar.generateLink( getEmail(), arguments.size );
+}
+```
+
+##### Nested Includes
+
+The `DefaultIncldues` array can also include **nested** relationships.  So if a `User` has a `Role` relationship and you want to include only the `roleName` property, you can do `role.roleName`.  Every nesting is demarcated with a period (`.`) and you will navigate to the relationship.
+
+```js
+defaultIncludes = [
+	"firstName",
+	"lastName",
+	"role.roleName",
+	"role.roleID",
+	"permissions"
+]
+```
+
+#### Default Excludes
+
+This array is a declaration of all properties/relationships to exclude from the memento state process.
+
+```js
+defaultExcludes = [
+	"APIToken",
+	"userID",
+	"permissions"
+]
+```
+
+##### Nested Excludes
+
+The `DefaultExcludes` array can also declare **nested** relationships.  So if a `User` has a `Role` relationship and you want to exclude the `roleID` property, you can do `role.roleId`.  Every nesting is demarcated with a period (`.`) and you will navigate to the relationship and define what portions of the nested relationship can be excluded out.
+
+```js
+defaultExcludes = [
+	"role.roleID",
+	"permissions"
+]
+```
+
+#### Never Include
+
+This array is used as a last line of defense.  Even if the `getMemento()` call receives an include that is listed in this array, it will still not add it to the resulting memento.  This is great if you are using dynamic include and exclude lists.  **You can also use nested relationships here as well.**
+
+```js
+neverInclude = [
+	"password"
+]
+```
+
+#### Defaults
+
+This structure will hold the default values to use for properties and/or relationships if at runtime they have a `null` value.  The `key` of the structure is the name of the property and/or relationship.  Please note that if you have a collection of relationships (array), the default value is an empty array by default.  This mostly applies if you want complete control of the default value.
+
+```js
+defaults = {
+	"role" : {},
+	"office" : {}
+}
+```
+
+#### Mappers
+
+This structure is a way to do transformations on actual properties and/or relationships after they have been added to the memento.  This can be post-processing functions that can be applied after retrieval. The `key` of the structure is the name of the property and/or relationship.  The `value` is a closure that receives the item and it must return back the item mapped according to your function.
+
+```js
+mappers = {
+	"lname" = function( item ){ return item.ucase(); },
+	"specialDate" = function( item ){ return dateTimeFormat( item, "full" ); }
+}
+```
+
+### `getMemento()` Method
+
+Now that you have learned how to define what will be created in your memento, let's discover how to actually get the memento.  The injected method to the business objects has the following signaure:
+
+```js
+struct function getMemento(
+	includes="",
+	excludes="",
+	struct mappers={},
+	struct defaults={},
+	boolean ignoreDefaults=false
+)
+```
+
+> You can find the API Docs Here: https://apidocs.ortussolutions.com/coldbox-modules/mementifier/1.0.0/index.html
+
+As you can see, the memento method has also a way to add dynamic `includes, excludes, mappers and defaults`.  This will allow you to add upon the defaults dynamically.
+
+#### Ignoring Defaults
+
+We have also added a way to ignore the default include and exclude lists via the `ignoreDefaults` flag.  If you turn that flag to `true` then **ONLY** the passed in `includes and excludes` will be used in the memento.  However, please note that the `neverInclude` array will **always** be used.
+
+#### Overriding `getMemento()`
+
+You might be in a situation where you still want to add custom magic to your memento and you will want to override the injected `getMemento()` method.  No problem!  If you create your own `getMemento()` method, then the `mementifier` will inject the method as `$getMemento()`  so you can do your overrides:
+
+```js
+struct function getMemento(
+	includes="",
+	excludes="",
+	struct mappers={},
+	struct defaults={},
+	boolean ignoreDefaults=false
+){
+	// Call mementifier
+	var memento	= this.$getMemento( argumentCollection=arguments );
+
+	// Add custom data
+	if( hasEntryType() ){
+		memento[ "typeSlug" ] = getEntryType().getTypeSlug();
+		memento[ "typeName" ] = getEntryType().getTypeName();
+	}
+
+	return memento;
+}
+```
+
+## Module Settings
 
 Just open your `config/Coldbox.cfc` and add the following settings into the `moduleSettings` struct under the `mementifier` key:
 
