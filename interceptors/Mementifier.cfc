@@ -18,7 +18,9 @@ component{
 	 * Listen to object creations
 	 */
 	function afterInstanceCreation( interceptData ){
-		processMemento( arguments.interceptData.target );
+		if( isStruct( arguments.interceptData.target ) ){
+			processMemento( arguments.interceptData.target );
+		}
 	}
 
 	/*********************************** CBORM EVENTS ***********************************/
