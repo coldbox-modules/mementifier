@@ -57,6 +57,7 @@ component{
 			&&
 			!structKeyExists( arguments.entity, "$mementifierSettings" )
 		){
+			//systemOutput( "==> Injectin mementifier: #getMetadata( arguments.entity ).name# ", true );
 			// Inject utility
 			arguments.entity.$injectMixin = variables.$injectMixin;
 			// Inject Settings
@@ -112,16 +113,14 @@ component{
 
 		// Incorporate Defaults if not ignored
 		if( !arguments.ignoreDefaults ){
-			arguments.includes
-				.append( this.memento.defaultIncludes, true );
-			arguments.excludes
-				.append(
-					this.memento.defaultExcludes.filter( function( item ){
-						// Filter out if incoming includes was specified
-						return !includes.findNoCase( item );
-					} ),
-					true
-				);
+			arguments.includes.append( this.memento.defaultIncludes, true );
+			arguments.excludes.append(
+				this.memento.defaultExcludes.filter( function( item ){
+					// Filter out if incoming includes was specified
+					return !includes.findNoCase( item );
+				} ),
+				true
+			);
 		}
 
 		// Incorporate Memento Mappers, and Defaults
@@ -131,79 +130,71 @@ component{
 		// Start processing pipeline on the includes properties
 		var result 			= {};
 		var mappersKeyArray = this.memento.mappers.keyArray();
-		arguments.includes
-			// Filter out exclude items and never include items
-			.filter( function( item ){
-				return !arrayFindNoCase( excludes, item ) && !arrayFindNoCase( this.memento.neverInclude, item );
-			} )
-			// Process each include item
-			.each( function( item ){
-				// Is this a nested include?
-				if( item.listLen( "." ) > 1 ){
-					// Retrieve the relationship
-					item = item.listFirst( "." );
-				}
 
-				// Retrieve Value for transformation: ACF Incompats Suck on elvis operator
-				if( structKeyExists( this, "get#item#" ) ){
-					var thisValue = invoke( this, "get#item#" );
-					// Verify Nullness
-					thisValue = isNull( thisValue ) ? (
-						structKeyExists( this.memento.defaults, item ) ? this.memento.defaults[ item ] : ""
-					) : thisValue;
-				} else {
-					// Calling for non-existent properties, exit out
-					return;
-				}
+		// Filter out exclude items and never include items
+		arguments.includes = arguments.includes.filter( function( item ){
+			return !arrayFindNoCase( excludes, item ) && !arrayFindNoCase( this.memento.neverInclude, item );
+		} );
 
-				// Match timestamps + date/time objects
-				if(
-					isSimpleValue( thisValue )
-					&&
-					reFind( "^\{ts ([^\}])*\}", thisValue )
-				){
-					try{
-						// Date Test just in case
-						thisValue.getTime();
+		//writeDump( var=arguments.includes, label="Processing Includes: #this.pk#" );abort;
 
-						// Iso Date?
-						if( $mementifierSettings.iso8601Format ){
-							result[ item ] = this.$FORMATTER_ISO8601.format( thisValue );
-						} else {
-							result[ item ] = this.$FORMATTER_CUSTOM.format( thisValue );
-						}
-					} catch( any e ){
-						result[ item ] = thisValue;
+		// Process Includes
+		for( var item in arguments.includes ){
+
+			//writeDump( var="Processing: #item#" );
+
+			// Is this a nested include?
+			if( item.listLen( "." ) > 1 ){
+				// Retrieve the relationship
+				item = item.listFirst( "." );
+			}
+
+			// Retrieve Value for transformation: ACF Incompats Suck on elvis operator
+			if( structKeyExists( this, "get#item#" ) ){
+				var thisValue = invoke( this, "get#item#" );
+				// Verify Nullness
+				thisValue = isNull( thisValue ) ? (
+					structKeyExists( this.memento.defaults, item ) ? this.memento.defaults[ item ] : ""
+				) : thisValue;
+			} else {
+				// Calling for non-existent properties, exit out
+				return;
+			}
+
+			// Match timestamps + date/time objects
+			if(
+				isSimpleValue( thisValue )
+				&&
+				reFind( "^\{ts ([^\}])*\}", thisValue )
+			){
+				try{
+					// Date Test just in case
+					thisValue.getTime();
+					// Iso Date?
+					if( $mementifierSettings.iso8601Format ){
+						result[ item ] = this.$FORMATTER_ISO8601.format( thisValue );
+					} else {
+						result[ item ] = this.$FORMATTER_CUSTOM.format( thisValue );
 					}
-				}
-				// Strict Type Boolean Values
-				else if( !isNumeric( thisValue ) && isBoolean( thisValue ) ){
-					result[ item ] = javaCast( "Boolean", thisValue );
-				}
-				// Simple Values
-				else if( isSimpleValue( thisValue ) ){
+				} catch( any e ){
 					result[ item ] = thisValue;
 				}
+			}
+			// Strict Type Boolean Values
+			else if( !isNumeric( thisValue ) && isBoolean( thisValue ) ){
+				result[ item ] = javaCast( "Boolean", thisValue );
+			}
+			// Simple Values
+			else if( isSimpleValue( thisValue ) ){
+				result[ item ] = thisValue;
+			}
 
-				// Array Collections
-				if( isArray( thisValue ) ){
-					// Default are collections, so transform them
-					var mappedValue = thisValue.map( function( collectionItem ){
-							// nest away baby!
-							return collectionItem.getMemento(
-								includes 		= $buildNestedMementoList( includes, item ),
-								excludes 		= $buildNestedMementoList( excludes, item ),
-								mappers 		= mappers,
-								defaults 		= defaults,
-								ignoreDefaults 	= ignoreDefaults
-							);
-						} );
-					result[ item ] = mappedValue;
-				}
-
-				// Single Object Relationships
-				if( isObject( thisValue ) ){
-					result[ item ] = thisValue.getMemento(
+			// Array Collections
+			if( isArray( thisValue ) ){
+				// Map Items into result object
+				result[ item ] = [];
+				for( var thisIndex = 1; thisIndex <= arrayLen( thisValue ); thisIndex++ ){
+					result[ item ][ thisIndex ] = thisValue[ thisIndex ].getMemento(
 						includes 		= $buildNestedMementoList( includes, item ),
 						excludes 		= $buildNestedMementoList( excludes, item ),
 						mappers 		= mappers,
@@ -211,15 +202,28 @@ component{
 						ignoreDefaults 	= ignoreDefaults
 					);
 				}
+			}
 
-				// Result Mapper for Item Result
-				if( mappersKeyArray.findNoCase( item ) ){
-					// ACF compat
-					var thisMapper = this.memento.mappers[ item ];
-					result[ item ] = thisMapper( result[ item ] );
-				}
+			// Single Object Relationships
+			if( isObject( thisValue ) ){
+				//writeDump( var=$buildNestedMementoList( includes, item ), label="includes: #item#" );
+				//writeDump( var=$buildNestedMementoList( excludes, item ), label="excludes: #item#" );
+				result[ item ] = thisValue.getMemento(
+					includes 		= $buildNestedMementoList( includes, item ),
+					excludes 		= $buildNestedMementoList( excludes, item ),
+					mappers 		= mappers,
+					defaults 		= defaults,
+					ignoreDefaults 	= ignoreDefaults
+				);
+			}
 
-			} );
+			// Result Mapper for Item Result
+			if( mappersKeyArray.findNoCase( item ) ){
+				// ACF compat
+				var thisMapper = this.memento.mappers[ item ];
+				result[ item ] = thisMapper( result[ item ] );
+			}
+		}
 
 		return result;
 	}
@@ -240,6 +244,14 @@ component{
 			.map( function( target ){
 				return target.listDeleteAt( 1, "." );
 			} );
+
+		// var results = [];
+		// for( var target in arguments.list ){
+		// 	if( listFirst( target, "." ) == root && listLen( target, "." ) > 1 ){
+		// 		results.append( target.listDeleteAt( 1, "." ) );
+		// 	}
+		// }
+		// return results;
 	}
 
 	/**
