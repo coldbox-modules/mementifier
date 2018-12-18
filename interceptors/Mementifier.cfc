@@ -158,7 +158,7 @@ component{
 				) : thisValue;
 			} else {
 				// Calling for non-existent properties, exit out
-				return;
+				break;
 			}
 
 			// Match timestamps + date/time objects
