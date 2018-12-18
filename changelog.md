@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.1
+
+* Fixes on non-existent properties
+
 ## v1.1.0
 
 * Major performance boosts
