@@ -15,7 +15,7 @@ The memementifier will listen to WireBox object creations and ORM events in orde
 Each entity must be marked with a `this.memento` struct with the following (optional) available keys:
 
 ```js
-this.mememento = {
+this.memento = {
 	// An array of the properties/relationships to include by default
 	defaultIncludes = [],
 	// An array of properties/relationships to exclude by default
