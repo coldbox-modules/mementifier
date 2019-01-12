@@ -157,8 +157,8 @@ component{
 					structKeyExists( this.memento.defaults, item ) ? this.memento.defaults[ item ] : ""
 				) : thisValue;
 			} else {
-				// Calling for non-existent properties, exit out
-				break;
+				// Calling for non-existent properties, skip out
+				continue;
 			}
 
 			// Match timestamps + date/time objects
@@ -228,6 +228,13 @@ component{
 				var thisMapper = this.memento.mappers[ item ];
 				result[ item ] = thisMapper( result[ item ] );
 			}
+			
+			
+			// ensure anything left over is provided as the value
+			if( !structKeyExists( result, item ) ){
+				result[ item ] = thisValue;
+			}
+
 		}
 
 		return result;
