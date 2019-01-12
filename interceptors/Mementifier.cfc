@@ -165,14 +165,19 @@ component{
 			if(
 				isSimpleValue( thisValue )
 				&&
-				reFind( "^\{ts ([^\}])*\}", thisValue )
+				(
+					reFind( "^\{ts ([^\}])*\}", thisValue ) // Lucee date format
+					||
+					reFind( "^\d{4}-\d{2}-\d{2}", thisValue ) // ACF date format begins with YYYY-MM-DD
+				)
 			){
 				try{
 					// Date Test just in case
 					thisValue.getTime();
 					// Iso Date?
 					if( $mementifierSettings.iso8601Format ){
-						result[ item ] = this.$FORMATTER_ISO8601.format( thisValue );
+						// we need to convert trailing Zulu time designations offset or JS libs like Moment will not know how to parse it
+						result[ item ] = this.$FORMATTER_ISO8601.format( thisValue ).replace("Z", "+00:00");
 					} else {
 						result[ item ] = this.$FORMATTER_CUSTOM.format( thisValue );
 					}
