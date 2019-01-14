@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.3.0
+
+* ACF Incompatibilities
+* Ensure result item
+
 ## v1.1.1
 
 * Fixes on non-existent properties

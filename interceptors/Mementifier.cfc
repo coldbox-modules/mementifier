@@ -157,22 +157,27 @@ component{
 					structKeyExists( this.memento.defaults, item ) ? this.memento.defaults[ item ] : ""
 				) : thisValue;
 			} else {
-				// Calling for non-existent properties, exit out
-				break;
+				// Calling for non-existent properties, skip out
+				continue;
 			}
 
 			// Match timestamps + date/time objects
 			if(
 				isSimpleValue( thisValue )
 				&&
-				reFind( "^\{ts ([^\}])*\}", thisValue )
+				(
+					reFind( "^\{ts ([^\}])*\}", thisValue ) // Lucee date format
+					||
+					reFind( "^\d{4}-\d{2}-\d{2}", thisValue ) // ACF date format begins with YYYY-MM-DD
+				)
 			){
 				try{
 					// Date Test just in case
 					thisValue.getTime();
 					// Iso Date?
 					if( $mementifierSettings.iso8601Format ){
-						result[ item ] = this.$FORMATTER_ISO8601.format( thisValue );
+						// we need to convert trailing Zulu time designations offset or JS libs like Moment will not know how to parse it
+						result[ item ] = this.$FORMATTER_ISO8601.format( thisValue ).replace("Z", "+00:00");
 					} else {
 						result[ item ] = this.$FORMATTER_CUSTOM.format( thisValue );
 					}
@@ -223,6 +228,13 @@ component{
 				var thisMapper = this.memento.mappers[ item ];
 				result[ item ] = thisMapper( result[ item ] );
 			}
+			
+			
+			// ensure anything left over is provided as the value
+			if( !structKeyExists( result, item ) ){
+				result[ item ] = thisValue;
+			}
+
 		}
 
 		return result;
