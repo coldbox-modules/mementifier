@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.2.0
+## v1.3.0
 
 * ACF Incompatibilities
 * Ensure result item
