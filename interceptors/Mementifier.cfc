@@ -51,10 +51,8 @@ component{
 	 * @entity The entity to process
 	 */
 	function processMemento( entity ){
-		// Verify we can mementofiy
+		// Verify we haven't mementified this object already
 		if(
-			structKeyExists( arguments.entity, "memento" )
-			&&
 			!structKeyExists( arguments.entity, "$mementifierSettings" )
 		){
 			//systemOutput( "==> Injectin mementifier: #getMetadata( arguments.entity ).name# ", true );
@@ -102,6 +100,18 @@ component{
 		}
 		if( isSimpleValue( arguments.excludes ) ){
 			arguments.excludes = listToArray( arguments.excludes );
+		}
+
+		// Is orm auto inflate on and no memento defined? Build the default includes using this entity and Hibernate
+		if( $mementifierSettings.ormAutoIncludes && isNull( this.memento.defaultIncludes ) ){
+			var entityName = variables.entityName ?: "";
+			if( !entityName.len() ){
+				var md = getMetadata( this );
+				entityName = ( md.keyExists( "entityName" ) ? md.entityName : listLast( md.name, "." ) );
+			}
+			this.memento.defaultIncludes = ormGetSessionFactory()
+				.getClassMetaData( entityName )
+				.getPropertyNames();
 		}
 
 		// Param Default Memento Settings
@@ -228,8 +238,8 @@ component{
 				var thisMapper = this.memento.mappers[ item ];
 				result[ item ] = thisMapper( result[ item ] );
 			}
-			
-			
+
+
 			// ensure anything left over is provided as the value
 			if( !structKeyExists( result, item ) ){
 				result[ item ] = thisValue;
