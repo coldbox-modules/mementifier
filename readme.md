@@ -1,6 +1,6 @@
 # Mementifier : The State Maker!
 
-Welcome to the `mementifier` module.  This module will transform your business objects into native ColdFusion (CFML) data structures with :rocket: speed.  It will inject itself into ORM objects and/or business objects alike and give them a nice `getMemento()` function to transform their properties and relationships (state) into a consumable structure or array of structures, etc.  No more building transformations by hand! No more inconsistencies! No more repeating yourself!
+Welcome to the `mementifier` module.  This module will transform your business objects into native ColdFusion (CFML) data structures with :rocket: speed.  It will inject itself into ORM objects and/or business objects alike and give them a nice `getMemento()` function to transform their properties and relationships (state) into a consumable structure or array of structures.  It can even detect ORM entities and you don't even have to write the default includes manually, it will auto-detect all properties.  No more building transformations by hand! No more inconsistencies! No more repeating yourself!
 
 > Memento pattern is used to restore state of an object to a previous state or to produce the state of the object.
 
@@ -31,7 +31,7 @@ this.memento = {
 
 #### Default Includes
 
-This array is a collection of the properties and/or relationships to add to the resulting memento of the object by default.  The `mementifier` will call the public `getter` method for the property to retrieve its value. If the returning value is `null` then the value will be an `empty` string.
+This array is a collection of the properties and/or relationships to add to the resulting memento of the object by default.  The `mementifier` will call the public `getter` method for the property to retrieve its value. If the returning value is `null` then the value will be an `empty` string.  If you are using CF ORM and the `ormAutoIncludes` setting is true (by default), then this array can be auto-populated for you.
 
 ```js
 defaultIncludes = [
@@ -193,7 +193,11 @@ moduleSettings = {
 		// The default date mask to use for date properties
 		dateMask      = "yyyy-mm-dd",
 		// The default time mask to use for date properties
-		timeMask      = "HH:mm:ss"
+		timeMask      = "HH:mm:ss",
+		// Enable orm auto default includes: If true and an object doesn't have any `memento` struct defined
+		// this module will create it with all properties and relationships it can find for the target entity
+		// leveraging the cborm module.
+		ormAutoIncludes = true
 	}
 }
 ```
