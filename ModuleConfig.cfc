@@ -28,7 +28,11 @@ component {
 			// The default date mask to use for date properties
 			dateMask      = "yyyy-mm-dd",
 			// The default time mask to use for date properties
-			timeMask      = "HH:mm:ss"
+			timeMask      = "HH:mm:ss",
+			// Enable orm auto default includes: If true and an object doesn't have any `memento` struct defined
+			// this module will create it with all properties and relationships it can find for the target entity
+			// leveraging the cborm module.
+			ormAutoIncludes = true
 		};
 
 		// Custom Declared Interceptors

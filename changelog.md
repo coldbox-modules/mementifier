@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.4.0
+
+* New setting: `ormAutoIncludes` which defaults to `true`.  If enabled, and an ORM entity does not have any includes defined, we will automatically include all ORM properties including relationships.
+
 ## v1.3.0
 
 * ACF Incompatibilities
