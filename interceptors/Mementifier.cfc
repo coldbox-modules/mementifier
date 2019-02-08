@@ -18,7 +18,8 @@ component{
 	 * Listen to object creations
 	 */
 	function afterInstanceCreation( interceptData ){
-		if( isStruct( arguments.interceptData.target ) ){
+		// Only process struct based objects with the `memento` property
+		if( isStruct( arguments.interceptData.target ) && structKeyExists( arguments.interceptData.target, "memento" ) ){
 			processMemento( arguments.interceptData.target );
 		}
 	}

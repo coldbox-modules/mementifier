@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.4.2
+
+* Only process memento based objects from WireBox.
+
 ## v1.4.1
 
 * Wrong date formatting pattern for Java SimpleDateFormat
