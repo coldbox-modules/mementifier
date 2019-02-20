@@ -191,7 +191,7 @@ moduleSettings = {
 		// Turn on to use the ISO8601 date/time formatting on all processed date/time properites, else use the masks
 		iso8601Format = false,
 		// The default date mask to use for date properties
-		dateMask      = "yyyy-mm-dd",
+		dateMask      = "yyyy-MM-dd",
 		// The default time mask to use for date properties
 		timeMask      = "HH:mm:ss",
 		// Enable orm auto default includes: If true and an object doesn't have any `memento` struct defined
