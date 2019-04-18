@@ -22,6 +22,27 @@
 				expect( memento.lname ).toBe( "TESTUSER" );
 			});
 
+			it( "can render mementos even if the obejct has already-serialized data", function(){
+				var event = this.request( route="/main/alreadySerialized", params={} );
+				var memento = deserializeJSON( event.getRenderedContent() );
+				// Derfault INcludes + Excludes
+
+				expect( memento[ "alreadySerialized" ] )
+					.toBeArray()
+					.toHaveLength( 2 );
+
+				expect( memento [ "alreadySerialized" ][ 1 ] )
+					.toBeStruct()
+					.toHaveKey( 'foo' );
+
+				expect( memento [ "alreadySerialized" ][ 2 ] )
+					.toBeStruct()
+					.toHaveKey( 'baz' );
+
+				expect( memento[ "alreadySerialized" ][ 1 ][ 'foo' ] )
+					.toBe( 'bar' );
+			});
+
 
 		});
 
