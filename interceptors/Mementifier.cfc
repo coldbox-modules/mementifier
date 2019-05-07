@@ -155,9 +155,9 @@ component{
 			//writeDump( var="Processing: #item#" );
 
 			// Is this a nested include?
-			if( item.listLen( "." ) > 1 ){
+			if( listLen( item,  "." ) > 1 ){
 				// Retrieve the relationship
-				item = item.listFirst( "." );
+				item = listFirst( item, "." );
 			}
 
 			// Retrieve Value for transformation: ACF Incompats Suck on elvis operator
@@ -272,7 +272,7 @@ component{
 				return listFirst( target, "." ) == root && listLen( target, "." ) > 1;
 			} )
 			.map( function( target ){
-				return target.listDeleteAt( 1, "." );
+				return listDeleteAt( target, 1, "." );
 			} );
 
 		// var results = [];
