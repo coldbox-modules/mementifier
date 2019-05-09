@@ -211,8 +211,8 @@ component{
 				result[ item ] = [];
 				for( var thisIndex = 1; thisIndex <= arrayLen( thisValue ); thisIndex++ ){
 					 // only get mementos from relationships that have mementos, in the event that we have an already-serialized array of structs
-					if( isStruct( thisValue[ thisIndex ] ) && structKeyExists( thisValue[ thisIndex ], 'memento' ) ) { // only get mementos from relationships that have mementos
-			
+					if( !isSimpleValue( thisValue[ thisIndex ] ) && structKeyExists( thisValue[ thisIndex ], "getMemento" ) ) {
+
 						result[ item ][ thisIndex ] = thisValue[ thisIndex ].getMemento(
 							includes 		= $buildNestedMementoList( includes, item ),
 							excludes 		= $buildNestedMementoList( excludes, item ),
@@ -220,8 +220,8 @@ component{
 							defaults 		= defaults,
 							ignoreDefaults 	= ignoreDefaults
 						);
-					}
-					else {
+
+					} else {
 						result[ item ][ thisIndex ] = thisValue [ thisIndex ];
 					}
 				}
