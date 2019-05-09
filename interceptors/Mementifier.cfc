@@ -155,9 +155,9 @@ component{
 			//writeDump( var="Processing: #item#" );
 
 			// Is this a nested include?
-			if( item.listLen( "." ) > 1 ){
+			if( listLen( item,  "." ) > 1 ){
 				// Retrieve the relationship
-				item = item.listFirst( "." );
+				item = listFirst( item, "." );
 			}
 
 			// Retrieve Value for transformation: ACF Incompats Suck on elvis operator
@@ -210,13 +210,20 @@ component{
 				// Map Items into result object
 				result[ item ] = [];
 				for( var thisIndex = 1; thisIndex <= arrayLen( thisValue ); thisIndex++ ){
-					result[ item ][ thisIndex ] = thisValue[ thisIndex ].getMemento(
-						includes 		= $buildNestedMementoList( includes, item ),
-						excludes 		= $buildNestedMementoList( excludes, item ),
-						mappers 		= mappers,
-						defaults 		= defaults,
-						ignoreDefaults 	= ignoreDefaults
-					);
+					 // only get mementos from relationships that have mementos, in the event that we have an already-serialized array of structs
+					if( !isSimpleValue( thisValue[ thisIndex ] ) && structKeyExists( thisValue[ thisIndex ], "getMemento" ) ) {
+
+						result[ item ][ thisIndex ] = thisValue[ thisIndex ].getMemento(
+							includes 		= $buildNestedMementoList( includes, item ),
+							excludes 		= $buildNestedMementoList( excludes, item ),
+							mappers 		= mappers,
+							defaults 		= defaults,
+							ignoreDefaults 	= ignoreDefaults
+						);
+
+					} else {
+						result[ item ][ thisIndex ] = thisValue [ thisIndex ];
+					}
 				}
 			}
 
@@ -265,7 +272,7 @@ component{
 				return listFirst( target, "." ) == root && listLen( target, "." ) > 1;
 			} )
 			.map( function( target ){
-				return target.listDeleteAt( 1, "." );
+				return listDeleteAt( target, 1, "." );
 			} );
 
 		// var results = [];

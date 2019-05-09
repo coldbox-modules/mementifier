@@ -1,6 +1,11 @@
 # Changelog
 
-## v1.4.2
+## v1.6.0
+
+* Allow for arrays of complex objects that don't have mementos
+* ACF11 Incompats due to member functions
+
+## v1.5.0
 
 * Only process memento based objects from WireBox.
 

@@ -26,6 +26,10 @@ component 	persistent="true"
 	property 	name="permissionList"
 				persistent="false";
 
+	property 	name="alreadySerialized"
+				type="array"
+				persistent="false";
+				
 	/* *********************************************************************
 	**						PROPERTIES
 	********************************************************************* */
@@ -157,7 +161,8 @@ component 	persistent="true"
 			"facebookURL",
 			"lastLogin",
 			"isConfirmed",
-			"avatarLink"
+			"avatarLink",
+			"alreadySerialized"
 		],
 		// Default Exclusions
 		defaultExcludes = [
@@ -190,6 +195,7 @@ component 	persistent="true"
 		variables.permissionList 	= "";
 		variables.APIToken 			= "";
 		variables.addToMailingList	= false;
+		variables.alreadySerialized = [];
 
 		// startup a token
 		generateAPIToken();
