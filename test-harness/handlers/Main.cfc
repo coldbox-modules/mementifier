@@ -49,4 +49,41 @@
 		);
 	}
 
+	function alreadySerialized( event, rc, prc ){
+		param rc.ignoreDefaults = false;
+		param rc.includes = "";
+		param rc.excludes = "";
+
+		var mockData = {
+			fname = "testuser",
+			lname = "testuser",
+			email = "testuser@testuser.com",
+			username = "testuser",
+			isConfirmed = true,
+			isActive = true,
+			otherURL = "www.luismajano.com",
+			alreadySerialized = [
+				{
+					'foo'	= 'bar'
+				},
+				{
+					'baz'	= 'frobozz'
+				}
+			]
+		};
+
+		var oUser = populateModel(
+			model					= userService.new(),
+			memento 				= mockData,
+			composeRelationships	= true
+		);
+
+		return oUser.getMemento(
+			includes        = rc.includes,
+			excludes        = rc.excludes,
+			ignoreDefaults 	= rc.ignoreDefaults,
+			mappers = {}
+		);
+	}
+
 }
