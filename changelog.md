@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.7.0
+
+* Allow for `defaultIncludes = [ "*" ]` to introspect the properties of the object automatically instead of writing all properties manually.
+
 ## v1.6.0
 
 * Allow for arrays of complex objects that don't have mementos
