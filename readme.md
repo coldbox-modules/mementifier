@@ -45,6 +45,14 @@ defaultIncludes = [
 ]
 ```
 
+##### Automatic Include Properties
+
+You can also create a single item of `[ "*" ]` which will tell the mementifier to introspect the object for all `properties` and use those instead for the default includes.
+
+```java
+defaultIncludes = [ "*" ]
+```
+
 ##### Custom Includes
 
 You can also define here properties that are NOT part of the object graph, but determined/constructed at runtime.  Let's say your `User` object needs to have an `avatarLink` in it's memento.  Then you can add a `avatarLink` to the array and create the appropriate `getAvatarLink()` method.  Then the `mementifier` will call your getter and add it to the resulting memento.

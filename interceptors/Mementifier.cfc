@@ -122,6 +122,16 @@ component{
 		param this.memento.mappers      	= {};
 		param this.memento.defaults     	= {};
 
+		// Do we have a * for auto includes of all properties in the object
+		if( this.memento.defaultIncludes.len() && this.memento.defaultIncludes[ 1 ] == "*" ){
+			this.memento.defaultIncludes = getMetadata( this ).properties
+			.filter( function( item ){
+				return !item.keyExists( "inject" );
+			} ).map( function( item ){
+				return item.name;
+			} );
+		}
+
 		// Incorporate Defaults if not ignored
 		if( !arguments.ignoreDefaults ){
 			arguments.includes.append( this.memento.defaultIncludes, true );
