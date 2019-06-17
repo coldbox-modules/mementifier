@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.7.1
+
+* ACF11 Compats
+
 ## v1.7.0
 
 * Allow for `defaultIncludes = [ "*" ]` to introspect the properties of the object automatically instead of writing all properties manually.

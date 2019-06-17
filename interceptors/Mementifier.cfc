@@ -106,7 +106,7 @@ component{
 		// Is orm auto inflate on and no memento defined? Build the default includes using this entity and Hibernate
 		if( $mementifierSettings.ormAutoIncludes && isNull( this.memento.defaultIncludes ) ){
 			var entityName = variables.entityName ?: "";
-			if( !entityName.len() ){
+			if( ! len( entityName ) ){
 				var md = getMetadata( this );
 				entityName = ( md.keyExists( "entityName" ) ? md.entityName : listLast( md.name, "." ) );
 			}
@@ -123,7 +123,7 @@ component{
 		param this.memento.defaults     	= {};
 
 		// Do we have a * for auto includes of all properties in the object
-		if( this.memento.defaultIncludes.len() && this.memento.defaultIncludes[ 1 ] == "*" ){
+		if( arrayLen( this.memento.defaultIncludes ) && this.memento.defaultIncludes[ 1 ] == "*" ){
 			this.memento.defaultIncludes = getMetadata( this ).properties
 			.filter( function( item ){
 				return !item.keyExists( "inject" );
