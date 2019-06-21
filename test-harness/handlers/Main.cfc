@@ -49,6 +49,32 @@
 		);
 	}
 
+	function resultMap( event, rc, prc ){
+		// mock 10 users
+		var aObjects = getInstance( "MockData@mockdatacfc" )
+			.mock(
+				userID = "uuid",
+				fname = "fname",
+				lname = "lname",
+				email = "email",
+				username = "words",
+				isConfirmed = "oneof:true:false",
+				isActive = "oneof:true:false",
+				otherURL = "words"
+			)
+			// Build out objects
+			.map( function( item ){
+				return populateModel(
+					model					= userService.new(),
+					memento 				= item,
+					composeRelationships	= true
+				);
+			} );
+
+		return getInstance( "ResultsMapper@mementifier" )
+			.process( aObjects, "userId" );
+	}
+
 	function alreadySerialized( event, rc, prc ){
 		param rc.ignoreDefaults = false;
 		param rc.includes = "";
