@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.8.0
+
+* Added the `ResultsMapper` model which will create results map a-la cffractal.  Just inject and call via the `process()` method.
+
 ## v1.7.1
 
 * ACF11 Compats

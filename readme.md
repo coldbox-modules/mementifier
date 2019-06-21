@@ -6,6 +6,28 @@ Welcome to the `mementifier` module.  This module will transform your business o
 
 You can combine this module with `cffractal` (https://forgebox.io/view/cffractal) and build consistent and fast :rocket: object graph transformations.
 
+## Module Settings
+
+Just open your `config/Coldbox.cfc` and add the following settings into the `moduleSettings` struct under the `mementifier` key:
+
+```js
+// module settings - stored in modules.name.settings
+moduleSettings = {
+	mementifier = {
+		// Turn on to use the ISO8601 date/time formatting on all processed date/time properites, else use the masks
+		iso8601Format = false,
+		// The default date mask to use for date properties
+		dateMask      = "yyyy-MM-dd",
+		// The default time mask to use for date properties
+		timeMask      = "HH:mm:ss",
+		// Enable orm auto default includes: If true and an object doesn't have any `memento` struct defined
+		// this module will create it with all properties and relationships it can find for the target entity
+		// leveraging the cborm module.
+		ormAutoIncludes = true
+	}
+}
+```
+
 ## Usage
 
 The memementifier will listen to WireBox object creations and ORM events in order to inject itself into target objects.  The target object must contain a `this.memento` structure in order for the `mementifier` to inject a `getMemento()` method into the target.  This method will allow you to transform the entity and its relationships into native struct/array/native formats.  
@@ -31,7 +53,7 @@ this.memento = {
 
 #### Default Includes
 
-This array is a collection of the properties and/or relationships to add to the resulting memento of the object by default.  The `mementifier` will call the public `getter` method for the property to retrieve its value. If the returning value is `null` then the value will be an `empty` string.  If you are using CF ORM and the `ormAutoIncludes` setting is true (by default), then this array can be auto-populated for you.
+This array is a collection of the properties and/or relationships to add to the resulting memento of the object by default.  The `mementifier` will call the public `getter` method for the property to retrieve its value. If the returning value is `null` then the value will be an `empty` string.  If you are using CF ORM and the `ormAutoIncludes` setting is **true** (by default), then this array can be auto-populated for you, no need to list all the properties.
 
 ```js
 defaultIncludes = [
@@ -52,6 +74,8 @@ You can also create a single item of `[ "*" ]` which will tell the mementifier t
 ```java
 defaultIncludes = [ "*" ]
 ```
+
+> Also note the `ormAutoIncludes` setting, which if you are using a ColdFusion ORM object, we will automatically add all properties to the default includes.
 
 ##### Custom Includes
 
@@ -188,26 +212,61 @@ struct function getMemento(
 }
 ```
 
-## Module Settings
+## Results Mapper
 
-Just open your `config/Coldbox.cfc` and add the following settings into the `moduleSettings` struct under the `mementifier` key:
+This feature was created to assist in support of the cffractal results map format.  It will process an array of objects and create a returning structure with the following specification:
+
+* `results` - An array containing all the unique identifiers from the array of objects processed
+* `resultsMap` - A struct keyed by the unique identifier containing the memento of each of those objects.
+
+Example:
 
 ```js
-// module settings - stored in modules.name.settings
-moduleSettings = {
-	mementifier = {
-		// Turn on to use the ISO8601 date/time formatting on all processed date/time properites, else use the masks
-		iso8601Format = false,
-		// The default date mask to use for date properties
-		dateMask      = "yyyy-MM-dd",
-		// The default time mask to use for date properties
-		timeMask      = "HH:mm:ss",
-		// Enable orm auto default includes: If true and an object doesn't have any `memento` struct defined
-		// this module will create it with all properties and relationships it can find for the target entity
-		// leveraging the cborm module.
-		ormAutoIncludes = true
-	}
-}
+// becomes
+var data = {
+    "results" = [
+        "F29958B1-5A2B-4785-BE0A11297D0B5373",
+        "42A6EB0A-1196-4A76-8B9BE67422A54B26"
+    ],
+    "resultsMap" = {
+        "F29958B1-5A2B-4785-BE0A11297D0B5373" = {
+            "id" = "F29958B1-5A2B-4785-BE0A11297D0B5373",
+            "name" = "foo"
+        },
+        "42A6EB0A-1196-4A76-8B9BE67422A54B26" = {
+            "id" = "42A6EB0A-1196-4A76-8B9BE67422A54B26",
+            "name" = "bar"
+        }
+    }
+};
+```
+
+Just inject the results mapper using this WireBox ID: `ResultsMapper@mementifier` and call the `process()` method with your collection, the unique identifier key name (defaults to `id`) and the other arguments that `getMemento()` can use. Here is the signature of the method:
+
+```js
+/**
+ * Construct a memento representation using a results map. This process will iterate over the collection and create a
+ * results array with all the identifiers and a struct keyed by identifier of the mememnto data.
+ *
+ * @collection The target collection
+ * @id The identifier key, defaults to `id` for simplicity.
+ * @includes The properties array or list to build the memento with alongside the default includes
+ * @excludes The properties array or list to exclude from the memento alongside the default excludes
+ * @mappers A struct of key-function pairs that will map properties to closures/lambadas to process the item value.  The closure will transform the item value.
+ * @defaults A struct of key-value pairs that denotes the default values for properties if they are null, defaults for everything are a blank string.
+ * @ignoreDefaults If set to true, default includes and excludes will be ignored and only the incoming `includes` and `excludes` list will be used.
+ *
+ * @return struct of { results = [], resultsMap = {} }
+ */
+function process(
+	required array collection,
+	id="id",
+	includes="",
+	excludes="",
+	struct mappers={},
+	struct defaults={},
+	boolean ignoreDefaults=false
+){}
 ```
 
 ********************************************************************************

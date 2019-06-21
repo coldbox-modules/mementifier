@@ -44,6 +44,15 @@
 			});
 
 
+			it( "can process a resultsMap", function(){
+				var results = this.request( route="/main/resultMap" )
+					.getValue( "cbox_handler_results" );
+
+				expect( results ).toHaveKey( "results" ).toHaveKey( "resultsMap" );
+				expect( results.resultsMap ).toHaveKey( results.results[ 1 ] );
+			});
+
+
 		});
 
 	}

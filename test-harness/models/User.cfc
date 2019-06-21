@@ -29,7 +29,7 @@ component 	persistent="true"
 	property 	name="alreadySerialized"
 				type="array"
 				persistent="false";
-				
+
 	/* *********************************************************************
 	**						PROPERTIES
 	********************************************************************* */
@@ -38,8 +38,7 @@ component 	persistent="true"
 				column="user_id"
 				fieldtype="id"
 				generator="uuid"
-				ormtype="string"
-				setter="false";
+				ormtype="string";
 
 	property 	name="fname"
 				notnull="true";
