@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.9.0
+
+* More Adobe ColdFusion incompatibilities
+
 ## v1.8.0
 
 * Added the `ResultsMapper` model which will create results map a-la cffractal.  Just inject and call via the `process()` method.

@@ -103,40 +103,44 @@ component{
 			arguments.excludes = listToArray( arguments.excludes );
 		}
 
+		// Param Default Memento Settings
+		// We do it here, because ACF caches crap!
+		var thisMemento = {
+			"defaultIncludes" 	: isNull( this.memento.defaultIncludes ) 	? [] : this.memento.defaultIncludes,
+			"defaultExcludes" 	: isNull( this.memento.defaultExcludes ) 	? [] : this.memento.defaultExcludes,
+			"neverInclude"		: isNull( this.memento.neverInclude ) 		? [] : this.memento.neverInclude,
+			"mappers"      		: isNull( this.memento.mappers ) 			? {} : this.memento.mappers,
+			"defaults"     		: isNull( this.memento.defaults ) 			? {} : this.memento.defaults
+		};
+
 		// Is orm auto inflate on and no memento defined? Build the default includes using this entity and Hibernate
-		if( $mementifierSettings.ormAutoIncludes && isNull( this.memento.defaultIncludes ) ){
-			var entityName = variables.entityName ?: "";
-			if( ! len( entityName ) ){
+		if( $mementifierSettings.ormAutoIncludes && !arrayLen( thisMemento.defaultIncludes ) ){
+			var thisName = isNull( variables.entityName ) ? "" : variables.entityName;
+			if( ! len( thisName ) ){
 				var md = getMetadata( this );
-				entityName = ( md.keyExists( "entityName" ) ? md.entityName : listLast( md.name, "." ) );
+				thisName = ( md.keyExists( "entityName" ) ? md.entityName : listLast( md.name, "." ) );
 			}
-			this.memento.defaultIncludes = ormGetSessionFactory()
-				.getClassMetaData( entityName )
+
+			thisMemento.defaultIncludes = ormGetSessionFactory()
+				.getClassMetaData( thisName )
 				.getPropertyNames();
 		}
 
-		// Param Default Memento Settings
-		param this.memento.defaultIncludes 	= [];
-		param this.memento.defaultExcludes 	= [];
-		param this.memento.neverInclude		= [];
-		param this.memento.mappers      	= {};
-		param this.memento.defaults     	= {};
-
 		// Do we have a * for auto includes of all properties in the object
-		if( arrayLen( this.memento.defaultIncludes ) && this.memento.defaultIncludes[ 1 ] == "*" ){
-			this.memento.defaultIncludes = getMetadata( this ).properties
-			.filter( function( item ){
-				return !item.keyExists( "inject" );
-			} ).map( function( item ){
-				return item.name;
-			} );
+		if( arrayLen( thisMemento.defaultIncludes ) && thisMemento.defaultIncludes[ 1 ] == "*" ){
+			thisMemento.defaultIncludes = getMetadata( this ).properties
+				.filter( function( item ){
+					return !item.keyExists( "inject" );
+				} ).map( function( item ){
+					return item.name;
+				} );
 		}
 
 		// Incorporate Defaults if not ignored
 		if( !arguments.ignoreDefaults ){
-			arguments.includes.append( this.memento.defaultIncludes, true );
+			arguments.includes.append( thisMemento.defaultIncludes, true );
 			arguments.excludes.append(
-				this.memento.defaultExcludes.filter( function( item ){
+				thisMemento.defaultExcludes.filter( function( item ){
 					// Filter out if incoming includes was specified
 					return !includes.findNoCase( item );
 				} ),
@@ -145,24 +149,22 @@ component{
 		}
 
 		// Incorporate Memento Mappers, and Defaults
-		this.memento.mappers.append( arguments.mappers, true );
-		this.memento.defaults.append( arguments.defaults, true );
+		thisMemento.mappers.append( arguments.mappers, true );
+		thisMemento.defaults.append( arguments.defaults, true );
 
 		// Start processing pipeline on the includes properties
 		var result 			= {};
-		var mappersKeyArray = this.memento.mappers.keyArray();
+		var mappersKeyArray = thisMemento.mappers.keyArray();
 
 		// Filter out exclude items and never include items
 		arguments.includes = arguments.includes.filter( function( item ){
-			return !arrayFindNoCase( excludes, item ) && !arrayFindNoCase( this.memento.neverInclude, item );
+			return !arrayFindNoCase( excludes, item ) && !arrayFindNoCase( thisMemento.neverInclude, item );
 		} );
-
-		//writeDump( var=arguments.includes, label="Processing Includes: #this.pk#" );abort;
 
 		// Process Includes
 		for( var item in arguments.includes ){
 
-			//writeDump( var="Processing: #item#" );
+			//writeDump( var="Processing: #item#" );abort;
 
 			// Is this a nested include?
 			if( listLen( item,  "." ) > 1 ){
@@ -175,7 +177,7 @@ component{
 				var thisValue = invoke( this, "get#item#" );
 				// Verify Nullness
 				thisValue = isNull( thisValue ) ? (
-					structKeyExists( this.memento.defaults, item ) ? this.memento.defaults[ item ] : ""
+					structKeyExists( thisMemento.defaults, item ) ? thisMemento.defaults[ item ] : ""
 				) : thisValue;
 			} else {
 				// Calling for non-existent properties, skip out
@@ -256,7 +258,6 @@ component{
 				var thisMapper = this.memento.mappers[ item ];
 				result[ item ] = thisMapper( result[ item ] );
 			}
-
 
 			// ensure anything left over is provided as the value
 			if( !structKeyExists( result, item ) ){
