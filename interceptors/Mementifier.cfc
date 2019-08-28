@@ -255,7 +255,7 @@ component{
 			// Result Mapper for Item Result
 			if( mappersKeyArray.findNoCase( item ) ){
 				// ACF compat
-				var thisMapper = this.memento.mappers[ item ];
+				var thisMapper = thisMemento.mappers[ item ];
 				result[ item ] = thisMapper( result[ item ] );
 			}
 
