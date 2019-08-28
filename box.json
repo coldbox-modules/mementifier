@@ -1,6 +1,6 @@
 {
     "name":"Mementifier : The State Maker!",
-    "version":"1.8.0",
+    "version":"1.9.0",
     "location":"https://downloads.ortussolutions.com/ortussolutions/coldbox-modules/mementifier/@build.version@/mementifier-@build.version@.zip",
     "author":"Ortus Solutions, Corp",
     "homepage":"https://github.com/coldbox-modules/mementifier",
