@@ -72,7 +72,8 @@ component{
 			}
 
 			// Inject helper methods
-			arguments.entity.$injectMixin( "$buildNestedMementoList", variables.$buildNestedMementoList );
+            arguments.entity.$injectMixin( "$buildNestedMementoList", variables.$buildNestedMementoList );
+            arguments.entity.$injectMixin( "$getDeepProperties", variables.$getDeepProperties );
 			// We do simple date formatters as they are faster than CFML methods
 			arguments.entity.$FORMATTER_ISO8601 = createObject( "java", "java.text.SimpleDateFormat" ).init( "yyyy-MM-dd'T'HH:mm:ssXXX" );
 			arguments.entity.$FORMATTER_CUSTOM 	= createObject( "java", "java.text.SimpleDateFormat" ).init( "#settings.dateMask# #settings.timeMask#" );
@@ -128,12 +129,19 @@ component{
 
 		// Do we have a * for auto includes of all properties in the object
 		if( arrayLen( thisMemento.defaultIncludes ) && thisMemento.defaultIncludes[ 1 ] == "*" ){
-			thisMemento.defaultIncludes = getMetadata( this ).properties
+            
+            // assign the default includes to be all properties
+            // however, we exclude anything with an inject key and anything on the default exclude list
+            thisMemento.defaultIncludes = $getDeepProperties()
 				.filter( function( item ){
-					return !item.keyExists( "inject" );
+					return (
+                        !item.keyExists( "inject" ) && 
+                        !thisMemento.defaultExcludes.findNoCase( item.name )
+                    );
 				} ).map( function( item ){
 					return item.name;
-				} );
+                } );
+                
 		}
 
 		// Incorporate Defaults if not ignored
@@ -302,5 +310,34 @@ component{
 		variables[ arguments.name ] = arguments.target;
 		this[ arguments.name ] 		= arguments.target;
 		return this;
-	}
+    }
+    
+    /**
+     * Get Deep Properties
+     * Returns an array of an objects properties including those inherited by base classes.
+     *
+     * @metaData (optional) The starting CFML metadata of the entity object. Defaults to the current object.
+     * 
+     * @return an array of object properties
+     */
+    private array function $getDeepProperties( struct metaData = getMetaData( this ) ) {
+        
+        var properties = [];
+        
+        // if this object extends another object, append any inherited properties.
+        if ( 
+            structKeyExists( arguments.metaData, "extends" ) && 
+            structKeyExists( arguments.metaData.extends, "properties" )
+        ) {
+            properties.append( $getDeepProperties( arguments.metaData.extends ), true );
+        }
+
+        // if this object has properties, append them.
+        if ( structKeyExists( arguments.metaData, "properties" ) ) {
+            properties.append( arguments.metadata.properties, true );
+        } 
+
+        return properties;
+
+    }
 }

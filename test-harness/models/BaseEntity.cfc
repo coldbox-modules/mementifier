@@ -38,16 +38,6 @@ component mappedsuperclass="true" accessors="true"{
 		variables.updatedDate 	= now();
 		variables.isActive		= true;
 
-		// Incorporate default includes for the base class.
-		if( !isNull( this.memento.defaultIncludes ) ){
-			this.memento.defaultIncludes.append( [
-				this.pk,
-				"createdDate",
-				"updatedDate",
-				"isActive"
-			], true );
-		}
-
 		return this;
 	}
 
