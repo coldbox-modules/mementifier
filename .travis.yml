@@ -57,6 +57,7 @@ before_script:
   - printf "DB_DATABASE=mementifier\n" >> test-harness/.env
   - printf "DB_USER=root\n" >> test-harness/.env
   - printf "DB_PASSWORD=\n" >> test-harness/.env
+  - printf "DB_PORT=\n" >> test-harness/.env
 
 script:
   # Set Current Version
