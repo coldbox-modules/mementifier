@@ -119,7 +119,7 @@ component{
 			var thisName = isNull( variables.entityName ) ? "" : variables.entityName;
 			if( ! len( thisName ) ){
 				var md = getMetadata( this );
-				thisName = ( md.keyExists( "entityName" ) ? md.entityName : listLast( md.name, "." ) );
+				thisName = ( structKeyExists( md, "entityName" ) ? md.entityName : listLast( md.name, "." ) );
 			}
 
 			thisMemento.defaultIncludes = ormGetSessionFactory()
@@ -135,7 +135,7 @@ component{
             thisMemento.defaultIncludes = $getDeepProperties()
 				.filter( function( item ){
 					return (
-                        !item.keyExists( "inject" ) && 
+                        !structKeyExists( item, "inject" ) && 
                         !thisMemento.defaultExcludes.findNoCase( item.name )
                     );
 				} ).map( function( item ){
