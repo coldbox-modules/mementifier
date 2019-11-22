@@ -135,7 +135,7 @@ component{
             thisMemento.defaultIncludes = $getDeepProperties()
 				.filter( function( item ){
 					return (
-                        !structKeyExists( item, "inject" ) && 
+                        !item.keyExists( "inject" ) && 
                         !thisMemento.defaultExcludes.findNoCase( item.name )
                     );
 				} ).map( function( item ){
