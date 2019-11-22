@@ -134,8 +134,8 @@ component{
             // however, we exclude anything with an inject key and anything on the default exclude list
             thisMemento.defaultIncludes = $getDeepProperties()
 				.filter( function( item ){
-					return (
-                        !item.keyExists( "inject" ) && 
+                    return (
+                        !structKeyExists( item, "inject" ) && 
                         !thisMemento.defaultExcludes.findNoCase( item.name )
                     );
 				} ).map( function( item ){
@@ -329,12 +329,16 @@ component{
             structKeyExists( arguments.metaData, "extends" ) && 
             structKeyExists( arguments.metaData.extends, "properties" )
         ) {
-            properties.append( $getDeepProperties( arguments.metaData.extends ), true );
+            for ( var item in $getDeepProperties( arguments.metaData.extends ) ) {
+                properties.append( item );
+            };
         }
 
         // if this object has properties, append them.
         if ( structKeyExists( arguments.metaData, "properties" ) ) {
-            properties.append( arguments.metadata.properties, true );
+            for ( var item in arguments.metadata.properties ) {
+                properties.append( item );
+            };
         } 
 
         return properties;
