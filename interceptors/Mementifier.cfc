@@ -121,9 +121,51 @@ component{
 				thisName = ( md.keyExists( "entityName" ) ? md.entityName : listLast( md.name, "." ) );
 			}
 
-			thisMemento.defaultIncludes = ormGetSessionFactory()
-				.getClassMetaData( thisName )
-				.getPropertyNames();
+			var typeMap = arrayReduce( 
+								orm.getSessionFactory( orm.getEntityDatasource( thisName ) )
+									.getClassMetaData( thisName )
+									.getPropertyTypes(), 
+								function( mdTypes, propertyClass ){
+									var propertyName = propertyClass.getName();
+									var propertyClassName = getMetadata( propertyClass ).name;
+
+									if( findNoCase( "java.util.collection", propertyName ) ){
+										propertyName  = replaceNoCase(
+															replaceNoCase(
+																replaceNoCase( propertyName, "java.util.collection(", "" )
+																, ")", "" )
+															, thisName & ".", ""
+														);
+									}
+
+									mdTypes[ propertyName ] = propertyClassName;
+									return mdTypes;
+								}
+								,{});
+			
+			thisMemento.defaultIncludes = typeMap.keyArray().filter( function( propertyName ){
+					switch( listLast( typeMap[ propertyName ], "." ) ){
+						case "BagType":
+                    	case "OneToManyType":
+						case "ManyToManyType":
+						case "ManyToOneType":
+						case "OneToOneType":
+						case "BinaryType":{
+                          return false;
+                    	}
+						default:{
+						  return true;
+						}
+					}
+			} );
+
+			// Append primary keys
+			var hibernateMD = getEntityMetadata( this );
+			if( hibernateMD.hasIdentifierProperty() ){
+				arrayAppend( thisMemento.defaultIncludes, hibernateMD.getIdentifierPropertyName() );
+			} else if( thisMemento.defaultIncludes.getIdentifierType().isComponentType() ){
+				arrayAppend( thisMemento.defaultIncludes, listToArray( arrayToList( hibernateMD.getIdentifierType().getPropertyNames() ) ), true );
+			}
 		}
 
 		// Do we have a * for auto includes of all properties in the object
