@@ -121,8 +121,9 @@ component{
 				thisName = ( md.keyExists( "entityName" ) ? md.entityName : listLast( md.name, "." ) );
 			}
 
+			var ormUtil = server.coldfusion.productname == "ColdFusion Server" ? new CFORMUtil() : new LuceeORMUtil(); 
 			var typeMap = arrayReduce( 
-								orm.getSessionFactory( orm.getEntityDatasource( thisName ) )
+								ormUtil.getSessionFactory( ormUtil.getEntityDatasource( thisName ) )
 									.getClassMetaData( thisName )
 									.getPropertyTypes(), 
 								function( mdTypes, propertyClass ){
@@ -160,7 +161,12 @@ component{
 			} );
 
 			// Append primary keys
-			var hibernateMD = getEntityMetadata( this );
+
+			var hibernateMD = ormUtil.getEntityMetadata(
+				entityName = thisName,
+				datasource = ormUtil.getEntityDatasource( this, structKeyExists( variables, "datasource" ) ? variables.datasource : ormUtil.getDefaultDatasource() )
+			);
+			
 			if( hibernateMD.hasIdentifierProperty() ){
 				arrayAppend( thisMemento.defaultIncludes, hibernateMD.getIdentifierPropertyName() );
 			} else if( thisMemento.defaultIncludes.getIdentifierType().isComponentType() ){
