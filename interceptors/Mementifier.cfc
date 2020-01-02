@@ -121,7 +121,7 @@ component{
 				thisName = ( md.keyExists( "entityName" ) ? md.entityName : listLast( md.name, "." ) );
 			}
 
-			var ormUtil = server.coldfusion.productname == "ColdFusion Server" ? new CFORMUtil() : new LuceeORMUtil(); 
+			var ormUtil = server.coldfusion.productname == "ColdFusion Server" ? new cborm.models.util.CFORMUtil() : new cborm.models.util.LuceeORMUtil(); 
 			var typeMap = arrayReduce( 
 								ormUtil.getSessionFactory( ormUtil.getEntityDatasource( thisName ) )
 									.getClassMetaData( thisName )
