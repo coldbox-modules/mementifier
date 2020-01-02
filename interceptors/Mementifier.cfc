@@ -225,7 +225,7 @@ component{
 				var thisValue = invoke( this, "get#item#" );
 				// Verify Nullness
 				thisValue = isNull( thisValue ) ? (
-					structKeyExists( thisMemento.defaults, item ) ? thisMemento.defaults[ item ] : ""
+					structKeyExists( thisMemento.defaults, item ) ? thisMemento.defaults[ item ] : $mementifierSettings.nullDefaultValue
 				) : thisValue;
 			} else {
 				// Calling for non-existent properties, skip out
