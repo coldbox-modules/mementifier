@@ -260,7 +260,7 @@ component{
 			}
 
 			// Array Collections
-			if( isArray( thisValue ) ){
+			else if( isArray( thisValue ) ){
 				// Map Items into result object
 				result[ item ] = [];
 				for( var thisIndex = 1; thisIndex <= arrayLen( thisValue ); thisIndex++ ){
@@ -282,7 +282,7 @@ component{
 			}
 
 			// Single Object Relationships
-			if( isObject( thisValue ) ){
+			else if( isValid( 'component', thisValue ) && structKeyExists( thisValue, "getMemento" ) ){
 				//writeDump( var=$buildNestedMementoList( includes, item ), label="includes: #item#" );
 				//writeDump( var=$buildNestedMementoList( excludes, item ), label="excludes: #item#" );
 				result[ item ] = thisValue.getMemento(
@@ -292,6 +292,9 @@ component{
 					defaults 		= defaults,
 					ignoreDefaults 	= ignoreDefaults
 				);
+			} else {
+				// we don't know what to do with this item so we return as-is
+				result[ item ] = thisValue;
 			}
 
 			// Result Mapper for Item Result
