@@ -295,14 +295,16 @@ component{
 
 			// Result Mapper for Item Result
 			if( mappersKeyArray.findNoCase( item ) ){
+				
 				// ACF compat
 				var thisMapper = thisMemento.mappers[ item ];
 				result[ item ] = thisMapper( result[ item ] );
-			}
 
-			// ensure anything left over is provided as the value
-			if( !structKeyExists( result, item ) ){
+			} else if( !structKeyExists( result, item ) ){
+				
+				// ensure anything left over is provided as the value
 				result[ item ] = thisValue;
+			
 			}
 
 		}
