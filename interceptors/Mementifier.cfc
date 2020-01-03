@@ -124,9 +124,7 @@ component{
 			var ormUtil = server.coldfusion.productname == "ColdFusion Server" ? new cborm.models.util.CFORMUtil() : new cborm.models.util.LuceeORMUtil(); 
 			var classMd = ormUtil.getSessionFactory( ormUtil.getEntityDatasource( thisName ) ).getClassMetaData( thisName );
 			var typeMap = arrayReduce( 
-								ormUtil.getSessionFactory( ormUtil.getEntityDatasource( thisName ) )
-									.getClassMetaData( thisName )
-									.getPropertyNames(), 
+								classMd.getPropertyNames(), 
 								function( mdTypes, propertyName ){
 									var propertyType = classMd.getPropertyType( propertyName );
 									var propertyClassName = getMetadata( propertyType ).name;
