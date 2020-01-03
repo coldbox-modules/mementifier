@@ -122,22 +122,14 @@ component{
 			}
 
 			var ormUtil = server.coldfusion.productname == "ColdFusion Server" ? new cborm.models.util.CFORMUtil() : new cborm.models.util.LuceeORMUtil(); 
+			var classMd = ormUtil.getSessionFactory( ormUtil.getEntityDatasource( thisName ) ).getClassMetaData( thisName );
 			var typeMap = arrayReduce( 
 								ormUtil.getSessionFactory( ormUtil.getEntityDatasource( thisName ) )
 									.getClassMetaData( thisName )
-									.getPropertyTypes(), 
-								function( mdTypes, propertyClass ){
-									var propertyName = propertyClass.getName();
-									var propertyClassName = getMetadata( propertyClass ).name;
-
-									if( findNoCase( "java.util.collection", propertyName ) ){
-										propertyName  = replaceNoCase(
-															replaceNoCase(
-																replaceNoCase( propertyName, "java.util.collection(", "" )
-																, ")", "" )
-															, thisName & ".", ""
-														);
-									}
+									.getPropertyNames(), 
+								function( mdTypes, propertyName ){
+									var propertyType = classMd.getPropertyType( propertyName );
+									var propertyClassName = getMetadata( propertyType ).name;
 
 									mdTypes[ propertyName ] = propertyClassName;
 									return mdTypes;
