@@ -257,13 +257,14 @@ component{
 				for( var thisIndex = 1; thisIndex <= arrayLen( thisValue ); thisIndex++ ){
 					 // only get mementos from relationships that have mementos, in the event that we have an already-serialized array of structs
 					if( !isSimpleValue( thisValue[ thisIndex ] ) && structKeyExists( thisValue[ thisIndex ], "getMemento" ) ) {
-
+						var nestedIncludes = $buildNestedMementoList( includes, item );
 						result[ item ][ thisIndex ] = thisValue[ thisIndex ].getMemento(
-							includes 		= $buildNestedMementoList( includes, item ),
+							includes 		= nestedIncludes,
 							excludes 		= $buildNestedMementoList( excludes, item ),
 							mappers 		= mappers,
 							defaults 		= defaults,
-							ignoreDefaults 	= ignoreDefaults
+							// cascade the ignore defaults down if specific nested includes are requested
+							ignoreDefaults 	= nestedIncludes.len() ? ignoreDefaults : false
 						);
 
 					} else {
@@ -276,12 +277,14 @@ component{
 			else if( isValid( 'component', thisValue ) && structKeyExists( thisValue, "getMemento" ) ){
 				//writeDump( var=$buildNestedMementoList( includes, item ), label="includes: #item#" );
 				//writeDump( var=$buildNestedMementoList( excludes, item ), label="excludes: #item#" );
+				var nestedIncludes = $buildNestedMementoList( includes, item );
 				result[ item ] = thisValue.getMemento(
-					includes 		= $buildNestedMementoList( includes, item ),
+					includes 		= nestedIncludes,
 					excludes 		= $buildNestedMementoList( excludes, item ),
 					mappers 		= mappers,
 					defaults 		= defaults,
-					ignoreDefaults 	= ignoreDefaults
+					// cascade the ignore defaults down if specific nested includes are requested
+					ignoreDefaults 	= nestedIncludes.len() ? ignoreDefaults : false
 				);
 			} else {
 				// we don't know what to do with this item so we return as-is
