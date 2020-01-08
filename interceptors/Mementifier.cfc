@@ -121,12 +121,13 @@ component{
 				thisName = ( md.keyExists( "entityName" ) ? md.entityName : listLast( md.name, "." ) );
 			}
 
-			var ormUtil = server.coldfusion.productname == "ColdFusion Server" ? new cborm.models.util.CFORMUtil() : new cborm.models.util.LuceeORMUtil(); 
-			var classMd = ormUtil.getSessionFactory( ormUtil.getEntityDatasource( thisName ) ).getClassMetaData( thisName );
+			var ORMService = new cborm.models.BaseORMService();
+
+			var entityMd = ORMService.getEntityMetadata( this );
 			var typeMap = arrayReduce( 
-								classMd.getPropertyNames(), 
+								entityMd.getPropertyNames(), 
 								function( mdTypes, propertyName ){
-									var propertyType = classMd.getPropertyType( propertyName );
+									var propertyType = entityMd.getPropertyType( propertyName );
 									var propertyClassName = getMetadata( propertyType ).name;
 
 									mdTypes[ propertyName ] = propertyClassName;
@@ -151,16 +152,10 @@ component{
 			} );
 
 			// Append primary keys
-
-			var hibernateMD = ormUtil.getEntityMetadata(
-				entityName = thisName,
-				datasource = ormUtil.getEntityDatasource( this, structKeyExists( variables, "datasource" ) ? variables.datasource : ormUtil.getDefaultDatasource() )
-			);
-			
-			if( hibernateMD.hasIdentifierProperty() ){
-				arrayAppend( thisMemento.defaultIncludes, hibernateMD.getIdentifierPropertyName() );
+			if( entityMd.hasIdentifierProperty() ){
+				arrayAppend( thisMemento.defaultIncludes, entityMd.getIdentifierPropertyName() );
 			} else if( thisMemento.defaultIncludes.getIdentifierType().isComponentType() ){
-				arrayAppend( thisMemento.defaultIncludes, listToArray( arrayToList( hibernateMD.getIdentifierType().getPropertyNames() ) ), true );
+				arrayAppend( thisMemento.defaultIncludes, listToArray( arrayToList( entityMd.getIdentifierType().getPropertyNames() ) ), true );
 			}
 		}
 
