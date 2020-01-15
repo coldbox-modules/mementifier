@@ -6,6 +6,8 @@
 
 ### Improvements
 
+* Enabled wildcard default includes (*) to retrieve inherited object properties instead of doing wacky things for inherited defaults to work.
+
 ### Compatibility
 
 * Removed ACF 11 Support
