@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.0
+
+### Features
+
+### Improvements
+
+### Compatibility
+
+* Removed ACF 11 Support
+
 ## v1.9.0
 
 * More Adobe ColdFusion incompatibilities
