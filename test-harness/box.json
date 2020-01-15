@@ -6,14 +6,14 @@
     "description":"",
     "dependencies":{
         "coldbox":"^5.0.0",
-        "cborm":"^1.5.0+84"
+        "cborm":"^2.0.0"
     },
     "devDependencies":{
-        "testbox":"^2.8.0",
+        "testbox":"^3.0.0",
         "mockdatacfc":"^3.1.0+13"
     },
     "installPaths":{
-        "coldbox":"coldbox",
+        "coldbox":"coldbox/",
         "testbox":"testbox/",
         "cborm":"modules/cborm/",
         "mockdatacfc":"modules/mockdatacfc/"
