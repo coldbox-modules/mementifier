@@ -165,8 +165,8 @@ component 	persistent="true"
 	};
 
 	/**
-	* Constructor
-	*/
+	 * Constructor
+	 */
 	function init(){
 		super.init();
 

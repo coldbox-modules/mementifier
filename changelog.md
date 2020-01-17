@@ -4,9 +4,12 @@
 
 ### Features
 
+* Enabled wildcard default includes (*) to retrieve inherited object properties instead of doing wacky things for inherited defaults to work.
+
 ### Improvements
 
-* Enabled wildcard default includes (*) to retrieve inherited object properties instead of doing wacky things for inherited defaults to work.
+* Updated to cborm2 for testing harness
+* Updated to TestBox 3
 
 ### Compatibility
 

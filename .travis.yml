@@ -67,6 +67,8 @@ script:
   - cd test-harness
   # run our dependency install to ensure the workbench is in place
   - box install
+  # Cleanup the recursive mementifier install
+  - rm -Rf modules/cborm/modules/mementifier
   # run our matrix server
   - box server start serverConfigFile="server-${ENGINE}.json"
   # If lucee 5 stop it due to stupid ORM bug that never gets fixed on first start.
