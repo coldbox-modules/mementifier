@@ -7,7 +7,7 @@ notifications:
 env:
   # Fill out these global variables for build process
   global:
-    - MODULE_ID=mementifier
+    - MODULE_ID=cbsecurity
   matrix:
     - ENGINE=lucee@5
     - ENGINE=adobe@2016
@@ -22,36 +22,40 @@ dist: trusty
 
 sudo: required
 
-services:
- - mysql
+addons:
+  apt:
+    packages:
+    - mysql-server-5.6
+    - mysql-client-core-5.6
+    - mysql-client-5.6
 
 before_install:
   # CommandBox Keys
   - curl -fsSl https://downloads.ortussolutions.com/debs/gpg | sudo apt-key add -
-  - sudo echo "deb http://downloads.ortussolutions.com/debs/noarch /" | sudo tee -a
+  - sudo echo "deb https://downloads.ortussolutions.com/debs/noarch /" | sudo tee -a
     /etc/apt/sources.list.d/commandbox.list
+
+before_script:
+  # create database
+  - mysql -u root -e 'create database cbsecurity;'
+  # import database
+  - mysql -u root < test-harness/tests/resources/cbsecurity.sql
+  - echo "Database created and loaded with test data"
+  # Seed .env
+  - echo "Seeding database .env file at /test-harness/.env"
+  - touch test-harness/.env
+  - printf "DB_HOST=localhost\n" >> test-harness/.env
+  - printf "DB_DATABASE=cbsecurity\n" >> test-harness/.env
+  - printf "DB_USER=root\n" >> test-harness/.env
+  - printf "DB_PASSWORD=\n" >> test-harness/.env
 
 install:
   # Install Commandbox
   - sudo apt-get update && sudo apt-get --assume-yes install rsync jq commandbox
   # Install CommandBox Supporting Librarires
-  - box install commandbox-dotenv,commandbox-docbox,commandbox-cfconfig
+  - box install commandbox-cfconfig,commandbox-dotenv,commandbox-docbox
   # If using auto-publish, you will need to provide your API token with this line:
   - box config set endpoints.forgebox.APIToken=$FORGEBOX_API_TOKEN > /dev/null
-
-before_script:
-  # create test database
-  - mysql -u root -e 'CREATE DATABASE mementifier;'
-  # import database
-  #- mysql -u root < test-harness/tests/resources/coolblog.sql
-  #- echo "Database created and loaded with test data"
-  # Seed .env
-  - echo "Seeding database .env file at /test-harness/.env"
-  - touch test-harness/.env
-  - printf "DB_HOST=localhost\n" >> test-harness/.env
-  - printf "DB_DATABASE=mementifier\n" >> test-harness/.env
-  - printf "DB_USER=root\n" >> test-harness/.env
-  - printf "DB_PASSWORD=\n" >> test-harness/.env
 
 script:
   # Set Current Version
@@ -63,16 +67,9 @@ script:
   - cd test-harness
   # run our dependency install to ensure the workbench is in place
   - box install
-  # Cleanup the recursive mementifier install
   - rm -Rf modules/cborm/modules/mementifier
   # run our matrix server
-  - box server start serverConfigFile="server-${ENGINE}.json" --debug
-  # CfConfig show
-  - box cfconfig show
-  # If lucee 5 stop it due to stupid ORM bug that never gets fixed on first start.
-  - echo "Checking if lucee5 so we can do a restart due to a stupid  ORM startup bug."
-  - if [ ${ENGINE} = 'lucee@5' ]; then box server stop; fi
-  - if [ ${ENGINE} = 'lucee@5' ]; then box server start serverConfigFile="server-lucee@5.json"; fi
+  - box server start serverConfigFile="server-${ENGINE}.json"
   # Startup the app
   - curl http://localhost:60299
   # Debugging of tests
@@ -85,7 +82,6 @@ script:
   - cat build/results.json
 
 after_failure:
-  - cat build/results.json
   - cd $TRAVIS_BUILD_DIR/test-harness
   # Display the contents of our root directory
   # Spit out our Commandbox log in case we need to debug

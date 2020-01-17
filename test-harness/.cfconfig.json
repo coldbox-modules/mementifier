@@ -1,4 +1,11 @@
 {
+    "debuggingEnabled":true,
+    "debuggingReportExecutionTimes":false,
+    "disableInternalCFJavaComponents":false,
+    "inspectTemplate":"always",
+    "requestTimeout":"0,0,0,90",
+	"robustExceptionEnabled":true,
+	"whitespaceManagement":"white-space-pref",
 	"datasources":{
         "mementifier":{
             "allowAlter":true,
@@ -26,11 +33,5 @@
             "username":"${DB_USERNAME}",
             "validate":"false"
         }
-    },
-    "debuggingEnabled":true,
-    "debuggingReportExecutionTimes":false,
-    "disableInternalCFJavaComponents":false,
-    "inspectTemplate":"always",
-    "requestTimeout":"0,0,0,90",
-    "robustExceptionEnabled":true
+	},
 }
