@@ -12,6 +12,5 @@
             "enable":"true"
         }
     },
-    "openBrowser":"false",
-    "follow":true
+    "openBrowser":"false"
 }
