@@ -43,13 +43,13 @@ before_script:
   #- echo "Database created and loaded with test data"
   # Seed .env
   - echo "Seeding database .env file at /test-harness/.env"
-  - rm test-harness/.env
   - touch test-harness/.env
   - cat test-harness/.env
   - printf "DB_HOST=localhost\n" >> test-harness/.env
   - printf "DB_DATABASE=mementifier\n" >> test-harness/.env
   - printf "DB_USER=root\n" >> test-harness/.env
   - printf "DB_PASSWORD=\n" >> test-harness/.env
+  - cat test-harness/.env
 
 install:
   # Install Commandbox
