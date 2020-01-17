@@ -41,7 +41,7 @@ install:
 
 before_script:
   # create test database
-  - mysql -u root -e 'create database mementifier;'
+  - mysql -u root -e 'CREATE DATABASE mementifier;'
   # import database
   #- mysql -u root < test-harness/tests/resources/coolblog.sql
   #- echo "Database created and loaded with test data"
@@ -52,7 +52,6 @@ before_script:
   - printf "DB_DATABASE=mementifier\n" >> test-harness/.env
   - printf "DB_USER=root\n" >> test-harness/.env
   - printf "DB_PASSWORD=\n" >> test-harness/.env
-  - cat test-harness/.env
 
 script:
   # Set Current Version
@@ -68,6 +67,8 @@ script:
   - rm -Rf modules/cborm/modules/mementifier
   # run our matrix server
   - box server start serverConfigFile="server-${ENGINE}.json"
+  # CfConfig show
+  - box cfconfig show
   # If lucee 5 stop it due to stupid ORM bug that never gets fixed on first start.
   - echo "Checking if lucee5 so we can do a restart due to a stupid  ORM startup bug."
   - if [ ${ENGINE} = 'lucee@5' ]; then box server stop; fi
