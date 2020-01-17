@@ -5,6 +5,8 @@
 ### Features
 
 * Enabled wildcard default includes (*) to retrieve inherited object properties instead of doing wacky things for inherited defaults to work.
+* New setting to chose a default value to expose when getters return `null`: `nullDefaultValue`
+* ORM Auto includes now ONLY includes properties to avoid bi-directional recursive exceptions.  This is also a compatiblity, where before EVERYTHING was included.  Now, only properties are included.
 
 ### Improvements
 
@@ -14,6 +16,7 @@
 ### Compatibility
 
 * Removed ACF 11 Support
+* ORM Auto includes only marshalls properties instead of everything.
 
 ## v1.9.0
 

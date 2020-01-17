@@ -18,16 +18,12 @@ branches:
   - development
   - master
 
-dist: trusty
+dist: bionic
 
 sudo: required
 
-addons:
-  apt:
-    packages:
-    - mysql-server-5.6
-    - mysql-client-core-5.6
-    - mysql-client-5.6
+services:
+ - mysql
 
 before_install:
   # CommandBox Keys
@@ -56,6 +52,7 @@ before_script:
   - printf "DB_DATABASE=mementifier\n" >> test-harness/.env
   - printf "DB_USER=root\n" >> test-harness/.env
   - printf "DB_PASSWORD=\n" >> test-harness/.env
+  - cat test-harness/.env
 
 script:
   # Set Current Version
