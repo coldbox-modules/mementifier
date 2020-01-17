@@ -122,9 +122,42 @@ component{
 				thisName = ( md.keyExists( "entityName" ) ? md.entityName : listLast( md.name, "." ) );
 			}
 
-			thisMemento.defaultIncludes = ormGetSessionFactory()
-				.getClassMetaData( thisName )
-				.getPropertyNames();
+			var ORMService = new cborm.models.BaseORMService();
+
+			var entityMd = ORMService.getEntityMetadata( this );
+			var typeMap = arrayReduce( 
+								entityMd.getPropertyNames(), 
+								function( mdTypes, propertyName ){
+									var propertyType = entityMd.getPropertyType( propertyName );
+									var propertyClassName = getMetadata( propertyType ).name;
+
+									mdTypes[ propertyName ] = propertyClassName;
+									return mdTypes;
+								}
+								,{});
+			
+			thisMemento.defaultIncludes = typeMap.keyArray().filter( function( propertyName ){
+					switch( listLast( typeMap[ propertyName ], "." ) ){
+						case "BagType":
+                    	case "OneToManyType":
+						case "ManyToManyType":
+						case "ManyToOneType":
+						case "OneToOneType":
+						case "BinaryType":{
+                          return false;
+                    	}
+						default:{
+						  return true;
+						}
+					}
+			} );
+
+			// Append primary keys
+			if( entityMd.hasIdentifierProperty() ){
+				arrayAppend( thisMemento.defaultIncludes, entityMd.getIdentifierPropertyName() );
+			} else if( thisMemento.defaultIncludes.getIdentifierType().isComponentType() ){
+				arrayAppend( thisMemento.defaultIncludes, listToArray( arrayToList( entityMd.getIdentifierType().getPropertyNames() ) ), true );
+			}
 		}
 
 		// Do we have a * for auto includes of all properties in the object
@@ -185,7 +218,7 @@ component{
 				var thisValue = invoke( this, "get#item#" );
 				// Verify Nullness
 				thisValue = isNull( thisValue ) ? (
-					structKeyExists( thisMemento.defaults, item ) ? thisMemento.defaults[ item ] : ""
+					structKeyExists( thisMemento.defaults, item ) ? thisMemento.defaults[ item ] : $mementifierSettings.nullDefaultValue
 				) : thisValue;
 			} else {
 				// Calling for non-existent properties, skip out
@@ -226,19 +259,20 @@ component{
 			}
 
 			// Array Collections
-			if( isArray( thisValue ) ){
+			else if( isArray( thisValue ) ){
 				// Map Items into result object
 				result[ item ] = [];
 				for( var thisIndex = 1; thisIndex <= arrayLen( thisValue ); thisIndex++ ){
 					 // only get mementos from relationships that have mementos, in the event that we have an already-serialized array of structs
 					if( !isSimpleValue( thisValue[ thisIndex ] ) && structKeyExists( thisValue[ thisIndex ], "getMemento" ) ) {
-
+						var nestedIncludes = $buildNestedMementoList( includes, item );
 						result[ item ][ thisIndex ] = thisValue[ thisIndex ].getMemento(
-							includes 		= $buildNestedMementoList( includes, item ),
+							includes 		= nestedIncludes,
 							excludes 		= $buildNestedMementoList( excludes, item ),
 							mappers 		= mappers,
 							defaults 		= defaults,
-							ignoreDefaults 	= ignoreDefaults
+							// cascade the ignore defaults down if specific nested includes are requested
+							ignoreDefaults 	= nestedIncludes.len() ? ignoreDefaults : false
 						);
 
 					} else {
@@ -248,28 +282,35 @@ component{
 			}
 
 			// Single Object Relationships
-			if( isObject( thisValue ) ){
+			else if( isValid( 'component', thisValue ) && structKeyExists( thisValue, "getMemento" ) ){
 				//writeDump( var=$buildNestedMementoList( includes, item ), label="includes: #item#" );
 				//writeDump( var=$buildNestedMementoList( excludes, item ), label="excludes: #item#" );
+				var nestedIncludes = $buildNestedMementoList( includes, item );
 				result[ item ] = thisValue.getMemento(
-					includes 		= $buildNestedMementoList( includes, item ),
+					includes 		= nestedIncludes,
 					excludes 		= $buildNestedMementoList( excludes, item ),
 					mappers 		= mappers,
 					defaults 		= defaults,
-					ignoreDefaults 	= ignoreDefaults
+					// cascade the ignore defaults down if specific nested includes are requested
+					ignoreDefaults 	= nestedIncludes.len() ? ignoreDefaults : false
 				);
+			} else {
+				// we don't know what to do with this item so we return as-is
+				result[ item ] = thisValue;
 			}
 
 			// Result Mapper for Item Result
 			if( mappersKeyArray.findNoCase( item ) ){
+				
 				// ACF compat
 				var thisMapper = thisMemento.mappers[ item ];
 				result[ item ] = thisMapper( result[ item ] );
-			}
 
-			// ensure anything left over is provided as the value
-			if( !structKeyExists( result, item ) ){
+			} else if( !structKeyExists( result, item ) ){
+				
+				// ensure anything left over is provided as the value
 				result[ item ] = thisValue;
+			
 			}
 
 		}

@@ -23,7 +23,9 @@ moduleSettings = {
 		// Enable orm auto default includes: If true and an object doesn't have any `memento` struct defined
 		// this module will create it with all properties and relationships it can find for the target entity
 		// leveraging the cborm module.
-		ormAutoIncludes = true
+		ormAutoIncludes = true,
+		// The default value for relationships/getters which return null
+		nullDefaultValue = ''
 	}
 }
 ```
