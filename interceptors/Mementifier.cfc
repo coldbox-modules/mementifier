@@ -72,7 +72,8 @@ component{
 			}
 
 			// Inject helper methods
-			arguments.entity.$injectMixin( "$buildNestedMementoList", variables.$buildNestedMementoList );
+            arguments.entity.$injectMixin( "$buildNestedMementoList", variables.$buildNestedMementoList );
+            arguments.entity.$injectMixin( "$getDeepProperties", variables.$getDeepProperties );
 			// We do simple date formatters as they are faster than CFML methods
 			arguments.entity.$FORMATTER_ISO8601 = createObject( "java", "java.text.SimpleDateFormat" ).init( "yyyy-MM-dd'T'HH:mm:ssXXX" );
 			arguments.entity.$FORMATTER_CUSTOM 	= createObject( "java", "java.text.SimpleDateFormat" ).init( "#settings.dateMask# #settings.timeMask#" );
@@ -121,19 +122,59 @@ component{
 				thisName = ( md.keyExists( "entityName" ) ? md.entityName : listLast( md.name, "." ) );
 			}
 
-			thisMemento.defaultIncludes = ormGetSessionFactory()
-				.getClassMetaData( thisName )
-				.getPropertyNames();
+			var ORMService = new cborm.models.BaseORMService();
+
+			var entityMd = ORMService.getEntityMetadata( this );
+			var typeMap = arrayReduce( 
+								entityMd.getPropertyNames(), 
+								function( mdTypes, propertyName ){
+									var propertyType = entityMd.getPropertyType( propertyName );
+									var propertyClassName = getMetadata( propertyType ).name;
+
+									mdTypes[ propertyName ] = propertyClassName;
+									return mdTypes;
+								}
+								,{});
+			
+			thisMemento.defaultIncludes = typeMap.keyArray().filter( function( propertyName ){
+					switch( listLast( typeMap[ propertyName ], "." ) ){
+						case "BagType":
+                    	case "OneToManyType":
+						case "ManyToManyType":
+						case "ManyToOneType":
+						case "OneToOneType":
+						case "BinaryType":{
+                          return false;
+                    	}
+						default:{
+						  return true;
+						}
+					}
+			} );
+
+			// Append primary keys
+			if( entityMd.hasIdentifierProperty() ){
+				arrayAppend( thisMemento.defaultIncludes, entityMd.getIdentifierPropertyName() );
+			} else if( thisMemento.defaultIncludes.getIdentifierType().isComponentType() ){
+				arrayAppend( thisMemento.defaultIncludes, listToArray( arrayToList( entityMd.getIdentifierType().getPropertyNames() ) ), true );
+			}
 		}
 
 		// Do we have a * for auto includes of all properties in the object
 		if( arrayLen( thisMemento.defaultIncludes ) && thisMemento.defaultIncludes[ 1 ] == "*" ){
-			thisMemento.defaultIncludes = getMetadata( this ).properties
+            
+            // assign the default includes to be all properties
+            // however, we exclude anything with an inject key and anything on the default exclude list
+            thisMemento.defaultIncludes = $getDeepProperties()
 				.filter( function( item ){
-					return !item.keyExists( "inject" );
+					return (
+                        !item.keyExists( "inject" ) && 
+                        !thisMemento.defaultExcludes.findNoCase( item.name )
+                    );
 				} ).map( function( item ){
 					return item.name;
-				} );
+                } );
+                
 		}
 
 		// Incorporate Defaults if not ignored
@@ -177,7 +218,7 @@ component{
 				var thisValue = invoke( this, "get#item#" );
 				// Verify Nullness
 				thisValue = isNull( thisValue ) ? (
-					structKeyExists( thisMemento.defaults, item ) ? thisMemento.defaults[ item ] : ""
+					structKeyExists( thisMemento.defaults, item ) ? thisMemento.defaults[ item ] : $mementifierSettings.nullDefaultValue
 				) : thisValue;
 			} else {
 				// Calling for non-existent properties, skip out
@@ -218,19 +259,20 @@ component{
 			}
 
 			// Array Collections
-			if( isArray( thisValue ) ){
+			else if( isArray( thisValue ) ){
 				// Map Items into result object
 				result[ item ] = [];
 				for( var thisIndex = 1; thisIndex <= arrayLen( thisValue ); thisIndex++ ){
 					 // only get mementos from relationships that have mementos, in the event that we have an already-serialized array of structs
 					if( !isSimpleValue( thisValue[ thisIndex ] ) && structKeyExists( thisValue[ thisIndex ], "getMemento" ) ) {
-
+						var nestedIncludes = $buildNestedMementoList( includes, item );
 						result[ item ][ thisIndex ] = thisValue[ thisIndex ].getMemento(
-							includes 		= $buildNestedMementoList( includes, item ),
+							includes 		= nestedIncludes,
 							excludes 		= $buildNestedMementoList( excludes, item ),
 							mappers 		= mappers,
 							defaults 		= defaults,
-							ignoreDefaults 	= ignoreDefaults
+							// cascade the ignore defaults down if specific nested includes are requested
+							ignoreDefaults 	= nestedIncludes.len() ? ignoreDefaults : false
 						);
 
 					} else {
@@ -240,28 +282,35 @@ component{
 			}
 
 			// Single Object Relationships
-			if( isObject( thisValue ) ){
+			else if( isValid( 'component', thisValue ) && structKeyExists( thisValue, "getMemento" ) ){
 				//writeDump( var=$buildNestedMementoList( includes, item ), label="includes: #item#" );
 				//writeDump( var=$buildNestedMementoList( excludes, item ), label="excludes: #item#" );
+				var nestedIncludes = $buildNestedMementoList( includes, item );
 				result[ item ] = thisValue.getMemento(
-					includes 		= $buildNestedMementoList( includes, item ),
+					includes 		= nestedIncludes,
 					excludes 		= $buildNestedMementoList( excludes, item ),
 					mappers 		= mappers,
 					defaults 		= defaults,
-					ignoreDefaults 	= ignoreDefaults
+					// cascade the ignore defaults down if specific nested includes are requested
+					ignoreDefaults 	= nestedIncludes.len() ? ignoreDefaults : false
 				);
+			} else {
+				// we don't know what to do with this item so we return as-is
+				result[ item ] = thisValue;
 			}
 
 			// Result Mapper for Item Result
 			if( mappersKeyArray.findNoCase( item ) ){
+				
 				// ACF compat
 				var thisMapper = thisMemento.mappers[ item ];
 				result[ item ] = thisMapper( result[ item ] );
-			}
 
-			// ensure anything left over is provided as the value
-			if( !structKeyExists( result, item ) ){
+			} else if( !structKeyExists( result, item ) ){
+				
+				// ensure anything left over is provided as the value
 				result[ item ] = thisValue;
+			
 			}
 
 		}
@@ -302,5 +351,34 @@ component{
 		variables[ arguments.name ] = arguments.target;
 		this[ arguments.name ] 		= arguments.target;
 		return this;
-	}
+    }
+    
+    /**
+     * Get Deep Properties
+     * Returns an array of an objects properties including those inherited by base classes.
+     *
+     * @metaData (optional) The starting CFML metadata of the entity object. Defaults to the current object.
+     * 
+     * @return an array of object properties
+     */
+    private array function $getDeepProperties( struct metaData = getMetaData( this ) ) {
+        
+        var properties = [];
+        
+        // if this object extends another object, append any inherited properties.
+        if ( 
+            structKeyExists( arguments.metaData, "extends" ) && 
+            structKeyExists( arguments.metaData.extends, "properties" )
+        ) {
+            properties.append( $getDeepProperties( arguments.metaData.extends ), true );
+        }
+
+        // if this object has properties, append them.
+        if ( structKeyExists( arguments.metaData, "properties" ) ) {
+            properties.append( arguments.metadata.properties, true );
+        } 
+
+        return properties;
+
+    }
 }

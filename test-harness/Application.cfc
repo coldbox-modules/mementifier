@@ -39,6 +39,7 @@ component{
     // Mappings
 	this.mappings[ "/root" ] = COLDBOX_APP_ROOT_PATH;
 	this.mappings[ "/cborm" ] = COLDBOX_APP_ROOT_PATH & "/modules/cborm";
+
 	// Map back to its root
 	moduleRootPath 	= REReplaceNoCase( this.mappings[ "/root" ], "#request.MODULE_NAME#(\\|/)test-harness(\\|/)", "" );
 	modulePath 		= REReplaceNoCase( this.mappings[ "/root" ], "test-harness(\\|/)", "" );
@@ -57,8 +58,11 @@ component{
 		flushAtRequestEnd = false,
 		eventhandling = true,
 		eventHandler = "cborm.models.EventHandler",
-		skipcfcWithError = true
+		skipcfcWithError = false
 	};
+
+	//applicationstop();abort;
+	//ormReload();
 
 	// application start
 	public boolean function onApplicationStart(){

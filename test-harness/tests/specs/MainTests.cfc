@@ -50,7 +50,25 @@
 
 				expect( results ).toHaveKey( "results" ).toHaveKey( "resultsMap" );
 				expect( results.resultsMap ).toHaveKey( results.results[ 1 ] );
-			});
+            });
+
+
+            it( "can render inherited properties with wildcard default properties", function() {
+
+                var event = this.request(
+                    route="/main/index",
+                    params={ }
+                );
+
+				var memento = deserializeJSON( event.getRenderedContent() );
+
+                // Expect inherited properties from the base class
+				expect( memento )
+					.toBeStruct()
+					.toHaveKey( "createdDate,isActive" )
+					.notToHaveKey( "modifiedDate" );
+
+            } );
 
 
 		});

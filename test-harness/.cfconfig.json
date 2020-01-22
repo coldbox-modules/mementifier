@@ -1,4 +1,11 @@
 {
+    "debuggingEnabled":true,
+    "debuggingReportExecutionTimes":false,
+    "disableInternalCFJavaComponents":false,
+    "inspectTemplate":"always",
+    "requestTimeout":"0,0,0,90",
+	"robustExceptionEnabled":true,
+	"whitespaceManagement":"white-space-pref",
 	"datasources":{
         "mementifier":{
             "allowAlter":true,
@@ -11,7 +18,7 @@
             "allowSelect":true,
             "allowUpdate":true,
             "blob":"false",
-            "class":"org.gjt.mm.mysql.Driver",
+            "class":"com.mysql.jdbc.Driver",
             "clob":"false",
             "connectionTimeout":"1",
             "custom":"useUnicode=true&characterEncoding=UTF-8&useLegacyDatetimeCode=true&useSSL=false",
@@ -26,11 +33,5 @@
             "username":"${DB_USERNAME}",
             "validate":"false"
         }
-    },
-    "debuggingEnabled":true,
-    "debuggingReportExecutionTimes":false,
-    "disableInternalCFJavaComponents":false,
-    "inspectTemplate":"always",
-    "requestTimeout":"0,0,0,90",
-    "robustExceptionEnabled":true
+	},
 }

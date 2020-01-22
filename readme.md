@@ -23,7 +23,9 @@ moduleSettings = {
 		// Enable orm auto default includes: If true and an object doesn't have any `memento` struct defined
 		// this module will create it with all properties and relationships it can find for the target entity
 		// leveraging the cborm module.
-		ormAutoIncludes = true
+		ormAutoIncludes = true,
+		// The default value for relationships/getters which return null
+		nullDefaultValue = ''
 	}
 }
 ```
@@ -268,6 +270,37 @@ function process(
 	boolean ignoreDefaults=false
 ){}
 ```
+
+## Running The Test Suites
+
+In order to collaborate on this project you will need to do a few things in order to get the test harness ready for execution.  The `test-harness` folder is where the ColdBox test app exists that consumes the module for testing.  The `test-harness/tests/specs` is where all the specs for testing are located.
+
+### Database
+
+Create a database called `mementifier` in any RDBMS you like. We have mostly used MySQL for the tests.
+
+### Environment
+
+Copy the `.env.template` as `.env` and modify it accordingly so it can connect to your database.
+
+### Dependencies
+
+Go into the root of `test-harness` and run a CommandBox shell: `box`.  Once in the shell install the dependencies `install`.
+
+### Start a Server
+
+Start a server, we have configured for you several CFML engines for you to test against, pick one from the list below:
+
+- `server start serverConfigFile=server-adobe@11.json`
+- `server start serverConfigFile=server-adobe@2016.json`
+- `server start serverConfigFile=server-adobe@2018.json`
+- `server start serverConfigFile=server-lucee@5.json`
+
+Then you can hit the test site app at http://localhost:60299.  This will create the database for you using the ColdFusion ORM.
+
+### Running Tests
+
+You can then run the tests at http://localhost:60299/tests/runner.cfm
 
 ********************************************************************************
 Copyright Since 2005 ColdBox Framework by Luis Majano and Ortus Solutions, Corp
