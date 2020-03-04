@@ -22,7 +22,7 @@
 				expect( memento.lname ).toBe( "TESTUSER" );
 			});
 
-			it( "can render mementos even if the obejct has already-serialized data", function(){
+			it( "can render mementos even if the object has already-serialized data", function(){
 				var event = this.request( route="/main/alreadySerialized", params={} );
 				var memento = deserializeJSON( event.getRenderedContent() );
 				// Derfault INcludes + Excludes
@@ -54,7 +54,6 @@
 
 
             it( "can render inherited properties with wildcard default properties", function() {
-
                 var event = this.request(
                     route="/main/index",
                     params={ }
@@ -70,7 +69,21 @@
 
             } );
 
+            it( "passes the memento as the second argument to mappers", function() {
+                var event = this.request(
+                    route="/main/index",
+                    params={
+                        "includes": "foo"
+                    }
+                );
 
+                var memento = deserializeJSON( event.getRenderedContent() );
+
+                // Expect inherited properties from the base class
+				expect( memento ).toBeStruct();
+				expect( memento ).toHaveKey( "foo" );
+				expect( memento.foo ).toBe( memento.fname & " " & memento.lname );
+            } );
 		});
 
 	}

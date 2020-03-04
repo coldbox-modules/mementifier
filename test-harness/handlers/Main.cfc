@@ -44,7 +44,10 @@
 			excludes        = rc.excludes,
 			ignoreDefaults 	= rc.ignoreDefaults,
 			mappers = {
-				lname = function( item ){ return item.ucase(); }
+                lname = function( item ){ return item.ucase(); },
+                "foo" = function( _, memento ) {
+                    return memento.fname & " " & memento.lname;
+                }
 			}
 		);
 	}
