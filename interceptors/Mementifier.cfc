@@ -95,10 +95,8 @@ component{
 		struct mappers={},
 		struct defaults={},
         boolean ignoreDefaults=false,
-        boolean trustedGetters
+        boolean trustedGetters=$mementifierSettings.trustedGetters
 	){
-        param arguments.trustedGetters = $mementifierSettings.trustedGetters;
-
 		// Inflate incoming lists, arrays are faster than lists
 		if( isSimpleValue( arguments.includes ) ){
 			arguments.includes = listToArray( arguments.includes );
@@ -313,14 +311,15 @@ component{
             }
         }
 
-        // Apply mappers after retrieving the full memento
-        for ( var item in result ) {
-			if( mappersKeyArray.findNoCase( item ) ){
-				// ACF compat
-				var thisMapper = thisMemento.mappers[ item ];
-				result[ item ] = thisMapper( result[ item ], result );
+        return result.map( function( key, value ) {
+            if ( mappersKeyArray.findNoCase( key ) ) {
+                // ACF compat
+				var thisMapper = thisMemento.mappers[ key ];
+				return thisMapper( value, result );
+            } else {
+                return value;
             }
-        }
+        } );
 
 		return result;
 	}
