@@ -42,7 +42,10 @@
 		return oUser.getMemento(
 			includes        = rc.includes,
 			excludes        = rc.excludes,
-			ignoreDefaults 	= rc.ignoreDefaults,
+            ignoreDefaults 	= rc.ignoreDefaults,
+            trustedGetters  = event.valueExists( "trustedGetters" ) ?
+                rc.trustedGetters :
+                javacast( "null", "" ),
 			mappers = {
                 lname = function( item ){ return item.ucase(); },
                 "foo" = function( _, memento ) {

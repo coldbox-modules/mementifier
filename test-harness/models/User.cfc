@@ -304,5 +304,13 @@ component 	persistent="true"
 	 */
 	string function getAvatarLink( numeric size=40 ){
 		return "//avatar.com?id=#createUUID()#";
-	}
+    }
+
+    public any function onMissingMethod( required string missingMethodName, required struct missingMethodArguments ) {
+        if ( len( missingMethodName ) > 3 && left( missingMethodName, 3 ) == "get" ) {
+            return mid( missingMethodName, 4, len( missingMethodName ) - 3 );
+        }
+        throw( "Method doesn't exist: [#missingMethodName#]" );
+    }
+
 }

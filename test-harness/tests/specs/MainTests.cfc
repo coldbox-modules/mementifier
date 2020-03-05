@@ -1,16 +1,12 @@
-﻿component extends="coldbox.system.testing.BaseTestCase"{
+﻿component extends="coldbox.system.testing.BaseTestCase" {
 
-/*********************************** BDD SUITES ***********************************/
-
-	function run(){
-
-		describe( "Mementifier", function(){
-
-			beforeEach(function( currentSpec ){
+	function run() {
+		describe( "Mementifier", function() {
+			beforeEach( function( currentSpec ) {
 				setup();
-			});
+			} );
 
-			it( "can render base mementos", function(){
+			it( "can render base mementos", function() {
 				var event = this.request( route="/main/index", params={} );
 				var memento = deserializeJSON( event.getRenderedContent() );
 				// Derfault INcludes + Excludes
@@ -20,9 +16,9 @@
 					.notToHaveKey( "permission" );
 				// mapper
 				expect( memento.lname ).toBe( "TESTUSER" );
-			});
+			} );
 
-			it( "can render mementos even if the object has already-serialized data", function(){
+			it( "can render mementos even if the object has already-serialized data", function() {
 				var event = this.request( route="/main/alreadySerialized", params={} );
 				var memento = deserializeJSON( event.getRenderedContent() );
 				// Derfault INcludes + Excludes
@@ -41,16 +37,16 @@
 
 				expect( memento[ "alreadySerialized" ][ 1 ][ 'foo' ] )
 					.toBe( 'bar' );
-			});
+			} );
 
 
-			it( "can process a resultsMap", function(){
+			it( "can process a resultsMap", function() {
 				var results = this.request( route="/main/resultMap" )
 					.getValue( "cbox_handler_results" );
 
 				expect( results ).toHaveKey( "results" ).toHaveKey( "resultsMap" );
 				expect( results.resultsMap ).toHaveKey( results.results[ 1 ] );
-            });
+            } );
 
 
             it( "can render inherited properties with wildcard default properties", function() {
@@ -69,7 +65,7 @@
 
             } );
 
-            it( "passes the memento as the second argument to mappers", function() {
+            it( "can use a mapper for a property that does not exist", function() {
                 var event = this.request(
                     route="/main/index",
                     params={
@@ -84,8 +80,38 @@
 				expect( memento ).toHaveKey( "foo" );
 				expect( memento.foo ).toBe( memento.fname & " " & memento.lname );
             } );
-		});
 
+            it( "skips properties that do not exist and do not have a mapper", function() {
+                var event = this.request(
+                    route = "/main/index",
+                    params = {
+                        "includes": "doesntexist"
+                    }
+                );
+
+                var memento = deserializeJSON( event.getRenderedContent() );
+
+                // Expect inherited properties from the base class
+				expect( memento ).toBeStruct();
+				expect( memento ).notToHaveKey( "doesntexist" );
+            } );
+
+            it( "tries to retrieve all properties when trustedGetters is on even if the method does not seem to exist", function() {
+                var event = this.request(
+                    route = "/main/index",
+                    params = {
+                        "includes": "doesntexist",
+                        "trustedGetters": true
+                    }
+                );
+
+                var memento = deserializeJSON( event.getRenderedContent() );
+
+				expect( memento ).toBeStruct();
+				expect( memento ).toHaveKey( "doesntexist" );
+				expect( memento.doesntexist ).toBe( "doesntexist" );
+            } );
+		} );
 	}
 
 }

@@ -94,8 +94,11 @@ component{
 		excludes="",
 		struct mappers={},
 		struct defaults={},
-		boolean ignoreDefaults=false
+        boolean ignoreDefaults=false,
+        boolean trustedGetters
 	){
+        param arguments.trustedGetters = $mementifierSettings.trustedGetters;
+
 		// Inflate incoming lists, arrays are faster than lists
 		if( isSimpleValue( arguments.includes ) ){
 			arguments.includes = listToArray( arguments.includes );
@@ -215,15 +218,20 @@ component{
 
             // Retrieve Value for transformation: ACF Incompats Suck on elvis operator
             var thisValue = javacast( "null", "" );
-			if( $mementifierSettings.trustedGetters || structKeyExists( this, "get#item#" ) ){
+
+            if ( arguments.trustedGetters || structKeyExists( this, "get#item#" ) ) {
                 try {
-                    var thisValue = invoke( this, "get#item#" );
+                    thisValue = invoke( this, "get#item#" );
                 } catch ( any e ) {
-                    if ( !$mementifierSettings.trustedGetters || !structKeyExists( arguments.mappers, item ) ) {
+                    // Unless trusted getters is on and there is a mapper for this item rethrow the exception.
+                    if ( !arguments.trustedGetters || !structKeyExists( arguments.mappers, item ) ) {
                         rethrow;
                     }
                 }
-			}
+            // If the key doesn't exist and there is no mapper for the item, go to the next item.
+			} else if ( !structKeyExists( arguments.mappers, item ) ) {
+                continue;
+            }
 
             // Verify Nullness
             thisValue = isNull( thisValue ) ? (
@@ -303,13 +311,9 @@ component{
 				// we don't know what to do with this item so we return as-is
 				result[ item ] = thisValue;
             }
-
-			if( !structKeyExists( result, item ) ){
-				// ensure anything left over is provided as the value
-				result[ item ] = thisValue;
-			}
         }
 
+        // Apply mappers after retrieving the full memento
         for ( var item in result ) {
 			if( mappersKeyArray.findNoCase( item ) ){
 				// ACF compat
