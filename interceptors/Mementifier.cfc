@@ -88,6 +88,7 @@ component{
 	 * @mappers A struct of key-function pairs that will map properties to closures/lambadas to process the item value.  The closure will transform the item value.
 	 * @defaults A struct of key-value pairs that denotes the default values for properties if they are null, defaults for everything are a blank string.
 	 * @ignoreDefaults If set to true, default includes and excludes will be ignored and only the incoming `includes` and `excludes` list will be used.
+	 * @trustedGetters If set to true, getters will not be checked for in the `this` scope before trying to invoke them.
 	 */
 	struct function getMemento(
 		includes="",
@@ -95,7 +96,7 @@ component{
 		struct mappers={},
 		struct defaults={},
         boolean ignoreDefaults=false,
-        boolean trustedGetters=$mementifierSettings.trustedGetters
+        boolean trustedGetters
 	){
 		// Inflate incoming lists, arrays are faster than lists
 		if( isSimpleValue( arguments.includes ) ){
@@ -108,15 +109,19 @@ component{
 		// Param Default Memento Settings
 		// We do it here, because ACF caches crap!
 		var thisMemento = {
-			"defaultIncludes" 	: isNull( this.memento.defaultIncludes ) 	? [] : this.memento.defaultIncludes,
-			"defaultExcludes" 	: isNull( this.memento.defaultExcludes ) 	? [] : this.memento.defaultExcludes,
-			"neverInclude"		: isNull( this.memento.neverInclude ) 		? [] : this.memento.neverInclude,
-			"mappers"      		: isNull( this.memento.mappers ) 			? {} : this.memento.mappers,
-			"defaults"     		: isNull( this.memento.defaults ) 			? {} : this.memento.defaults
-		};
+			"defaultIncludes" 	: isNull( this.memento.defaultIncludes ) 	? []                                   : this.memento.defaultIncludes,
+			"defaultExcludes" 	: isNull( this.memento.defaultExcludes ) 	? []                                   : this.memento.defaultExcludes,
+			"neverInclude"		: isNull( this.memento.neverInclude ) 		? []                                   : this.memento.neverInclude,
+			"mappers"      		: isNull( this.memento.mappers ) 			? {}                                   : this.memento.mappers,
+			"defaults"     		: isNull( this.memento.defaults ) 			? {}                                   : this.memento.defaults,
+			"trustedGetters"    : isNull( this.memento.trustedGetters )     ? $mementifierSettings.trustedGetters  : this.memento.trustedGetters,
+			"ormAutoIncludes"   : isNull( this.memento.ormAutoIncludes )    ? $mementifierSettings.ormAutoIncludes : this.memento.ormAutoIncludes
+        };
+
+        param arguments.trustedGetters = thisMemento.trustedGetters;
 
 		// Is orm auto inflate on and no memento defined? Build the default includes using this entity and Hibernate
-		if( $mementifierSettings.ormAutoIncludes && !arrayLen( thisMemento.defaultIncludes ) ){
+		if( thisMemento.ormAutoIncludes && !arrayLen( thisMemento.defaultIncludes ) ){
 			var thisName = isNull( variables.entityName ) ? "" : variables.entityName;
 			if( ! len( thisName ) ){
 				var md = getMetadata( this );
@@ -187,7 +192,7 @@ component{
 					return !includes.findNoCase( item );
 				} ),
 				true
-			);
+            );
 		}
 
 		// Incorporate Memento Mappers, and Defaults
