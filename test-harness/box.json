@@ -20,8 +20,8 @@
     },
     "testbox":{
         "runner":"http://localhost:60299/tests/runner.cfm"
-	},
-	"scripts" : {
-		"cleanMementifier" : "rm modules/cborm/modules/mementifier --force --recurse"
-	}
+    },
+    "scripts":{
+        "cleanMementifier":"rm modules/cborm/modules/mementifier --force --recurse"
+    }
 }
