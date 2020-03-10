@@ -25,14 +25,16 @@ moduleSettings = {
 		// leveraging the cborm module.
 		ormAutoIncludes = true,
 		// The default value for relationships/getters which return null
-		nullDefaultValue = ''
+		nullDefaultValue = '',
+        // Don't check for getters before invoking them
+        trustedGetters = false
 	}
 }
 ```
 
 ## Usage
 
-The memementifier will listen to WireBox object creations and ORM events in order to inject itself into target objects.  The target object must contain a `this.memento` structure in order for the `mementifier` to inject a `getMemento()` method into the target.  This method will allow you to transform the entity and its relationships into native struct/array/native formats.  
+The memementifier will listen to WireBox object creations and ORM events in order to inject itself into target objects.  The target object must contain a `this.memento` structure in order for the `mementifier` to inject a `getMemento()` method into the target.  This method will allow you to transform the entity and its relationships into native struct/array/native formats.
 
 ### `this.memento` Marker
 
@@ -49,7 +51,11 @@ this.memento = {
 	// A struct of defaults for properties/relationships if they are null
 	defaults = {},
 	// A struct of mapping functions for properties/relationships that can transform them
-	mappers = {}
+    mappers = {},
+    // Don't check for getters before invoking them
+    trustedGetters = $mementifierSettings.trustedGetters,
+    // Enable orm auto default includes
+    ormAutoIncludes = $mementifierSettings.ormAutoIncludes,
 }
 ```
 
@@ -158,12 +164,20 @@ defaults = {
 
 #### Mappers
 
-This structure is a way to do transformations on actual properties and/or relationships after they have been added to the memento.  This can be post-processing functions that can be applied after retrieval. The `key` of the structure is the name of the property and/or relationship.  The `value` is a closure that receives the item and it must return back the item mapped according to your function.
+This structure is a way to do transformations on actual properties and/or relationships after they have been added to the memento.  This can be post-processing functions that can be applied after retrieval. The `key` of the structure is the name of the property and/or relationship.  The `value` is a closure that receives the item and the rest of the memento and it must return back the item mapped according to your function.
 
 ```js
 mappers = {
-	"lname" = function( item ){ return item.ucase(); },
-	"specialDate" = function( item ){ return dateTimeFormat( item, "full" ); }
+	"lname" = function( item, memento ){ return item.ucase(); },
+	"specialDate" = function( item, memento ){ return dateTimeFormat( item, "full" ); }
+}
+```
+
+You can use mappers to include a key not found in your memento, but rather one that combines values from other values.
+
+```js
+mappers = {
+    "fullname" = function( _, memento ) { return memento.fname & " " & memento.lname; }
 }
 ```
 
@@ -177,17 +191,22 @@ struct function getMemento(
 	excludes="",
 	struct mappers={},
 	struct defaults={},
-	boolean ignoreDefaults=false
+    boolean ignoreDefaults=false,
+    boolean trustedGetters
 )
 ```
 
 > You can find the API Docs Here: https://apidocs.ortussolutions.com/coldbox-modules/mementifier/1.0.0/index.html
 
-As you can see, the memento method has also a way to add dynamic `includes, excludes, mappers and defaults`.  This will allow you to add upon the defaults dynamically.
+As you can see, the memento method has also a way to add dynamic `includes`, `excludes`, `mappers` and `defaults`.  This will allow you to add upon the defaults dynamically.
 
 #### Ignoring Defaults
 
-We have also added a way to ignore the default include and exclude lists via the `ignoreDefaults` flag.  If you turn that flag to `true` then **ONLY** the passed in `includes and excludes` will be used in the memento.  However, please note that the `neverInclude` array will **always** be used.
+We have also added a way to ignore the default include and exclude lists via the `ignoreDefaults` flag.  If you turn that flag to `true` then **ONLY** the passed in `includes` and `excludes` will be used in the memento.  However, please note that the `neverInclude` array will **always** be used.
+
+#### Trusted Getters
+
+You can turn on trusted getters during call time by passing `true` to the `trustedGetters` argument.
 
 #### Overriding `getMemento()`
 
@@ -199,7 +218,8 @@ struct function getMemento(
 	excludes="",
 	struct mappers={},
 	struct defaults={},
-	boolean ignoreDefaults=false
+	boolean ignoreDefaults=false,
+	boolean trustedGetters
 ){
 	// Call mementifier
 	var memento	= this.$getMemento( argumentCollection=arguments );
@@ -267,7 +287,8 @@ function process(
 	excludes="",
 	struct mappers={},
 	struct defaults={},
-	boolean ignoreDefaults=false
+    boolean ignoreDefaults=false,
+    boolean trustedGetters
 ){}
 ```
 
@@ -313,7 +334,7 @@ Because of His grace, this project exists. If you don't like this, then don't re
 By whom also we have access by faith into this grace wherein we stand, and rejoice in hope of the glory of God.
 And not only so, but we glory in tribulations also: knowing that tribulation worketh patience;
 And patience, experience; and experience, hope:
-And hope maketh not ashamed; because the love of God is shed abroad in our hearts by the 
+And hope maketh not ashamed; because the love of God is shed abroad in our hearts by the
 Holy Ghost which is given unto us. ." Romans 5:5
 
 ### THE DAILY BREAD

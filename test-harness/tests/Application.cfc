@@ -6,6 +6,10 @@ www.ortussolutions.com
 */
 component{
 
+    // structDelete( application, "cbController" );
+    // applicationStop();
+    // abort;
+
 	// UPDATE THE NAME OF THE MODULE IN TESTING BELOW
 	request.MODULE_NAME = "mementifier";
 

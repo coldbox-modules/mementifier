@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0
+
+* `Feature` : Enabled mappers to be called after memento was finalized in order to allow you to build composite properties and non-existent properties on the memento
+* `Feature` : New setting `trustedGetters` to allow you to leverage virtual `getters()` especially on frameworks like Quick. This setting can also be used in the `getMemento()` calls directly or setup in an entity definition.
+
 ## 2.0.0
 
 ### Features

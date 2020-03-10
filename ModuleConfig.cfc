@@ -34,7 +34,9 @@ component {
 			// leveraging the cborm module.
 			ormAutoIncludes = true,
 			// The default value for getters which return null
-			nullDefaultValue = ''
+            nullDefaultValue = '',
+            // Don't check for getters before invoking them
+            trustedGetters = false
 		};
 
 		// Custom Declared Interceptors
