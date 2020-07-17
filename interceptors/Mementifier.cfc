@@ -75,8 +75,9 @@ component{
             arguments.entity.$injectMixin( "$buildNestedMementoList", variables.$buildNestedMementoList );
             arguments.entity.$injectMixin( "$getDeepProperties", variables.$getDeepProperties );
 			// We do simple date formatters as they are faster than CFML methods
-			arguments.entity.$FORMATTER_ISO8601 = createObject( "java", "java.text.SimpleDateFormat" ).init( "yyyy-MM-dd'T'HH:mm:ssXXX" );
-			arguments.entity.$FORMATTER_CUSTOM 	= createObject( "java", "java.text.SimpleDateFormat" ).init( "#settings.dateMask# #settings.timeMask#" );
+			var timezone = createObject( "java", "java.util.TimeZone" ).getTimeZone( getTimezoneInfo().id );
+			arguments.entity.$FORMATTER_ISO8601 = createObject( "java", "java.text.SimpleDateFormat" ).init( "yyyy-MM-dd'T'HH:mm:ssXXX" ).setTimeZone( timezone );
+			arguments.entity.$FORMATTER_CUSTOM 	= createObject( "java", "java.text.SimpleDateFormat" ).init( "#settings.dateMask# #settings.timeMask#" ).setTimeZone( timezone );
 		}
 	}
 
