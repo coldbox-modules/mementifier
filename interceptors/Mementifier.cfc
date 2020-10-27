@@ -238,7 +238,7 @@ component{
 
             // Verify Nullness
             thisValue = isNull( thisValue ) ? (
-				thisMemento.defaults.keyArray().containsNoCase( item ) ?
+				arrayContainsNoCase( thisMemento.defaults.keyArray(), item ) ?
 					( isNull( thisMemento.defaults[ item ] ) ? javacast( "null", "" ) : thisMemento.defaults[ item ] ) :
 					$mementifierSettings.nullDefaultValue
 			) : thisValue;
