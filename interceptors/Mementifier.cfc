@@ -209,6 +209,7 @@ component{
         } );
 
 		// Process Includes
+		// Please keep at a traditional LOOP to avoid closure reference memory leaks and slowness on some engines.
 		for( var item in arguments.includes ){
 
 			// writeDump( var="Processing: #item#" );abort;
@@ -242,7 +243,7 @@ component{
 					( isNull( thisMemento.defaults[ item ] ) ? javacast( "null", "" ) : thisMemento.defaults[ item ] ) :
 					$mementifierSettings.nullDefaultValue
 			) : thisValue;
-			
+
 			if ( isNull( thisValue ) ) {
 				result[ item ] = javacast( "null", "" );
 			}
@@ -321,16 +322,23 @@ component{
             }
         }
 
-        return result.map( function( key, value ) {
-            if ( mappersKeyArray.findNoCase( key ) ) {
+		// This cannot use functional approaches like result.map() due to
+		// slowness on some engines ( Adobe :( ) and also closure pointers that cause
+		// memory leaks, especially when dealing with ORM engines. Please keep at a traditional loop
+		for( var item in result ){
+			// Do we have a mapper according to this key?
+			if ( mappersKeyArray.findNoCase( item ) ) {
                 // ACF compat
-				var thisMapper = thisMemento.mappers[ key ];
-				return thisMapper( value, result );
+				var thisMapper = thisMemento.mappers[ item ];
+				// Transform it
+				result[ item ] = thisMapper( result[ item ], result );
             } else {
-                return isNull( value ) ? javacast( "null", "" ) : value;
+				// Check for null values
+                result[ item ] = ( !result.keyExists( item ) || isNull( result[ item ] ) ) ? javacast( "null", "" ) : result[ item ];
             }
-        } );
+		}
 
+        // Return memento
 		return result;
 	}
 
