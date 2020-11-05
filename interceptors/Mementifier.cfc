@@ -238,11 +238,16 @@ component{
 
             // Verify Nullness
             thisValue = isNull( thisValue ) ? (
-                structKeyExists( thisMemento.defaults, item ) ? thisMemento.defaults[ item ] : $mementifierSettings.nullDefaultValue
-            ) : thisValue;
-
+				arrayContainsNoCase( thisMemento.defaults.keyArray(), item ) ?
+					( isNull( thisMemento.defaults[ item ] ) ? javacast( "null", "" ) : thisMemento.defaults[ item ] ) :
+					$mementifierSettings.nullDefaultValue
+			) : thisValue;
+			
+			if ( isNull( thisValue ) ) {
+				result[ item ] = javacast( "null", "" );
+			}
 			// Match timestamps + date/time objects
-			if(
+			else if(
 				isSimpleValue( thisValue )
 				&&
 				(
@@ -322,7 +327,7 @@ component{
 				var thisMapper = thisMemento.mappers[ key ];
 				return thisMapper( value, result );
             } else {
-                return value;
+                return isNull( value ) ? javacast( "null", "" ) : value;
             }
         } );
 
