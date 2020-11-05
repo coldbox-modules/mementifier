@@ -31,8 +31,8 @@
     ],
     "scripts":{
         "release":"recipe build/release.boxr",
-        "format":"cfformat run interceptors/,models/,test-harness/tests/specs",
-        "format:watch":"cfformat watch interceptors/,models/,test-harness/tests/specs ./.cfformat.json",
-        "format:check":"cfformat check interceptors/,models/,test-harness/tests/specs"
+        "format":"cfformat run interceptors/,models/,test-harness/handlers,test-harness/tests/specs",
+        "format:watch":"cfformat watch interceptors/,models/,test-harness/handlers,test-harness/tests/specs ./.cfformat.json",
+        "format:check":"cfformat check interceptors/,models/,test-harness/handlers,test-harness/tests/specs"
     }
 }

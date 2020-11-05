@@ -74,6 +74,10 @@ component{
 	// request start
 	public boolean function onRequestStart(String targetPage){
 
+		if( structKeyExists( url, "fwreinit" ) ){
+			ormReload();
+		}
+
 		// Process ColdBox Request
 		application.cbBootstrap.onRequestStart( arguments.targetPage );
 
