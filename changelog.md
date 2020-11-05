@@ -11,7 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Added the ability to cherry pick data from ANY relationship no matter how deep it goes.  If you add into the `includes` a property from another object: `role.name`, ONLY the `role.name` will be added into the resulting memento. Not the entire `role` like it was in version 2.1.0 and below. This gives you a lot more flexibility when including and excluding properties from relationships.
 * Allow defaults to be `null` thanks to @elpete
 * Updated changelog to new keepachangelog.com standards
 * Added new release recipe according to new module template

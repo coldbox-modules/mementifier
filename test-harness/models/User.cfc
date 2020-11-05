@@ -163,6 +163,7 @@ component 	persistent="true"
 		// Default properties to serialize
 		defaultIncludes = [
 			//"*"
+			"userId",
 			"blogUrl",
 			"fname",
 			"lname"
@@ -173,7 +174,8 @@ component 	persistent="true"
 			"password",
 			"role",
 			"permissions",
-			"settings.description"
+			"settings.description",
+			"settings.isConfirmed"
 		],
 		neverInclude = [
 			"password"

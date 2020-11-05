@@ -96,7 +96,7 @@ component{
 		struct mappers={},
 		struct defaults={},
         boolean ignoreDefaults=false,
-        boolean trustedGetters
+		boolean trustedGetters
 	){
 		// Inflate incoming lists, arrays are faster than lists
 		if( isSimpleValue( arguments.includes ) ){
@@ -287,14 +287,13 @@ component{
 			else if( isArray( thisValue ) ){
 				// Map Items into result object
 				result[ item ] = [];
+
 				for( var thisIndex = 1; thisIndex <= arrayLen( thisValue ); thisIndex++ ){
 					 // only get mementos from relationships that have mementos, in the event that we have an already-serialized array of structs
 					if( !isSimpleValue( thisValue[ thisIndex ] ) && structKeyExists( thisValue[ thisIndex ], "getMemento" ) ) {
 
 						// If no nested includes requested, then default them
-						if( isSimpleValue( nestedIncludes ) && !len( nestedIncludes ) ){
-							nestedIncludes = $buildNestedMementoList( includes, item );
-						}
+						var nestedIncludes = $buildNestedMementoList( includes, item );
 
 						// Process the item memento
 						result[ item ][ thisIndex ] = thisValue[ thisIndex ].getMemento(
@@ -303,7 +302,7 @@ component{
 							mappers 		= mappers,
 							defaults 		= defaults,
 							// cascade the ignore defaults down if specific nested includes are requested
-							ignoreDefaults 	= nestedIncludes.len() ? true : false
+							ignoreDefaults 	= arguments.ignoreDefaults
 						);
 
 					} else {
@@ -318,9 +317,7 @@ component{
 				//writeDump( var=$buildNestedMementoList( excludes, item ), label="excludes: #item#" );
 
 				// If no nested includes requested, then default them
-				if( isSimpleValue( nestedIncludes ) && !len( nestedIncludes ) ){
-					nestedIncludes = $buildNestedMementoList( includes, item );
-				}
+				var nestedIncludes = $buildNestedMementoList( includes, item );
 
 				// Process the item memento
 				var thisItemMemento = thisValue.getMemento(
@@ -329,7 +326,7 @@ component{
 					mappers 		= mappers,
 					defaults 		= defaults,
 					// cascade the ignore defaults down if specific nested includes are requested
-					ignoreDefaults 	= nestedIncludes.len() ? true : false
+					ignoreDefaults 	= arguments.ignoreDefaults
 				);
 
 				// Do we have a root already for this guy?

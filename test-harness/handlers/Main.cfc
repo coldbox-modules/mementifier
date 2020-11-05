@@ -7,6 +7,7 @@
 
 	function index( event, rc, prc ){
 		param rc.ignoreDefaults = false;
+		param rc.ignoredRoots = "";
 		param rc.includes       = "";
 		param rc.excludes       = "";
 
@@ -47,7 +48,8 @@
 		var result = oUser.getMemento(
 			includes = rc.includes,
 			excludes = rc.excludes,
-            ignoreDefaults = rc.ignoreDefaults,
+			ignoreDefaults = rc.ignoreDefaults,
+			ignoredRoots = rc.ignoredRoots,
             trustedGetters = event.valueExists( "trustedGetters" ) ?
                 rc.trustedGetters :
                 javacast( "null", "" ),
