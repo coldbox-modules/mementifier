@@ -147,7 +147,13 @@ component 	persistent="true"
 	// Mementofication Settings
 	this.memento = {
 		// Default properties to serialize
-		defaultIncludes = [ "*" ],
+		defaultIncludes = [
+			"*"
+			//"blogUrl",
+			//"fname",
+			//"lname",
+			//"role.name"
+		],
 		// Default Exclusions
 		defaultExcludes = [
 			"APIToken",

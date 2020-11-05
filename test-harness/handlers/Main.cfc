@@ -39,7 +39,7 @@
 			permissionService.new( { permission="CUSTOM_WRITE", description="write" } )
 		] );
 
-		return oUser.getMemento(
+		var result = oUser.getMemento(
 			includes        = rc.includes,
 			excludes        = rc.excludes,
             ignoreDefaults 	= rc.ignoreDefaults,
@@ -53,6 +53,11 @@
                 }
 			}
 		);
+
+		writeDump( var=result );
+		abort;
+
+		return result;
 	}
 
 	function resultMap( event, rc, prc ){

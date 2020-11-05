@@ -213,9 +213,12 @@ component{
 		for( var item in arguments.includes ){
 
 			// writeDump( var="Processing: #item#" );abort;
+			var nestedIncludes = "";
 
 			// Is this a nested include?
 			if( listLen( item,  "." ) > 1 ){
+				// Nested List by removing relationship root.
+				nestedIncludes = listDeleteAt( item, 1, "." );
 				// Retrieve the relationship
 				item = listFirst( item, "." );
             }
@@ -287,14 +290,20 @@ component{
 				for( var thisIndex = 1; thisIndex <= arrayLen( thisValue ); thisIndex++ ){
 					 // only get mementos from relationships that have mementos, in the event that we have an already-serialized array of structs
 					if( !isSimpleValue( thisValue[ thisIndex ] ) && structKeyExists( thisValue[ thisIndex ], "getMemento" ) ) {
-						var nestedIncludes = $buildNestedMementoList( includes, item );
+
+						// If no nested includes requested, then default them
+						if( isSimpleValue( nestedIncludes ) && !len( nestedIncludes ) ){
+							nestedIncludes = $buildNestedMementoList( includes, item );
+						}
+
+						// Process the item memento
 						result[ item ][ thisIndex ] = thisValue[ thisIndex ].getMemento(
 							includes 		= nestedIncludes,
 							excludes 		= $buildNestedMementoList( excludes, item ),
 							mappers 		= mappers,
 							defaults 		= defaults,
 							// cascade the ignore defaults down if specific nested includes are requested
-							ignoreDefaults 	= nestedIncludes.len() ? ignoreDefaults : false
+							ignoreDefaults 	= nestedIncludes.len() ? true : false
 						);
 
 					} else {
@@ -307,20 +316,34 @@ component{
 			else if( isValid( 'component', thisValue ) && structKeyExists( thisValue, "getMemento" ) ){
 				//writeDump( var=$buildNestedMementoList( includes, item ), label="includes: #item#" );
 				//writeDump( var=$buildNestedMementoList( excludes, item ), label="excludes: #item#" );
-				var nestedIncludes = $buildNestedMementoList( includes, item );
-				result[ item ] = thisValue.getMemento(
+
+				// If no nested includes requested, then default them
+				if( isSimpleValue( nestedIncludes ) && !len( nestedIncludes ) ){
+					nestedIncludes = $buildNestedMementoList( includes, item );
+				}
+
+				// Process the item memento
+				var thisItemMemento = thisValue.getMemento(
 					includes 		= nestedIncludes,
 					excludes 		= $buildNestedMementoList( excludes, item ),
 					mappers 		= mappers,
 					defaults 		= defaults,
 					// cascade the ignore defaults down if specific nested includes are requested
-					ignoreDefaults 	= nestedIncludes.len() ? ignoreDefaults : false
+					ignoreDefaults 	= nestedIncludes.len() ? true : false
 				);
+
+				// Do we have a root already for this guy?
+				if( result.keyExists( item ) ){
+					structAppend( result[ item ], thisItemMemento, false );
+				} else {
+					result[ item ] = thisItemMemento;
+				}
+
 			} else {
 				// we don't know what to do with this item so we return as-is
 				result[ item ] = thisValue;
             }
-        }
+		}
 
 		// This cannot use functional approaches like result.map() due to
 		// slowness on some engines ( Adobe :( ) and also closure pointers that cause
