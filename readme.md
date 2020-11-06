@@ -118,6 +118,8 @@ defaultIncludes = [
 ]
 ```
 
+Please note that all nested relationships will ONLY bring those properties from the relationship. Not the entire relationship.
+
 #### Default Excludes
 
 This array is a declaration of all properties/relationships to exclude from the memento state process.

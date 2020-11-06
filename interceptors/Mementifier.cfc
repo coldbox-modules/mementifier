@@ -96,7 +96,7 @@ component{
 		struct mappers={},
 		struct defaults={},
         boolean ignoreDefaults=false,
-        boolean trustedGetters
+		boolean trustedGetters
 	){
 		// Inflate incoming lists, arrays are faster than lists
 		if( isSimpleValue( arguments.includes ) ){
@@ -209,12 +209,16 @@ component{
         } );
 
 		// Process Includes
+		// Please keep at a traditional LOOP to avoid closure reference memory leaks and slowness on some engines.
 		for( var item in arguments.includes ){
 
 			// writeDump( var="Processing: #item#" );abort;
+			var nestedIncludes = "";
 
 			// Is this a nested include?
 			if( listLen( item,  "." ) > 1 ){
+				// Nested List by removing relationship root.
+				nestedIncludes = listDeleteAt( item, 1, "." );
 				// Retrieve the relationship
 				item = listFirst( item, "." );
             }
@@ -238,11 +242,16 @@ component{
 
             // Verify Nullness
             thisValue = isNull( thisValue ) ? (
-                structKeyExists( thisMemento.defaults, item ) ? thisMemento.defaults[ item ] : $mementifierSettings.nullDefaultValue
-            ) : thisValue;
+				arrayContainsNoCase( thisMemento.defaults.keyArray(), item ) ?
+					( isNull( thisMemento.defaults[ item ] ) ? javacast( "null", "" ) : thisMemento.defaults[ item ] ) :
+					$mementifierSettings.nullDefaultValue
+			) : thisValue;
 
+			if ( isNull( thisValue ) ) {
+				result[ item ] = javacast( "null", "" );
+			}
 			// Match timestamps + date/time objects
-			if(
+			else if(
 				isSimpleValue( thisValue )
 				&&
 				(
@@ -278,17 +287,22 @@ component{
 			else if( isArray( thisValue ) ){
 				// Map Items into result object
 				result[ item ] = [];
+
 				for( var thisIndex = 1; thisIndex <= arrayLen( thisValue ); thisIndex++ ){
 					 // only get mementos from relationships that have mementos, in the event that we have an already-serialized array of structs
 					if( !isSimpleValue( thisValue[ thisIndex ] ) && structKeyExists( thisValue[ thisIndex ], "getMemento" ) ) {
+
+						// If no nested includes requested, then default them
 						var nestedIncludes = $buildNestedMementoList( includes, item );
+
+						// Process the item memento
 						result[ item ][ thisIndex ] = thisValue[ thisIndex ].getMemento(
 							includes 		= nestedIncludes,
 							excludes 		= $buildNestedMementoList( excludes, item ),
 							mappers 		= mappers,
 							defaults 		= defaults,
 							// cascade the ignore defaults down if specific nested includes are requested
-							ignoreDefaults 	= nestedIncludes.len() ? ignoreDefaults : false
+							ignoreDefaults 	= arguments.ignoreDefaults
 						);
 
 					} else {
@@ -301,31 +315,50 @@ component{
 			else if( isValid( 'component', thisValue ) && structKeyExists( thisValue, "getMemento" ) ){
 				//writeDump( var=$buildNestedMementoList( includes, item ), label="includes: #item#" );
 				//writeDump( var=$buildNestedMementoList( excludes, item ), label="excludes: #item#" );
+
+				// If no nested includes requested, then default them
 				var nestedIncludes = $buildNestedMementoList( includes, item );
-				result[ item ] = thisValue.getMemento(
+
+				// Process the item memento
+				var thisItemMemento = thisValue.getMemento(
 					includes 		= nestedIncludes,
 					excludes 		= $buildNestedMementoList( excludes, item ),
 					mappers 		= mappers,
 					defaults 		= defaults,
 					// cascade the ignore defaults down if specific nested includes are requested
-					ignoreDefaults 	= nestedIncludes.len() ? ignoreDefaults : false
+					ignoreDefaults 	= arguments.ignoreDefaults
 				);
+
+				// Do we have a root already for this guy?
+				if( result.keyExists( item ) ){
+					structAppend( result[ item ], thisItemMemento, false );
+				} else {
+					result[ item ] = thisItemMemento;
+				}
+
 			} else {
 				// we don't know what to do with this item so we return as-is
 				result[ item ] = thisValue;
             }
-        }
+		}
 
-        return result.map( function( key, value ) {
-            if ( mappersKeyArray.findNoCase( key ) ) {
+		// This cannot use functional approaches like result.map() due to
+		// slowness on some engines ( Adobe :( ) and also closure pointers that cause
+		// memory leaks, especially when dealing with ORM engines. Please keep at a traditional loop
+		for( var item in result ){
+			// Do we have a mapper according to this key?
+			if ( mappersKeyArray.findNoCase( item ) ) {
                 // ACF compat
-				var thisMapper = thisMemento.mappers[ key ];
-				return thisMapper( value, result );
+				var thisMapper = thisMemento.mappers[ item ];
+				// Transform it
+				result[ item ] = thisMapper( result[ item ], result );
             } else {
-                return value;
+				// Check for null values
+                result[ item ] = ( !result.keyExists( item ) || isNull( result[ item ] ) ) ? javacast( "null", "" ) : result[ item ];
             }
-        } );
+		}
 
+        // Return memento
 		return result;
 	}
 

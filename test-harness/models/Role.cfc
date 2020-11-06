@@ -80,7 +80,10 @@ component 	persistent="true"
 
 	// Mementofication
 	this.memento = {
-		defaultIncludes : [ "role", "description", "permissions" ],
+		defaultIncludes : [
+			//"role",
+			"description",
+			"permissions" ],
 		defaultExcludes : [ ]
 	};
 

@@ -135,7 +135,21 @@ component 	persistent="true"
 			 	linktable="userPermissions"
 			 	inversejoincolumn="FK_permissionID"
 			 	orderby="permission"
-			 	db_displayColumns="permission";
+				 db_displayColumns="permission";
+
+	// O2M -> Settings
+	property
+		name        ="settings"
+		singularName="setting"
+		type        ="array"
+		fieldtype   ="one-to-many"
+		cfc         ="Setting"
+		fkcolumn    ="FK_userId"
+		inverse     ="true"
+		lazy        ="extra"
+		cascade     ="all-delete-orphan"
+		batchsize   ="25"
+		orderby     ="name DESC";
 
 	/* *********************************************************************
 	**						STATIC PROPERTIES & CONSTRAINTS
@@ -147,20 +161,29 @@ component 	persistent="true"
 	// Mementofication Settings
 	this.memento = {
 		// Default properties to serialize
-		defaultIncludes = [ "*" ],
+		defaultIncludes = [
+			//"*"
+			"userId",
+			"blogUrl",
+			"fname",
+			"lname"
+		],
 		// Default Exclusions
 		defaultExcludes = [
 			"APIToken",
 			"password",
 			"role",
-			"permissions"
+			"permissions",
+			"settings.description",
+			"settings.isConfirmed"
 		],
 		neverInclude = [
 			"password"
 		],
 		// Defaults
 		defaults = {
-			"role" = {}
+			"role" = {},
+			"settings" = []
 		}
 	};
 

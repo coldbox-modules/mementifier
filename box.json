@@ -1,6 +1,6 @@
 {
     "name":"Mementifier : The State Maker!",
-    "version":"2.1.0",
+    "version":"2.2.0",
     "location":"https://downloads.ortussolutions.com/ortussolutions/coldbox-modules/mementifier/@build.version@/mementifier-@build.version@.zip",
     "author":"Ortus Solutions, Corp",
     "homepage":"https://github.com/coldbox-modules/mementifier",
@@ -30,6 +30,9 @@
         "*/.md"
     ],
     "scripts":{
-        "toMaster":"recipe build/toMaster.boxr"
+        "release":"recipe build/release.boxr",
+        "format":"cfformat run interceptors/,models/,test-harness/handlers,test-harness/tests/specs",
+        "format:watch":"cfformat watch interceptors/,models/,test-harness/handlers,test-harness/tests/specs ./.cfformat.json",
+        "format:check":"cfformat check interceptors/,models/,test-harness/handlers,test-harness/tests/specs"
     }
 }
