@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----
 
+## [2.2.1] => 2020-NOV-06
+
+### Fixed
+
+* Reverted missing `nestedIncludes.len()` for ignore defaults on nested hierarchies.
+ 
+----
+
 ## [2.2.0] => 2020-NOV-05
 
 ### Added
