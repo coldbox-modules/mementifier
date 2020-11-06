@@ -302,7 +302,7 @@ component{
 							mappers 		= mappers,
 							defaults 		= defaults,
 							// cascade the ignore defaults down if specific nested includes are requested
-							ignoreDefaults 	= arguments.ignoreDefaults
+							ignoreDefaults 	= nestedIncludes.len() ? arguments.ignoreDefaults : false
 						);
 
 					} else {
@@ -326,7 +326,7 @@ component{
 					mappers 		= mappers,
 					defaults 		= defaults,
 					// cascade the ignore defaults down if specific nested includes are requested
-					ignoreDefaults 	= arguments.ignoreDefaults
+					ignoreDefaults 	= nestedIncludes.len() ? arguments.ignoreDefaults : false
 				);
 
 				// Do we have a root already for this guy?
