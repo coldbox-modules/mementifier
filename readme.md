@@ -56,6 +56,12 @@ this.memento = {
     trustedGetters = $mementifierSettings.trustedGetters,
     // Enable orm auto default includes
     ormAutoIncludes = $mementifierSettings.ormAutoIncludes,
+    // Use the ISO 8601 formatter for this component
+    iso8601Format = $mementifierSettings.iso8601Format,
+    // Use a custom date mask for this component
+    dateMask = $mementifierSettings.dateMask,
+	// Use a custom time mask for this component
+    timeMask = $mementifierSettings.timeMask
 }
 ```
 
@@ -194,7 +200,10 @@ struct function getMemento(
 	struct mappers={},
 	struct defaults={},
     boolean ignoreDefaults=false,
-    boolean trustedGetters
+	boolean trustedGetters,
+	boolean iso8601Format,
+	string dateMask,
+	string timeMask
 )
 ```
 
@@ -221,7 +230,10 @@ struct function getMemento(
 	struct mappers={},
 	struct defaults={},
 	boolean ignoreDefaults=false,
-	boolean trustedGetters
+	boolean trustedGetters,
+	boolean iso8601Format,
+	string dateMask,
+	string timeMask
 ){
 	// Call mementifier
 	var memento	= this.$getMemento( argumentCollection=arguments );
