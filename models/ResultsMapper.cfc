@@ -11,7 +11,7 @@
  * }
  * </pre>
  */
-component singleton{
+component singleton {
 
 	/**
 	 * Constructor
@@ -37,25 +37,21 @@ component singleton{
 	 */
 	function process(
 		required array collection,
-		id="id",
-		includes="",
-		excludes="",
-		struct mappers={},
-		struct defaults={},
-        boolean ignoreDefaults=false,
-        boolean trustedGetters
+		id                     = "id",
+		includes               = "",
+		excludes               = "",
+		struct mappers         = {},
+		struct defaults        = {},
+		boolean ignoreDefaults = false,
+		boolean trustedGetters
 	){
 		var args = arguments;
-		return arguments.collection
-			.reduce( function( accumulator, item ){
-				var id = invoke( arguments.item, "get#id#" );
-				arguments.accumulator.results.append( id );
-				arguments.accumulator.resultsMap[ id ] = item.getMemento( argumentCollection=args );
-				return arguments.accumulator;
-			}, {
-				"results" 		: [],
-				"resultsMap" 	: {}
-			} );
+		return arguments.collection.reduce( function( accumulator, item ){
+			var id = invoke( arguments.item, "get#id#" );
+			arguments.accumulator.results.append( id );
+			arguments.accumulator.resultsMap[ id ] = item.getMemento( argumentCollection = args );
+			return arguments.accumulator;
+		}, { "results" : [], "resultsMap" : {} } );
 	}
 
 }
