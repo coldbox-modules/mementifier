@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----
 
+## [2.3.0] => 2020-NOV-17
+
+### Added
+
+* Thanks to @elpete you can now add date/time formatting rules at the `getmemento()` level and the `this.memento` level. Please see the [readme](readme.md) for further information.
+  
+----
+
 ## [2.2.1] => 2020-NOV-06
 
 ### Fixed
