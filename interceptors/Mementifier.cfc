@@ -2,7 +2,7 @@
  * Listen to various entity methods so we can inject our mementifying capabilties to objects.
  * If an object already has a `getMemento()` method, we will inject a `$getMemento()` method so you can still decorate it.
  */
-component{
+component {
 
 	property name="settings" inject="coldbox:moduleSettings:mementifier";
 
@@ -19,7 +19,12 @@ component{
 	 */
 	function afterInstanceCreation( interceptData ){
 		// Only process struct based objects with the `memento` property
-		if( isStruct( arguments.interceptData.target ) && structKeyExists( arguments.interceptData.target, "memento" ) ){
+		if (
+			isStruct( arguments.interceptData.target ) && structKeyExists(
+				arguments.interceptData.target,
+				"memento"
+			)
+		) {
 			processMemento( arguments.interceptData.target );
 		}
 	}
@@ -53,17 +58,23 @@ component{
 	 */
 	function processMemento( entity ){
 		// Verify we haven't mementified this object already
-		if(
-			!structKeyExists( arguments.entity, "$mementifierSettings" )
-		){
-			//systemOutput( "==> Injectin mementifier: #getMetadata( arguments.entity ).name# ", true );
+		if (
+			!structKeyExists(
+				arguments.entity,
+				"$mementifierSettings"
+			)
+		) {
+			// systemOutput( "==> Injectin mementifier: #getMetadata( arguments.entity ).name# ", true );
 			// Inject utility
 			arguments.entity.$injectMixin = variables.$injectMixin;
 			// Inject Settings
-			arguments.entity.$injectMixin( "$mementifierSettings", variables.settings );
+			arguments.entity.$injectMixin(
+				"$mementifierSettings",
+				variables.settings
+			);
 
 			// Inject getMemento if not overriden
-			if( !structKeyExists( arguments.entity, "getMemento" ) ){
+			if ( !structKeyExists( arguments.entity, "getMemento" ) ) {
 				arguments.entity.$injectMixin( "getMemento", variables.getMemento );
 			}
 			// Else inject it with the $getMemento alias
@@ -72,11 +83,23 @@ component{
 			}
 
 			// Inject helper methods
-            arguments.entity.$injectMixin( "$buildNestedMementoList", variables.$buildNestedMementoList );
-            arguments.entity.$injectMixin( "$getDeepProperties", variables.$getDeepProperties );
+			arguments.entity.$injectMixin(
+				"$buildNestedMementoList",
+				variables.$buildNestedMementoList
+			);
+			arguments.entity.$injectMixin(
+				"$getDeepProperties",
+				variables.$getDeepProperties
+			);
 			// We do simple date formatters as they are faster than CFML methods
-			arguments.entity.$FORMATTER_ISO8601 = createObject( "java", "java.text.SimpleDateFormat" ).init( "yyyy-MM-dd'T'HH:mm:ssXXX" );
-			arguments.entity.$FORMATTER_CUSTOM 	= createObject( "java", "java.text.SimpleDateFormat" ).init( "#settings.dateMask# #settings.timeMask#" );
+			var dateMask                        = isNull( this.memento.dateMask ) ? settings.dateMask : this.memento.dateMask;
+			var timeMask                        = isNull( this.memento.timeMask ) ? settings.timeMask : this.memento.timeMask;
+			arguments.entity.$FORMATTER_ISO8601 = createObject( "java", "java.text.SimpleDateFormat" ).init(
+				"yyyy-MM-dd'T'HH:mm:ssXXX"
+			);
+			arguments.entity.$FORMATTER_CUSTOM = createObject( "java", "java.text.SimpleDateFormat" ).init(
+				"#dateMask# #timeMask#"
+			);
 		}
 	}
 
@@ -89,102 +112,130 @@ component{
 	 * @defaults A struct of key-value pairs that denotes the default values for properties if they are null, defaults for everything are a blank string.
 	 * @ignoreDefaults If set to true, default includes and excludes will be ignored and only the incoming `includes` and `excludes` list will be used.
 	 * @trustedGetters If set to true, getters will not be checked for in the `this` scope before trying to invoke them.
+	 * @iso8601Format If set to true, will use the ISO 8601 standard for formatting dates
+	 * @dateMask The date mask to use when formatting datetimes. Only used if iso8601Format is false.
+	 * @timeMask The time mask to use when formatting datetimes. Only used if iso8601Format is false.
 	 */
 	struct function getMemento(
-		includes="",
-		excludes="",
-		struct mappers={},
-		struct defaults={},
-        boolean ignoreDefaults=false,
-		boolean trustedGetters
+		includes               = "",
+		excludes               = "",
+		struct mappers         = {},
+		struct defaults        = {},
+		boolean ignoreDefaults = false,
+		boolean trustedGetters,
+		boolean iso8601Format,
+		string dateMask,
+		string timeMask
 	){
 		// Inflate incoming lists, arrays are faster than lists
-		if( isSimpleValue( arguments.includes ) ){
+		if ( isSimpleValue( arguments.includes ) ) {
 			arguments.includes = listToArray( arguments.includes );
 		}
-		if( isSimpleValue( arguments.excludes ) ){
+		if ( isSimpleValue( arguments.excludes ) ) {
 			arguments.excludes = listToArray( arguments.excludes );
 		}
 
 		// Param Default Memento Settings
 		// We do it here, because ACF caches crap!
 		var thisMemento = {
-			"defaultIncludes" 	: isNull( this.memento.defaultIncludes ) 	? []                                   : this.memento.defaultIncludes,
-			"defaultExcludes" 	: isNull( this.memento.defaultExcludes ) 	? []                                   : this.memento.defaultExcludes,
-			"neverInclude"		: isNull( this.memento.neverInclude ) 		? []                                   : this.memento.neverInclude,
-			"mappers"      		: isNull( this.memento.mappers ) 			? {}                                   : this.memento.mappers,
-			"defaults"     		: isNull( this.memento.defaults ) 			? {}                                   : this.memento.defaults,
-			"trustedGetters"    : isNull( this.memento.trustedGetters )     ? $mementifierSettings.trustedGetters  : this.memento.trustedGetters,
-			"ormAutoIncludes"   : isNull( this.memento.ormAutoIncludes )    ? $mementifierSettings.ormAutoIncludes : this.memento.ormAutoIncludes
-        };
+			"defaultIncludes" : isNull( this.memento.defaultIncludes ) ? [] : this.memento.defaultIncludes,
+			"defaultExcludes" : isNull( this.memento.defaultExcludes ) ? [] : this.memento.defaultExcludes,
+			"neverInclude"    : isNull( this.memento.neverInclude ) ? [] : this.memento.neverInclude,
+			"mappers"         : isNull( this.memento.mappers ) ? {} : this.memento.mappers,
+			"defaults"        : isNull( this.memento.defaults ) ? {} : this.memento.defaults,
+			"trustedGetters"  : isNull( this.memento.trustedGetters ) ? $mementifierSettings.trustedGetters : this.memento.trustedGetters,
+			"ormAutoIncludes" : isNull( this.memento.ormAutoIncludes ) ? $mementifierSettings.ormAutoIncludes : this.memento.ormAutoIncludes,
+			"iso8601Format"   : isNull( this.memento.iso8601Format ) ? $mementifierSettings.iso8601Format : this.memento.iso8601Format,
+			"dateMask"        : isNull( this.memento.dateMask ) ? $mementifierSettings.dateMask : this.memento.dateMask,
+			"timeMask"        : isNull( this.memento.timeMask ) ? $mementifierSettings.timeMask : this.memento.timeMask
+		};
 
-        param arguments.trustedGetters = thisMemento.trustedGetters;
+		param arguments.trustedGetters = thisMemento.trustedGetters;
+		param arguments.iso8601Format  = thisMemento.iso8601Format;
+
+		var customDateFormatter = this.$FORMATTER_CUSTOM;
+		if ( !isNull( arguments.dateMask ) || !isNull( arguments.timeMask ) ) {
+			param arguments.dateMask = thisMemento.dateMask;
+			param arguments.timeMask = thisMemento.timeMask;
+			customDateFormatter      = createObject( "java", "java.text.SimpleDateFormat" ).init(
+				"#arguments.dateMask# #arguments.timeMask#"
+			);
+		}
 
 		// Is orm auto inflate on and no memento defined? Build the default includes using this entity and Hibernate
-		if( thisMemento.ormAutoIncludes && !arrayLen( thisMemento.defaultIncludes ) ){
+		if ( thisMemento.ormAutoIncludes && !arrayLen( thisMemento.defaultIncludes ) ) {
 			var thisName = isNull( variables.entityName ) ? "" : variables.entityName;
-			if( ! len( thisName ) ){
-				var md = getMetadata( this );
+			if ( !len( thisName ) ) {
+				var md   = getMetadata( this );
 				thisName = ( md.keyExists( "entityName" ) ? md.entityName : listLast( md.name, "." ) );
 			}
 
 			var ORMService = new cborm.models.BaseORMService();
 
 			var entityMd = ORMService.getEntityMetadata( this );
-			var typeMap = arrayReduce(
-								entityMd.getPropertyNames(),
-								function( mdTypes, propertyName ){
-									var propertyType = entityMd.getPropertyType( propertyName );
-									var propertyClassName = getMetadata( propertyType ).name;
+			var typeMap  = arrayReduce(
+				entityMd.getPropertyNames(),
+				function( mdTypes, propertyName ){
+					var propertyType      = entityMd.getPropertyType( propertyName );
+					var propertyClassName = getMetadata( propertyType ).name;
 
-									mdTypes[ propertyName ] = propertyClassName;
-									return mdTypes;
-								}
-								,{});
+					mdTypes[ propertyName ] = propertyClassName;
+					return mdTypes;
+				},
+				{}
+			);
 
-			thisMemento.defaultIncludes = typeMap.keyArray().filter( function( propertyName ){
-					switch( listLast( typeMap[ propertyName ], "." ) ){
+			thisMemento.defaultIncludes = typeMap
+				.keyArray()
+				.filter( function( propertyName ){
+					switch ( listLast( typeMap[ propertyName ], "." ) ) {
 						case "BagType":
-                    	case "OneToManyType":
+						case "OneToManyType":
 						case "ManyToManyType":
 						case "ManyToOneType":
 						case "OneToOneType":
-						case "BinaryType":{
-                          return false;
-                    	}
-						default:{
-						  return true;
+						case "BinaryType": {
+							return false;
+						}
+						default: {
+							return true;
 						}
 					}
-			} );
+				} );
 
 			// Append primary keys
-			if( entityMd.hasIdentifierProperty() ){
-				arrayAppend( thisMemento.defaultIncludes, entityMd.getIdentifierPropertyName() );
-			} else if( thisMemento.defaultIncludes.getIdentifierType().isComponentType() ){
-				arrayAppend( thisMemento.defaultIncludes, listToArray( arrayToList( entityMd.getIdentifierType().getPropertyNames() ) ), true );
+			if ( entityMd.hasIdentifierProperty() ) {
+				arrayAppend(
+					thisMemento.defaultIncludes,
+					entityMd.getIdentifierPropertyName()
+				);
+			} else if ( thisMemento.defaultIncludes.getIdentifierType().isComponentType() ) {
+				arrayAppend(
+					thisMemento.defaultIncludes,
+					listToArray( arrayToList( entityMd.getIdentifierType().getPropertyNames() ) ),
+					true
+				);
 			}
 		}
 
 		// Do we have a * for auto includes of all properties in the object
-		if( arrayLen( thisMemento.defaultIncludes ) && thisMemento.defaultIncludes[ 1 ] == "*" ){
-
-            // assign the default includes to be all properties
-            // however, we exclude anything with an inject key and anything on the default exclude list
-            thisMemento.defaultIncludes = $getDeepProperties()
+		if ( arrayLen( thisMemento.defaultIncludes ) && thisMemento.defaultIncludes[ 1 ] == "*" ) {
+			// assign the default includes to be all properties
+			// however, we exclude anything with an inject key and anything on the default exclude list
+			thisMemento.defaultIncludes = $getDeepProperties()
 				.filter( function( item ){
 					return (
-                        !item.keyExists( "inject" ) &&
-                        !thisMemento.defaultExcludes.findNoCase( item.name )
-                    );
-				} ).map( function( item ){
+						!item.keyExists( "inject" ) &&
+						!thisMemento.defaultExcludes.findNoCase( item.name )
+					);
+				} )
+				.map( function( item ){
 					return item.name;
-                } );
-
+				} );
 		}
 
 		// Incorporate Defaults if not ignored
-		if( !arguments.ignoreDefaults ){
+		if ( !arguments.ignoreDefaults ) {
 			arguments.includes.append( thisMemento.defaultIncludes, true );
 			arguments.excludes.append(
 				thisMemento.defaultExcludes.filter( function( item ){
@@ -192,7 +243,7 @@ component{
 					return !includes.findNoCase( item );
 				} ),
 				true
-            );
+			);
 		}
 
 		// Incorporate Memento Mappers, and Defaults
@@ -200,58 +251,58 @@ component{
 		thisMemento.defaults.append( arguments.defaults, true );
 
 		// Start processing pipeline on the includes properties
-		var result 			= {};
+		var result          = {};
 		var mappersKeyArray = thisMemento.mappers.keyArray();
 
 		// Filter out exclude items and never include items
 		arguments.includes = arguments.includes.filter( function( item ){
 			return !arrayFindNoCase( excludes, item ) && !arrayFindNoCase( thisMemento.neverInclude, item );
-        } );
+		} );
 
 		// Process Includes
 		// Please keep at a traditional LOOP to avoid closure reference memory leaks and slowness on some engines.
-		for( var item in arguments.includes ){
-
+		for ( var item in arguments.includes ) {
 			// writeDump( var="Processing: #item#" );abort;
 			var nestedIncludes = "";
 
 			// Is this a nested include?
-			if( listLen( item,  "." ) > 1 ){
+			if ( listLen( item, "." ) > 1 ) {
 				// Nested List by removing relationship root.
 				nestedIncludes = listDeleteAt( item, 1, "." );
 				// Retrieve the relationship
-				item = listFirst( item, "." );
-            }
+				item           = listFirst( item, "." );
+			}
 
-            // Retrieve Value for transformation: ACF Incompats Suck on elvis operator
-            var thisValue = javacast( "null", "" );
+			// Retrieve Value for transformation: ACF Incompats Suck on elvis operator
+			var thisValue = javacast( "null", "" );
 
-            if ( arguments.trustedGetters || structKeyExists( this, "get#item#" ) ) {
-                try {
-                    thisValue = invoke( this, "get#item#" );
-                } catch ( any e ) {
-                    // Unless trusted getters is on and there is a mapper for this item rethrow the exception.
-                    if ( !arguments.trustedGetters || !structKeyExists( arguments.mappers, item ) ) {
-                        rethrow;
-                    }
-                }
-            // If the key doesn't exist and there is no mapper for the item, go to the next item.
+			if ( arguments.trustedGetters || structKeyExists( this, "get#item#" ) ) {
+				try {
+					thisValue = invoke( this, "get#item#" );
+				} catch ( any e ) {
+					// Unless trusted getters is on and there is a mapper for this item rethrow the exception.
+					if ( !arguments.trustedGetters || !structKeyExists( arguments.mappers, item ) ) {
+						rethrow;
+					}
+				}
+				// If the key doesn't exist and there is no mapper for the item, go to the next item.
 			} else if ( !structKeyExists( arguments.mappers, item ) ) {
-                continue;
-            }
+				continue;
+			}
 
-            // Verify Nullness
-            thisValue = isNull( thisValue ) ? (
-				arrayContainsNoCase( thisMemento.defaults.keyArray(), item ) ?
-					( isNull( thisMemento.defaults[ item ] ) ? javacast( "null", "" ) : thisMemento.defaults[ item ] ) :
-					$mementifierSettings.nullDefaultValue
+			// Verify Nullness
+			thisValue = isNull( thisValue ) ? (
+				arrayContainsNoCase(
+					thisMemento.defaults.keyArray(),
+					item
+				) ? ( isNull( thisMemento.defaults[ item ] ) ? javacast( "null", "" ) : thisMemento.defaults[ item ] ) : $mementifierSettings.nullDefaultValue
 			) : thisValue;
 
 			if ( isNull( thisValue ) ) {
 				result[ item ] = javacast( "null", "" );
 			}
 			// Match timestamps + date/time objects
-			else if(
+			else if (
 				isSimpleValue( thisValue )
 				&&
 				(
@@ -259,106 +310,114 @@ component{
 					||
 					reFind( "^\d{4}-\d{2}-\d{2}", thisValue ) // ACF date format begins with YYYY-MM-DD
 				)
-			){
-				try{
+			) {
+				try {
 					// Date Test just in case
 					thisValue.getTime();
 					// Iso Date?
-					if( $mementifierSettings.iso8601Format ){
+					if ( arguments.iso8601Format ) {
 						// we need to convert trailing Zulu time designations offset or JS libs like Moment will not know how to parse it
-						result[ item ] = this.$FORMATTER_ISO8601.format( thisValue ).replace("Z", "+00:00");
+						result[ item ] = this.$FORMATTER_ISO8601.format( thisValue ).replace( "Z", "+00:00" );
 					} else {
-						result[ item ] = this.$FORMATTER_CUSTOM.format( thisValue );
+						result[ item ] = customDateFormatter.format( thisValue );
 					}
-				} catch( any e ){
+				} catch ( any e ) {
 					result[ item ] = thisValue;
 				}
 			}
 			// Strict Type Boolean Values
-			else if( !isNumeric( thisValue ) && isBoolean( thisValue ) ){
-				result[ item ] = javaCast( "Boolean", thisValue );
+			else if ( !isNumeric( thisValue ) && isBoolean( thisValue ) ) {
+				result[ item ] = javacast( "Boolean", thisValue );
 			}
 			// Simple Values
-			else if( isSimpleValue( thisValue ) ){
+			else if ( isSimpleValue( thisValue ) ) {
 				result[ item ] = thisValue;
 			}
 
 			// Array Collections
-			else if( isArray( thisValue ) ){
+			else if ( isArray( thisValue ) ) {
 				// Map Items into result object
 				result[ item ] = [];
 
-				for( var thisIndex = 1; thisIndex <= arrayLen( thisValue ); thisIndex++ ){
-					 // only get mementos from relationships that have mementos, in the event that we have an already-serialized array of structs
-					if( !isSimpleValue( thisValue[ thisIndex ] ) && structKeyExists( thisValue[ thisIndex ], "getMemento" ) ) {
-
+				for ( var thisIndex = 1; thisIndex <= arrayLen( thisValue ); thisIndex++ ) {
+					// only get mementos from relationships that have mementos, in the event that we have an already-serialized array of structs
+					if (
+						!isSimpleValue( thisValue[ thisIndex ] ) && structKeyExists(
+							thisValue[ thisIndex ],
+							"getMemento"
+						)
+					) {
 						// If no nested includes requested, then default them
 						var nestedIncludes = $buildNestedMementoList( includes, item );
 
 						// Process the item memento
 						result[ item ][ thisIndex ] = thisValue[ thisIndex ].getMemento(
-							includes 		= nestedIncludes,
-							excludes 		= $buildNestedMementoList( excludes, item ),
-							mappers 		= mappers,
-							defaults 		= defaults,
+							includes       = nestedIncludes,
+							excludes       = $buildNestedMementoList( excludes, item ),
+							mappers        = mappers,
+							defaults       = defaults,
 							// cascade the ignore defaults down if specific nested includes are requested
-							ignoreDefaults 	= nestedIncludes.len() ? arguments.ignoreDefaults : false
+							ignoreDefaults = nestedIncludes.len() ? arguments.ignoreDefaults : false
 						);
-
 					} else {
-						result[ item ][ thisIndex ] = thisValue [ thisIndex ];
+						result[ item ][ thisIndex ] = thisValue[ thisIndex ];
 					}
 				}
 			}
 
 			// Single Object Relationships
-			else if( isValid( 'component', thisValue ) && structKeyExists( thisValue, "getMemento" ) ){
-				//writeDump( var=$buildNestedMementoList( includes, item ), label="includes: #item#" );
-				//writeDump( var=$buildNestedMementoList( excludes, item ), label="excludes: #item#" );
+			else if ( isValid( "component", thisValue ) && structKeyExists( thisValue, "getMemento" ) ) {
+				// writeDump( var=$buildNestedMementoList( includes, item ), label="includes: #item#" );
+				// writeDump( var=$buildNestedMementoList( excludes, item ), label="excludes: #item#" );
 
 				// If no nested includes requested, then default them
 				var nestedIncludes = $buildNestedMementoList( includes, item );
 
 				// Process the item memento
 				var thisItemMemento = thisValue.getMemento(
-					includes 		= nestedIncludes,
-					excludes 		= $buildNestedMementoList( excludes, item ),
-					mappers 		= mappers,
-					defaults 		= defaults,
+					includes       = nestedIncludes,
+					excludes       = $buildNestedMementoList( excludes, item ),
+					mappers        = mappers,
+					defaults       = defaults,
 					// cascade the ignore defaults down if specific nested includes are requested
-					ignoreDefaults 	= nestedIncludes.len() ? arguments.ignoreDefaults : false
+					ignoreDefaults = nestedIncludes.len() ? arguments.ignoreDefaults : false
 				);
 
 				// Do we have a root already for this guy?
-				if( result.keyExists( item ) ){
-					structAppend( result[ item ], thisItemMemento, false );
+				if ( result.keyExists( item ) ) {
+					structAppend(
+						result[ item ],
+						thisItemMemento,
+						false
+					);
 				} else {
 					result[ item ] = thisItemMemento;
 				}
-
 			} else {
 				// we don't know what to do with this item so we return as-is
 				result[ item ] = thisValue;
-            }
+			}
 		}
 
 		// This cannot use functional approaches like result.map() due to
 		// slowness on some engines ( Adobe :( ) and also closure pointers that cause
 		// memory leaks, especially when dealing with ORM engines. Please keep at a traditional loop
-		for( var item in result ){
+		for ( var item in result ) {
 			// Do we have a mapper according to this key?
 			if ( mappersKeyArray.findNoCase( item ) ) {
-                // ACF compat
+				// ACF compat
 				var thisMapper = thisMemento.mappers[ item ];
 				// Transform it
 				result[ item ] = thisMapper( result[ item ], result );
-            } else {
+			} else {
 				// Check for null values
-                result[ item ] = ( !result.keyExists( item ) || isNull( result[ item ] ) ) ? javacast( "null", "" ) : result[ item ];
-            }
+				result[ item ] = ( !result.keyExists( item ) || isNull( result[ item ] ) ) ? javacast( "null", "" ) : result[
+					item
+				];
+			}
 		}
 
-        // Return memento
+		// Return memento
 		return result;
 	}
 
@@ -393,36 +452,41 @@ component{
 	 */
 	function $injectMixin( name, target ){
 		variables[ arguments.name ] = arguments.target;
-		this[ arguments.name ] 		= arguments.target;
+		this[ arguments.name ]      = arguments.target;
 		return this;
-    }
+	}
 
-    /**
-     * Get Deep Properties
-     * Returns an array of an objects properties including those inherited by base classes.
-     *
-     * @metaData (optional) The starting CFML metadata of the entity object. Defaults to the current object.
-     *
-     * @return an array of object properties
-     */
-    private array function $getDeepProperties( struct metaData = getMetaData( this ) ) {
+	/**
+	 * Get Deep Properties
+	 * Returns an array of an objects properties including those inherited by base classes.
+	 *
+	 * @metaData (optional) The starting CFML metadata of the entity object. Defaults to the current object.
+	 *
+	 * @return an array of object properties
+	 */
+	private array function $getDeepProperties( struct metaData = getMetadata( this ) ){
+		var properties = [];
 
-        var properties = [];
+		// if this object extends another object, append any inherited properties.
+		if (
+			structKeyExists( arguments.metaData, "extends" ) &&
+			structKeyExists(
+				arguments.metaData.extends,
+				"properties"
+			)
+		) {
+			properties.append(
+				$getDeepProperties( arguments.metaData.extends ),
+				true
+			);
+		}
 
-        // if this object extends another object, append any inherited properties.
-        if (
-            structKeyExists( arguments.metaData, "extends" ) &&
-            structKeyExists( arguments.metaData.extends, "properties" )
-        ) {
-            properties.append( $getDeepProperties( arguments.metaData.extends ), true );
-        }
+		// if this object has properties, append them.
+		if ( structKeyExists( arguments.metaData, "properties" ) ) {
+			properties.append( arguments.metadata.properties, true );
+		}
 
-        // if this object has properties, append them.
-        if ( structKeyExists( arguments.metaData, "properties" ) ) {
-            properties.append( arguments.metadata.properties, true );
-        }
+		return properties;
+	}
 
-        return properties;
-
-    }
 }
