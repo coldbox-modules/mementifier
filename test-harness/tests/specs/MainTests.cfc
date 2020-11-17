@@ -7,7 +7,7 @@
 			} );
 
 			it( "can render base mementos", function() {
-				var event = this.request( route="/main/index", params={} );
+				var event   = this.request( route="/main/index", params={} );
 				var memento = deserializeJSON( event.getRenderedContent() );
 				// Derfault INcludes + Excludes
 				expect( memento )
@@ -19,7 +19,9 @@
 			} );
 
 			it( "can render mementos even if the object has already-serialized data", function() {
-				var event = this.request( route="/main/alreadySerialized", params={} );
+				var event = this.request( route="/main/alreadySerialized", params={
+					"includes": "alreadySerialized"
+				} );
 				var memento = deserializeJSON( event.getRenderedContent() );
 				// Derfault INcludes + Excludes
 
@@ -51,8 +53,10 @@
 
             it( "can render inherited properties with wildcard default properties", function() {
                 var event = this.request(
-                    route="/main/index",
-                    params={ }
+                    route ="/main/index",
+                    params={
+						"includes": "createdDate,isActive"
+					}
                 );
 
 				var memento = deserializeJSON( event.getRenderedContent() );
@@ -67,7 +71,7 @@
 
             it( "can use a mapper for a property that does not exist", function() {
                 var event = this.request(
-                    route="/main/index",
+                    route ="/main/index",
                     params={
                         "includes": "foo"
                     }
@@ -83,7 +87,7 @@
 
             it( "skips properties that do not exist and do not have a mapper", function() {
                 var event = this.request(
-                    route = "/main/index",
+                    route  = "/main/index",
                     params = {
                         "includes": "doesntexist"
                     }
@@ -98,9 +102,9 @@
 
             it( "tries to retrieve all properties when trustedGetters is on even if the method does not seem to exist", function() {
                 var event = this.request(
-                    route = "/main/index",
+                    route  = "/main/index",
                     params = {
-                        "includes": "doesntexist",
+                        "includes"      : "doesntexist",
                         "trustedGetters": true
                     }
                 );
@@ -110,6 +114,51 @@
 				expect( memento ).toBeStruct();
 				expect( memento ).toHaveKey( "doesntexist" );
 				expect( memento.doesntexist ).toBe( "doesntexist" );
+			} );
+
+			it( "can specify iso8601 in the getMemento call", function() {
+                var event = this.request(
+                    route  = "/main/index",
+                    params = {
+						"includes": "createdDate",
+                        "iso8601Format": true
+                    }
+                );
+
+				var memento = deserializeJSON( event.getRenderedContent() );
+				expect( memento ).toBeStruct();
+				expect( memento ).toHaveKey( "createdDate" );
+				expect( memento.createdDate ).toInclude( "T" );
+			} );
+
+			it( "can specify a date mask in the getMemento call", function() {
+                var event = this.request(
+                    route  = "/main/index",
+                    params = {
+						"includes": "createdDate",
+                        "dateMask": "MMM d YYYY"
+                    }
+                );
+
+				var memento = deserializeJSON( event.getRenderedContent() );
+				expect( memento ).toBeStruct();
+				expect( memento ).toHaveKey( "createdDate" );
+				expect( listToArray( memento.createdDate, "" )[ 1 ] ).notToBeNumeric();
+			} );
+
+			it( "can specify a time mask in the getMemento call", function() {
+                var event = this.request(
+                    route  = "/main/index",
+                    params = {
+						"includes": "createdDate",
+                        "timeMask": "H"
+                    }
+                );
+
+				var memento = deserializeJSON( event.getRenderedContent() );
+				expect( memento ).toBeStruct();
+				expect( memento ).toHaveKey( "createdDate" );
+				expect( find( ":", memento.createdDate ) > 0 ).toBeFalse( "Should not find a : character." );
             } );
 		} );
 	}

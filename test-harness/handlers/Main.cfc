@@ -1,13 +1,13 @@
 ﻿component{
 
-	property name="userService"       inject="entityService:User";
-	property name="roleService"       inject="entityService:Role";
-	property name="settingService"    inject="entityService:Setting";
+	property name="userService"             inject="entityService:User";
+	property name="roleService"             inject="entityService:Role";
+	property name="settingService"       inject="entityService:Setting";
 	property name="permissionService" inject="entityService:Permission";
 
 	function index( event, rc, prc ){
 		param rc.ignoreDefaults = false;
-		param rc.ignoredRoots = "";
+		param rc.ignoredRoots   = "";
 		param rc.includes       = "";
 		param rc.excludes       = "";
 
@@ -46,10 +46,10 @@
 		);
 
 		var result = oUser.getMemento(
-			includes = rc.includes,
-			excludes = rc.excludes,
+			includes       = rc.includes,
+			excludes       = rc.excludes,
 			ignoreDefaults = rc.ignoreDefaults,
-			ignoredRoots = rc.ignoredRoots,
+			ignoredRoots   = rc.ignoredRoots,
             trustedGetters = event.valueExists( "trustedGetters" ) ?
                 rc.trustedGetters :
                 javacast( "null", "" ),
@@ -58,11 +58,17 @@
                 "foo" = function( _, memento ) {
                     return memento.fname & " " & memento.lname;
                 }
-			}
+			},
+			iso8601Format = event.valueExists( "iso8601Format" ) ?
+				rc.iso8601Format :
+				javacast( "null", "" ),
+			dateMask = event.valueExists( "dateMask" ) ?
+				rc.dateMask :
+				javacast( "null", "" ),
+			timeMask = event.valueExists( "timeMask" ) ?
+				rc.timeMask :
+				javacast( "null", "" )
 		);
-
-		writeDump( var=result );
-		abort;
 
 		return result;
 	}
