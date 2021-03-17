@@ -73,6 +73,56 @@
 		return result;
 	}
 
+	function nested( event, rc, prc ) {
+		var mockData = {
+			fname       = "testuser",
+			lname       = "testuser",
+			email       = "testuser@testuser.com",
+			username    = "testuser",
+			isConfirmed = true,
+			isActive    = true,
+			otherURL    = "www.luismajano.com"
+		};
+
+		var oUser = populateModel(
+			model               = userService.new(),
+			memento             = mockData,
+			composeRelationships= true
+		);
+		oUser.setRole(
+			roleService.new( {
+				role       ="Admin",
+				description="Awesome Admin"
+			} )
+		);
+		oUser.getRole().setPermissions( [
+			permissionService.new( { permission="READ", description="read" } ),
+			permissionService.new( { permission="WRITE", description="write" } )
+		] );
+		oUser.setPermissions( [
+			permissionService.new( { permission="CUSTOM_READ", description="read" } ),
+			permissionService.new( { permission="CUSTOM_WRITE", description="write" } )
+		] );
+
+		oUser.setSettings(
+			[ getNewSetting(), getNewSetting(), getNewSetting(), getNewSetting(), getNewSetting() ]
+		);
+
+		var result = oUser.getMemento(
+			includes       = [ "role.permissions", "role.userId" ],
+			mappers = {
+                "description": function( item, memento ) {
+                    throw( "Should not be called" );
+                },
+                "role.permissions.description": function( item ) {
+                    return uCase( item );
+                }
+            }
+		);
+
+		return result;
+	}
+
 	private function getNewSetting(){
 		return settingService.new( {
 			name       : "setting-#createUUID()#",

@@ -88,6 +88,10 @@ component {
 				variables.$buildNestedMementoList
 			);
 			arguments.entity.$injectMixin(
+				"$buildNestedMementoStruct",
+				variables.$buildNestedMementoStruct
+			);
+			arguments.entity.$injectMixin(
 				"$getDeepProperties",
 				variables.$getDeepProperties
 			);
@@ -354,8 +358,8 @@ component {
 						result[ item ][ thisIndex ] = thisValue[ thisIndex ].getMemento(
 							includes       = nestedIncludes,
 							excludes       = $buildNestedMementoList( excludes, item ),
-							mappers        = mappers,
-							defaults       = defaults,
+							mappers        = $buildNestedMementoStruct( mappers, item ),
+							defaults       = $buildNestedMementoStruct( defaults, item ),
 							// cascade the ignore defaults down if specific nested includes are requested
 							ignoreDefaults = nestedIncludes.len() ? arguments.ignoreDefaults : false
 						);
@@ -377,8 +381,8 @@ component {
 				var thisItemMemento = thisValue.getMemento(
 					includes       = nestedIncludes,
 					excludes       = $buildNestedMementoList( excludes, item ),
-					mappers        = mappers,
-					defaults       = defaults,
+					mappers        = $buildNestedMementoStruct( mappers, item ),
+					defaults       = $buildNestedMementoStruct( defaults, item ),
 					// cascade the ignore defaults down if specific nested includes are requested
 					ignoreDefaults = nestedIncludes.len() ? arguments.ignoreDefaults : false
 				);
@@ -445,6 +449,23 @@ component {
 		// 	}
 		// }
 		// return results;
+	}
+
+	/**
+	 * Build a new memento mappers/defaults struct using the target list and a property root
+	 *
+	 * @struct The struct to use for construction
+	 * @root The root to filter out
+	 *
+	 * @return A struct of the new hiearchy to use
+	 */
+	function $buildNestedMementoStruct( required struct s, required string root ) {
+        return arguments.s.reduce( function( acc, key, value ) {
+            if ( listFirst( key, "." ) == root && listLen( key, "." ) > 1 ) {
+                acc[ listDeleteAt( key, 1, "." ) ] = value;
+            }
+            return acc;
+        }, {} );
 	}
 
 	/**

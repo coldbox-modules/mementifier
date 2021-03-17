@@ -160,6 +160,19 @@
 				expect( memento ).toHaveKey( "createdDate" );
 				expect( find( ":", memento.createdDate ) > 0 ).toBeFalse( "Should not find a : character." );
             } );
+
+            it( "correctly passes nested mappers", function() {
+                expect( function() {
+                    var event = this.request(
+                        route  = "/main/nested",
+                        params = {}
+                    );
+
+                    var memento = deserializeJSON( event.getRenderedContent() );
+                    expect( memento.role.permissions[ 1 ].description ).toBeWithCase( "READ" );
+                    expect( memento.role.permissions[ 2 ].description ).toBeWithCase( "WRITE" );
+                } ).notToThrow();
+            } );
 		} );
 	}
 
