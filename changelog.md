@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----
 
+## [2.4.0] => 2021-MAR-22
+
+### Added
+
+* ColdBox 6 Testing upgrades
+* cborm 3 testing
+* TestBox 4 upgrade
+* Full varscoping access to avoid scope lookups
+* Markdown linting
+* Updated formatting rules
+* Updated travis OS
+
+### Fixed
+
+* fix: Correctly apply nested mappers [#20](https://github.com/coldbox-modules/mementifier/pull/20)
+
+----
+
 ## [2.3.0] => 2020-NOV-17
 
 ### Added
