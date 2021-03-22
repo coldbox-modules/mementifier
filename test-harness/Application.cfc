@@ -54,7 +54,7 @@ component{
 	this.ormSettings = {
 		cfclocation = [ "models" ],
 		logSQL = true,
-		dbcreate = "update",
+		dbcreate = "dropcreate",
 		flushAtRequestEnd = false,
 		eventhandling = true,
 		eventHandler = "cborm.models.EventHandler",

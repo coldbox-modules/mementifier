@@ -39,10 +39,32 @@ component{
 	this.ormSettings = {
 		cfclocation = [ "/root/models" ],
 		logSQL = true,
-		dbcreate = "update",
+		dbcreate = "dropcreate",
 		flushAtRequestEnd = false,
 		eventhandling = true,
 		eventHandler = "cborm.models.EventHandler",
 		skipcfcWithError = true
 	};
+
+	// request start
+	public boolean function onRequestStart( String targetPage ){
+		if ( url.keyExists( "fwreinit" ) ) {
+			ormReload();
+			if ( structKeyExists( server, "lucee" ) ) {
+				pagePoolClear();
+			}
+		}
+
+		return true;
+	}
+
+	public function onRequestEnd(){
+		// CB 6 graceful shutdown
+		if ( !isNull( application.cbController ) ) {
+			application.cbController.getLoaderService().processShutdown();
+		}
+
+		structDelete( application, "cbController" );
+		structDelete( application, "wirebox" );
+	}
 }

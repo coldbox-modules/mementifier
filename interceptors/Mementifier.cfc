@@ -4,6 +4,7 @@
  */
 component {
 
+	// DI
 	property name="settings" inject="coldbox:moduleSettings:mementifier";
 
 	/**
@@ -96,8 +97,8 @@ component {
 				variables.$getDeepProperties
 			);
 			// We do simple date formatters as they are faster than CFML methods
-			var dateMask                        = isNull( this.memento.dateMask ) ? settings.dateMask : this.memento.dateMask;
-			var timeMask                        = isNull( this.memento.timeMask ) ? settings.timeMask : this.memento.timeMask;
+			var dateMask                        = isNull( this.memento.dateMask ) ? variables.settings.dateMask : this.memento.dateMask;
+			var timeMask                        = isNull( this.memento.timeMask ) ? variables.settings.timeMask : this.memento.timeMask;
 			arguments.entity.$FORMATTER_ISO8601 = createObject( "java", "java.text.SimpleDateFormat" ).init(
 				"yyyy-MM-dd'T'HH:mm:ssXXX"
 			);
@@ -147,16 +148,17 @@ component {
 			"neverInclude"    : isNull( this.memento.neverInclude ) ? [] : this.memento.neverInclude,
 			"mappers"         : isNull( this.memento.mappers ) ? {} : this.memento.mappers,
 			"defaults"        : isNull( this.memento.defaults ) ? {} : this.memento.defaults,
-			"trustedGetters"  : isNull( this.memento.trustedGetters ) ? $mementifierSettings.trustedGetters : this.memento.trustedGetters,
-			"ormAutoIncludes" : isNull( this.memento.ormAutoIncludes ) ? $mementifierSettings.ormAutoIncludes : this.memento.ormAutoIncludes,
-			"iso8601Format"   : isNull( this.memento.iso8601Format ) ? $mementifierSettings.iso8601Format : this.memento.iso8601Format,
-			"dateMask"        : isNull( this.memento.dateMask ) ? $mementifierSettings.dateMask : this.memento.dateMask,
-			"timeMask"        : isNull( this.memento.timeMask ) ? $mementifierSettings.timeMask : this.memento.timeMask
+			"trustedGetters"  : isNull( this.memento.trustedGetters ) ? variables.$mementifierSettings.trustedGetters : this.memento.trustedGetters,
+			"ormAutoIncludes" : isNull( this.memento.ormAutoIncludes ) ? variables.$mementifierSettings.ormAutoIncludes : this.memento.ormAutoIncludes,
+			"iso8601Format"   : isNull( this.memento.iso8601Format ) ? variables.$mementifierSettings.iso8601Format : this.memento.iso8601Format,
+			"dateMask"        : isNull( this.memento.dateMask ) ? variables.$mementifierSettings.dateMask : this.memento.dateMask,
+			"timeMask"        : isNull( this.memento.timeMask ) ? variables.$mementifierSettings.timeMask : this.memento.timeMask
 		};
 
 		param arguments.trustedGetters = thisMemento.trustedGetters;
 		param arguments.iso8601Format  = thisMemento.iso8601Format;
 
+		// Customize date formatting tools
 		var customDateFormatter = this.$FORMATTER_CUSTOM;
 		if ( !isNull( arguments.dateMask ) || !isNull( arguments.timeMask ) ) {
 			param arguments.dateMask = thisMemento.dateMask;
@@ -180,11 +182,11 @@ component {
 			var typeMap  = arrayReduce(
 				entityMd.getPropertyNames(),
 				function( mdTypes, propertyName ){
-					var propertyType      = entityMd.getPropertyType( propertyName );
+					var propertyType      = entityMd.getPropertyType( arguments.propertyName );
 					var propertyClassName = getMetadata( propertyType ).name;
 
-					mdTypes[ propertyName ] = propertyClassName;
-					return mdTypes;
+					arguments.mdTypes[ arguments.propertyName ] = propertyClassName;
+					return arguments.mdTypes;
 				},
 				{}
 			);
@@ -192,7 +194,12 @@ component {
 			thisMemento.defaultIncludes = typeMap
 				.keyArray()
 				.filter( function( propertyName ){
-					switch ( listLast( typeMap[ propertyName ], "." ) ) {
+					switch (
+						listLast(
+							typeMap[ arguments.propertyName ],
+							"."
+						)
+					) {
 						case "BagType":
 						case "OneToManyType":
 						case "ManyToManyType":
@@ -229,12 +236,12 @@ component {
 			thisMemento.defaultIncludes = $getDeepProperties()
 				.filter( function( item ){
 					return (
-						!item.keyExists( "inject" ) &&
-						!thisMemento.defaultExcludes.findNoCase( item.name )
+						!arguments.item.keyExists( "inject" ) &&
+						!thisMemento.defaultExcludes.findNoCase( arguments.item.name )
 					);
 				} )
 				.map( function( item ){
-					return item.name;
+					return arguments.item.name;
 				} );
 		}
 
@@ -244,7 +251,7 @@ component {
 			arguments.excludes.append(
 				thisMemento.defaultExcludes.filter( function( item ){
 					// Filter out if incoming includes was specified
-					return !includes.findNoCase( item );
+					return !includes.findNoCase( arguments.item );
 				} ),
 				true
 			);
@@ -260,7 +267,10 @@ component {
 
 		// Filter out exclude items and never include items
 		arguments.includes = arguments.includes.filter( function( item ){
-			return !arrayFindNoCase( excludes, item ) && !arrayFindNoCase( thisMemento.neverInclude, item );
+			return !arrayFindNoCase( excludes, arguments.item ) && !arrayFindNoCase(
+				thisMemento.neverInclude,
+				arguments.item
+			);
 		} );
 
 		// Process Includes
@@ -299,7 +309,7 @@ component {
 				arrayContainsNoCase(
 					thisMemento.defaults.keyArray(),
 					item
-				) ? ( isNull( thisMemento.defaults[ item ] ) ? javacast( "null", "" ) : thisMemento.defaults[ item ] ) : $mementifierSettings.nullDefaultValue
+				) ? ( isNull( thisMemento.defaults[ item ] ) ? javacast( "null", "" ) : thisMemento.defaults[ item ] ) : variables.$mementifierSettings.nullDefaultValue
 			) : thisValue;
 
 			if ( isNull( thisValue ) ) {
@@ -337,12 +347,11 @@ component {
 			else if ( isSimpleValue( thisValue ) ) {
 				result[ item ] = thisValue;
 			}
-
 			// Array Collections
 			else if ( isArray( thisValue ) ) {
 				// Map Items into result object
 				result[ item ] = [];
-
+				// Again we use traditional loops to avoid closure references and slowness on some engines
 				for ( var thisIndex = 1; thisIndex <= arrayLen( thisValue ); thisIndex++ ) {
 					// only get mementos from relationships that have mementos, in the event that we have an already-serialized array of structs
 					if (
@@ -436,10 +445,10 @@ component {
 	function $buildNestedMementoList( required list, required root ){
 		return arguments.list
 			.filter( function( target ){
-				return listFirst( target, "." ) == root && listLen( target, "." ) > 1;
+				return listFirst( arguments.target, "." ) == root && listLen( arguments.target, "." ) > 1;
 			} )
 			.map( function( target ){
-				return listDeleteAt( target, 1, "." );
+				return listDeleteAt( arguments.target, 1, "." );
 			} );
 
 		// var results = [];
@@ -459,13 +468,16 @@ component {
 	 *
 	 * @return A struct of the new hiearchy to use
 	 */
-	function $buildNestedMementoStruct( required struct s, required string root ) {
-        return arguments.s.reduce( function( acc, key, value ) {
-            if ( listFirst( key, "." ) == root && listLen( key, "." ) > 1 ) {
-                acc[ listDeleteAt( key, 1, "." ) ] = value;
-            }
-            return acc;
-        }, {} );
+	function $buildNestedMementoStruct(
+		required struct s,
+		required string root
+	){
+		return arguments.s.reduce( function( acc, key, value ){
+			if ( listFirst( arguments.key, "." ) == root && listLen( arguments.key, "." ) > 1 ) {
+				arguments.acc[ listDeleteAt( arguments.key, 1, "." ) ] = arguments.value;
+			}
+			return arguments.acc;
+		}, {} );
 	}
 
 	/**
