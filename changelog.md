@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----
 
+## [2.5.0] => 2021-APR-30
+
+### Added
+
+* Ability to do output aliases using `:` notation: `property:alias`
+
+### Fixed
+
+* When using orm with composite keys and no default includes it should look at the metdata for the identifier type not the includes
+
+
+----
+
 ## [2.4.0] => 2021-MAR-22
 
 ### Added

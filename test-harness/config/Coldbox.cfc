@@ -26,7 +26,7 @@
 			//Error/Exception Handling
 			exceptionHandler		= "",
 			onInvalidEvent			= "",
-			customErrorTemplate 	= "/coldbox/system/includes/BugReport.cfm",
+			customErrorTemplate 	= "/coldbox/system/exceptions/Whoops.cfm",
 
 			//Application Aspects
 			handlerCaching 			= false,
@@ -50,7 +50,6 @@
 
 		//Register interceptors as an array, we need order
 		interceptors = [
-			 //SES
 		];
 
 		//LogBox DSL
@@ -71,12 +70,9 @@
 
 	}
 
-	/**
-	 * Load the Module you are testing
-	 */
-	function afterAspectsLoad( event, interceptData, rc, prc ){
+	function afterModuleRegistrations( event, interceptData ){
 		controller.getModuleService()
-			.registerAndActivateModule(
+			.registerModule(
 				moduleName 		= request.MODULE_NAME,
 				invocationPath 	= "moduleroot"
 			);

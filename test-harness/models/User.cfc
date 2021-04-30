@@ -165,8 +165,8 @@ component 	persistent="true"
 			//"*"
 			"userId",
 			"blogUrl",
-			"fname",
-			"lname"
+			"fname:firstName",
+			"lname:lastName"
 		],
 		// Default Exclusions
 		defaultExcludes = [
