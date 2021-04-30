@@ -292,7 +292,7 @@ component {
 			var thisValue = javacast( "null", "" );
 			// Do we have a property output alias?
 			if ( item.find( ":" ) ) {
-				var thisAlias = item.getToken( 2, ":" )
+				var thisAlias = item.getToken( 2, ":" );
 				item          = item.getToken( 1, ":" );
 			} else {
 				var thisAlias = item;
