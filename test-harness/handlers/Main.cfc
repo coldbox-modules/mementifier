@@ -6,6 +6,7 @@
 	property name="permissionService" inject="entityService:Permission";
 
 	function index( event, rc, prc ){
+
 		param rc.ignoreDefaults = false;
 		param rc.ignoredRoots   = "";
 		param rc.includes       = "";
@@ -20,6 +21,8 @@
 			isActive    = true,
 			otherURL    = "www.luismajano.com"
 		};
+
+
 
 		var oUser = populateModel(
 			model               = userService.new(),
@@ -56,7 +59,7 @@
 			mappers = {
                 lname = function( item ){ return item.ucase(); },
                 "foo" = function( _, memento ) {
-                    return memento.fname & " " & memento.lname;
+                    return memento.firstName & " " & memento.lastName;
                 }
 			},
 			iso8601Format = event.valueExists( "iso8601Format" ) ?

@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----
 
-## [2.5.0] => 2021-
+## [2.5.0] => 2021-APR-30
+
+### Added
+
+* Ability to do output aliases using `:` notation: `property:alias`
 
 ### Fixed
 

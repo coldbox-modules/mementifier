@@ -15,7 +15,7 @@
     "installPaths":{
         "coldbox":"coldbox/",
         "testbox":"testbox/",
-        "cborm":"modules/cborm/",
+        "cborm":"lazymodules/cborm/",
         "mockdatacfc":"modules/mockdatacfc/"
     },
     "testbox":{

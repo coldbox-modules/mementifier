@@ -290,6 +290,13 @@ component {
 
 			// Retrieve Value for transformation: ACF Incompats Suck on elvis operator
 			var thisValue = javacast( "null", "" );
+			// Do we have a property output alias?
+			if ( item.find( ":" ) ) {
+				var thisAlias = item.getToken( 2, ":" )
+				item          = item.getToken( 1, ":" );
+			} else {
+				var thisAlias = item;
+			}
 
 			if ( arguments.trustedGetters || structKeyExists( this, "get#item#" ) ) {
 				try {
@@ -314,7 +321,7 @@ component {
 			) : thisValue;
 
 			if ( isNull( thisValue ) ) {
-				result[ item ] = javacast( "null", "" );
+				result[ thisAlias ] = javacast( "null", "" );
 			}
 			// Match timestamps + date/time objects
 			else if (
@@ -332,26 +339,26 @@ component {
 					// Iso Date?
 					if ( arguments.iso8601Format ) {
 						// we need to convert trailing Zulu time designations offset or JS libs like Moment will not know how to parse it
-						result[ item ] = this.$FORMATTER_ISO8601.format( thisValue ).replace( "Z", "+00:00" );
+						result[ thisAlias ] = this.$FORMATTER_ISO8601.format( thisValue ).replace( "Z", "+00:00" );
 					} else {
-						result[ item ] = customDateFormatter.format( thisValue );
+						result[ thisAlias ] = customDateFormatter.format( thisValue );
 					}
 				} catch ( any e ) {
-					result[ item ] = thisValue;
+					result[ thisAlias ] = thisValue;
 				}
 			}
 			// Strict Type Boolean Values
 			else if ( !isNumeric( thisValue ) && isBoolean( thisValue ) ) {
-				result[ item ] = javacast( "Boolean", thisValue );
+				result[ thisAlias ] = javacast( "Boolean", thisValue );
 			}
 			// Simple Values
 			else if ( isSimpleValue( thisValue ) ) {
-				result[ item ] = thisValue;
+				result[ thisAlias ] = thisValue;
 			}
 			// Array Collections
 			else if ( isArray( thisValue ) ) {
 				// Map Items into result object
-				result[ item ] = [];
+				result[ thisAlias ] = [];
 				// Again we use traditional loops to avoid closure references and slowness on some engines
 				for ( var thisIndex = 1; thisIndex <= arrayLen( thisValue ); thisIndex++ ) {
 					// only get mementos from relationships that have mementos, in the event that we have an already-serialized array of structs
@@ -365,7 +372,7 @@ component {
 						var nestedIncludes = $buildNestedMementoList( includes, item );
 
 						// Process the item memento
-						result[ item ][ thisIndex ] = thisValue[ thisIndex ].getMemento(
+						result[ thisAlias ][ thisIndex ] = thisValue[ thisIndex ].getMemento(
 							includes       = nestedIncludes,
 							excludes       = $buildNestedMementoList( excludes, item ),
 							mappers        = $buildNestedMementoStruct( mappers, item ),
@@ -374,7 +381,7 @@ component {
 							ignoreDefaults = nestedIncludes.len() ? arguments.ignoreDefaults : false
 						);
 					} else {
-						result[ item ][ thisIndex ] = thisValue[ thisIndex ];
+						result[ thisAlias ][ thisIndex ] = thisValue[ thisIndex ];
 					}
 				}
 			}
@@ -400,16 +407,16 @@ component {
 				// Do we have a root already for this guy?
 				if ( result.keyExists( item ) ) {
 					structAppend(
-						result[ item ],
+						result[ thisAlias ],
 						thisItemMemento,
 						false
 					);
 				} else {
-					result[ item ] = thisItemMemento;
+					result[ thisAlias ] = thisItemMemento;
 				}
 			} else {
 				// we don't know what to do with this item so we return as-is
-				result[ item ] = thisValue;
+				result[ thisAlias ] = thisValue;
 			}
 		}
 

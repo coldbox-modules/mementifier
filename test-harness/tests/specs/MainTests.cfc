@@ -15,7 +15,7 @@
 					.notToHaveKey( "role" )
 					.notToHaveKey( "permission" );
 				// mapper
-				expect( memento.lname ).toBe( "TESTUSER" );
+				expect( memento.lastName ).toBe( "TESTUSER" );
 			} );
 
 			it( "can render mementos even if the object has already-serialized data", function() {
@@ -82,7 +82,7 @@
                 // Expect inherited properties from the base class
 				expect( memento ).toBeStruct();
 				expect( memento ).toHaveKey( "foo" );
-				expect( memento.foo ).toBe( memento.fname & " " & memento.lname );
+				expect( memento.foo ).toBe( memento.firstName & " " & memento.lastName );
             } );
 
             it( "skips properties that do not exist and do not have a mapper", function() {
@@ -173,6 +173,15 @@
                     expect( memento.role.permissions[ 2 ].description ).toBeWithCase( "WRITE" );
                 } ).notToThrow();
             } );
+
+			it( "can use property aliases for includes", function(){
+				var event = this.request(
+					route  = "/main/index",
+					params = { includes = "APIToken:token"}
+				);
+				var memento = deserializeJSON( event.getRenderedContent() );
+				expect( memento ).toHaveKey( "token,firstName,lastName" );
+			});
 		} );
 	}
 
