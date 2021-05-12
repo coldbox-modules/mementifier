@@ -59,12 +59,20 @@ component {
 	 */
 	function processMemento( entity ){
 		// Verify we haven't mementified this object already
-		if ( !structKeyExists( arguments.entity, "$mementifierSettings" ) ) {
+		if (
+			!structKeyExists(
+				arguments.entity,
+				"$mementifierSettings"
+			)
+		) {
 			// systemOutput( "==> Injectin mementifier: #getMetadata( arguments.entity ).name# ", true );
 			// Inject utility
 			arguments.entity.$injectMixin = variables.$injectMixin;
 			// Inject Settings
-			arguments.entity.$injectMixin( "$mementifierSettings", variables.settings );
+			arguments.entity.$injectMixin(
+				"$mementifierSettings",
+				variables.settings
+			);
 
 			// Inject getMemento if not overriden
 			if ( !structKeyExists( arguments.entity, "getMemento" ) ) {
@@ -84,18 +92,19 @@ component {
 				"$buildNestedMementoStruct",
 				variables.$buildNestedMementoStruct
 			);
-			arguments.entity.$injectMixin( "$getDeepProperties", variables.$getDeepProperties );
+			arguments.entity.$injectMixin(
+				"$getDeepProperties",
+				variables.$getDeepProperties
+			);
 			// We do simple date formatters as they are faster than CFML methods
 			var dateMask                        = isNull( this.memento.dateMask ) ? variables.settings.dateMask : this.memento.dateMask;
 			var timeMask                        = isNull( this.memento.timeMask ) ? variables.settings.timeMask : this.memento.timeMask;
-			arguments.entity.$FORMATTER_ISO8601 = createObject(
-				"java",
-				"java.text.SimpleDateFormat"
-			).init( "yyyy-MM-dd'T'HH:mm:ssXXX" );
-			arguments.entity.$FORMATTER_CUSTOM = createObject(
-				"java",
-				"java.text.SimpleDateFormat"
-			).init( "#dateMask# #timeMask#" );
+			arguments.entity.$FORMATTER_ISO8601 = createObject( "java", "java.text.SimpleDateFormat" ).init(
+				"yyyy-MM-dd'T'HH:mm:ssXXX"
+			);
+			arguments.entity.$FORMATTER_CUSTOM = createObject( "java", "java.text.SimpleDateFormat" ).init(
+				"#dateMask# #timeMask#"
+			);
 			// Do we set timezones?
 			if ( len( variables.settings.convertToTimezone ) ) {
 				var tz = createObject( "java", "java.util.TimeZone" ).getTimeZone(
@@ -193,7 +202,12 @@ component {
 			thisMemento.defaultIncludes = typeMap
 				.keyArray()
 				.filter( function( propertyName ){
-					switch ( listLast( typeMap[ arguments.propertyName ], "." ) ) {
+					switch (
+						listLast(
+							typeMap[ arguments.propertyName ],
+							"."
+						)
+					) {
 						case "BagType":
 						case "OneToManyType":
 						case "ManyToManyType":
@@ -210,7 +224,10 @@ component {
 
 			// Append primary keys
 			if ( entityMd.hasIdentifierProperty() ) {
-				arrayAppend( thisMemento.defaultIncludes, entityMd.getIdentifierPropertyName() );
+				arrayAppend(
+					thisMemento.defaultIncludes,
+					entityMd.getIdentifierPropertyName()
+				);
 			} else if ( thisMemento.defaultIncludes.getIdentifierType().isComponentType() ) {
 				arrayAppend(
 					thisMemento.defaultIncludes,
@@ -282,7 +299,7 @@ component {
 			var thisValue = javacast( "null", "" );
 			// Do we have a property output alias?
 			if ( item.find( ":" ) ) {
-				var thisAlias = item.getToken( 2, ":" )
+				var thisAlias = item.getToken( 2, ":" );
 				item          = item.getToken( 1, ":" );
 			} else {
 				var thisAlias = item;
@@ -304,11 +321,10 @@ component {
 
 			// Verify Nullness
 			thisValue = isNull( thisValue ) ? (
-				arrayContainsNoCase( thisMemento.defaults.keyArray(), item ) ? (
-					isNull( thisMemento.defaults[ item ] ) ? javacast( "null", "" ) : thisMemento.defaults[
-						item
-					]
-				) : variables.$mementifierSettings.nullDefaultValue
+				arrayContainsNoCase(
+					thisMemento.defaults.keyArray(),
+					item
+				) ? ( isNull( thisMemento.defaults[ item ] ) ? javacast( "null", "" ) : thisMemento.defaults[ item ] ) : variables.$mementifierSettings.nullDefaultValue
 			) : thisValue;
 
 			if ( isNull( thisValue ) ) {
@@ -330,15 +346,11 @@ component {
 					// Iso Date?
 					if ( arguments.iso8601Format ) {
 						// we need to convert trailing Zulu time designations offset or JS libs like Moment will not know how to parse it
-						result[ thisAlias ] = this.$FORMATTER_ISO8601
-							.format( thisValue )
-							.replace( "Z", "+00:00" );
+						result[ thisAlias ] = this.$FORMATTER_ISO8601.format( thisValue ).replace( "Z", "+00:00" );
 					} else {
 						result[ thisAlias ] = customDateFormatter.format( thisValue );
 					}
 				} catch ( any e ) {
-					writeDump( var = e );
-					abort;
 					result[ thisAlias ] = thisValue;
 				}
 			}
@@ -401,7 +413,11 @@ component {
 
 				// Do we have a root already for this guy?
 				if ( result.keyExists( thisAlias ) ) {
-					structAppend( result[ thisAlias ], thisItemMemento, false );
+					structAppend(
+						result[ thisAlias ],
+						thisItemMemento,
+						false
+					);
 				} else {
 					result[ thisAlias ] = thisItemMemento;
 				}
@@ -423,10 +439,9 @@ component {
 				result[ item ] = thisMapper( result[ item ], result );
 			} else {
 				// Check for null values
-				result[ item ] = ( !result.keyExists( item ) || isNull( result[ item ] ) ) ? javacast(
-					"null",
-					""
-				) : result[ item ];
+				result[ item ] = ( !result.keyExists( item ) || isNull( result[ item ] ) ) ? javacast( "null", "" ) : result[
+					item
+				];
 			}
 		}
 
@@ -445,10 +460,7 @@ component {
 	function $buildNestedMementoList( required list, required root ){
 		return arguments.list
 			.filter( function( target ){
-				return listFirst( arguments.target, "." ) == root && listLen(
-					arguments.target,
-					"."
-				) > 1;
+				return listFirst( arguments.target, "." ) == root && listLen( arguments.target, "." ) > 1;
 			} )
 			.map( function( target ){
 				return listDeleteAt( arguments.target, 1, "." );
@@ -471,7 +483,10 @@ component {
 	 *
 	 * @return A struct of the new hiearchy to use
 	 */
-	function $buildNestedMementoStruct( required struct s, required string root ){
+	function $buildNestedMementoStruct(
+		required struct s,
+		required string root
+	){
 		return arguments.s.reduce( function( acc, key, value ){
 			if ( listFirst( arguments.key, "." ) == root && listLen( arguments.key, "." ) > 1 ) {
 				arguments.acc[ listDeleteAt( arguments.key, 1, "." ) ] = arguments.value;
@@ -503,9 +518,15 @@ component {
 		// if this object extends another object, append any inherited properties.
 		if (
 			structKeyExists( arguments.metaData, "extends" ) &&
-			structKeyExists( arguments.metaData.extends, "properties" )
+			structKeyExists(
+				arguments.metaData.extends,
+				"properties"
+			)
 		) {
-			properties.append( $getDeepProperties( arguments.metaData.extends ), true );
+			properties.append(
+				$getDeepProperties( arguments.metaData.extends ),
+				true
+			);
 		}
 
 		// if this object has properties, append them.
