@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+----
+
+## [2.5.0] => 2021-MAY-12
+
+### Added
+
+* New setting `convertToTimezone` which if you set a timezone, mementifier will convert date/time's to that specific timezone.
+
 ----
 
 ## [2.5.0] => 2021-APR-30
