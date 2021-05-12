@@ -27,7 +27,9 @@ moduleSettings = {
 		// The default value for relationships/getters which return null
 		nullDefaultValue = '',
         // Don't check for getters before invoking them
-        trustedGetters = false
+        trustedGetters = false,
+		// If not empty, convert all date/times to the specific timezone
+		convertToTimezone = ""
 	}
 }
 ```
@@ -247,6 +249,16 @@ struct function getMemento(
 	return memento;
 }
 ```
+
+## Timezone Conversions
+
+Mementifier can also convert date/time objects into specific formats but also a specific timezone. You will use the `convertToTimezone` configuration setting and set it to a valid Java Timezone string.  This can be either an abbreviation such as "PST", a full name such as "America/Los_Angeles", or a custom ID such as "GMT-8:00". Nice listing: https://garygregory.wordpress.com/2013/06/18/what-are-the-java-timezone-ids/
+
+```
+convertToTimezone : "UTC"
+```
+
+That's it. Now mementifier will format the date/times with the appropriate selected timezone or use the system default timezone.
 
 ## Results Mapper
 

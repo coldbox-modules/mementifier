@@ -105,6 +105,14 @@ component {
 			arguments.entity.$FORMATTER_CUSTOM = createObject( "java", "java.text.SimpleDateFormat" ).init(
 				"#dateMask# #timeMask#"
 			);
+			// Do we set timezones?
+			if ( len( variables.settings.convertToTimezone ) ) {
+				var tz = createObject( "java", "java.util.TimeZone" ).getTimeZone(
+					variables.settings.convertToTimezone
+				);
+				arguments.entity.$FORMATTER_ISO8601.setTimezone( tz );
+				arguments.entity.$FORMATTER_CUSTOM.setTimezone( tz );
+			}
 		}
 	}
 
@@ -220,10 +228,9 @@ component {
 					thisMemento.defaultIncludes,
 					entityMd.getIdentifierPropertyName()
 				);
-			} else if ( entityMd.getIdentifierType().isComponentType() ) {
+			} else if ( thisMemento.defaultIncludes.getIdentifierType().isComponentType() ) {
 				arrayAppend(
 					thisMemento.defaultIncludes,
-					// Convert Java array to CF Array
 					listToArray( arrayToList( entityMd.getIdentifierType().getPropertyNames() ) ),
 					true
 				);
@@ -405,7 +412,7 @@ component {
 				);
 
 				// Do we have a root already for this guy?
-				if ( result.keyExists( item ) ) {
+				if ( result.keyExists( thisAlias ) ) {
 					structAppend(
 						result[ thisAlias ],
 						thisItemMemento,
