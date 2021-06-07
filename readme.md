@@ -63,7 +63,18 @@ this.memento = {
     // Use a custom date mask for this component
     dateMask = $mementifierSettings.dateMask,
 	// Use a custom time mask for this component
-    timeMask = $mementifierSettings.timeMask
+    timeMask = $mementifierSettings.timeMask,
+	// A collection of mementifier profiles you can use to create many output permutations
+	profiles = {
+		name = {
+			defaultIncludes : [],
+			defaultExcludes : [],
+			neverInclude = [],
+			defaults = {},
+			mappers = {}
+			...
+		}
+	}
 }
 ```
 
@@ -205,7 +216,8 @@ struct function getMemento(
 	boolean trustedGetters,
 	boolean iso8601Format,
 	string dateMask,
-	string timeMask
+	string timeMask,
+	string profile = ""
 )
 ```
 
@@ -216,6 +228,97 @@ As you can see, the memento method has also a way to add dynamic `includes`, `ex
 #### Ignoring Defaults
 
 We have also added a way to ignore the default include and exclude lists via the `ignoreDefaults` flag.  If you turn that flag to `true` then **ONLY** the passed in `includes` and `excludes` will be used in the memento.  However, please note that the `neverInclude` array will **always** be used.
+
+#### Output Profiles
+
+You can use the `this.memento.profiles` to define many output profiles a part from the defaults includes and excludes.  This is used by using the `profile` argument to the `getMemento()` call.  The mementifier will then pass in the profile argument to the object and it's entire object graph.  If a child of the object graph does NOT have that profile, it will rever to the defaults instead.
+
+This is a great way to encapsulate many different output mementifiying options:
+
+```
+// Declare your profiles
+this.memento = {
+	defaultIncludes : [
+		"allowComments",
+		"cache",
+		"cacheLastAccessTimeout",
+		"cacheLayout",
+		"cacheTimeout",
+		"categoriesArray:categories",
+		"contentID",
+		"contentType",
+		"createdDate",
+		"creatorSnapshot:creator", // Creator
+		"expireDate",
+		"featuredImage",
+		"featuredImageURL",
+		"HTMLDescription",
+		"HTMLKeywords",
+		"HTMLTitle",
+		"isPublished",
+		"isDeleted",
+		"lastEditorSnapshot:lastEditor",
+		"markup",
+		"modifiedDate",
+		"numberOfChildren",
+		"numberOfComments",
+		"numberOfHits",
+		"numberOfVersions",
+		"parentSnapshot:parent", // Parent
+		"publishedDate",
+		"showInSearch",
+		"slug",
+		"title"
+	],
+	defaultExcludes : [
+		"children",
+		"comments",
+		"commentSubscriptions",
+		"contentVersions",
+		"customFields",
+		"linkedContent",
+		"parent",
+		"relatedContent",
+		"site",
+		"stats"
+	],
+	neverInclude : [ "passwordProtection" ],
+	mappers      : {},
+	defaults     : { stats : {} },
+	profiles     : {
+		export : {
+			defaultIncludes : [
+				"children",
+				"comments",
+				"commentSubscriptions",
+				"contentVersions",
+				"customFields",
+				"linkedContent",
+				"relatedContent",
+				"siteID",
+				"stats"
+			],
+			defaultExcludes : [
+				"commentSubscriptions.relatedContentSnapshot:relatedContent",
+				"children.parentSnapshot:parent",
+				"parent",
+				"site"
+			]
+		}
+	}
+};
+// Incorporate all defaults into export profile to avoid duplicate writing them
+this.memento.profiles[ "export" ].defaultIncludes.append( this.memento.defaultIncludes, true );
+```
+
+Then use it via the `getMemento()` method call:
+
+```
+content.getMemento( profile: "export" )
+```
+
+Please note that you can still influence the profile by passing in extra `includes`, `excludes` and all the valid memento arguments.
+
 
 #### Trusted Getters
 
@@ -235,7 +338,8 @@ struct function getMemento(
 	boolean trustedGetters,
 	boolean iso8601Format,
 	string dateMask,
-	string timeMask
+	string timeMask,
+	string profile = ""
 ){
 	// Call mementifier
 	var memento	= this.$getMemento( argumentCollection=arguments );
