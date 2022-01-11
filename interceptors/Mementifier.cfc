@@ -309,7 +309,7 @@ component {
 					}
 				}
 				// If the key doesn't exist and there is no mapper for the item, go to the next item.
-			} else if ( !structKeyExists( arguments.mappers, item ) ) {
+			} else if ( !structKeyExists( thisMemento.mappers, item ) ) {
 				continue;
 			}
 
