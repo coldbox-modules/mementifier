@@ -76,26 +76,18 @@ component {
 			}
 
 			// Inject helper methods
-			arguments.entity.$injectMixin(
-				"$buildNestedMementoList",
-				variables.$buildNestedMementoList
-			);
-			arguments.entity.$injectMixin(
-				"$buildNestedMementoStruct",
-				variables.$buildNestedMementoStruct
-			);
+			arguments.entity.$injectMixin( "$buildNestedMementoList", variables.$buildNestedMementoList );
+			arguments.entity.$injectMixin( "$buildNestedMementoStruct", variables.$buildNestedMementoStruct );
 			arguments.entity.$injectMixin( "$getDeepProperties", variables.$getDeepProperties );
 			// We do simple date formatters as they are faster than CFML methods
 			var dateMask                        = isNull( this.memento.dateMask ) ? variables.settings.dateMask : this.memento.dateMask;
 			var timeMask                        = isNull( this.memento.timeMask ) ? variables.settings.timeMask : this.memento.timeMask;
-			arguments.entity.$FORMATTER_ISO8601 = createObject(
-				"java",
-				"java.text.SimpleDateFormat"
-			).init( "yyyy-MM-dd'T'HH:mm:ssXXX" );
-			arguments.entity.$FORMATTER_CUSTOM = createObject(
-				"java",
-				"java.text.SimpleDateFormat"
-			).init( "#dateMask# #timeMask#" );
+			arguments.entity.$FORMATTER_ISO8601 = createObject( "java", "java.text.SimpleDateFormat" ).init(
+				"yyyy-MM-dd'T'HH:mm:ssXXX"
+			);
+			arguments.entity.$FORMATTER_CUSTOM = createObject( "java", "java.text.SimpleDateFormat" ).init(
+				"#dateMask# #timeMask#"
+			);
 			// Do we set timezones?
 			if ( len( variables.settings.convertToTimezone ) ) {
 				var tz = createObject( "java", "java.util.TimeZone" ).getTimeZone(
@@ -110,16 +102,16 @@ component {
 	/**
 	 * Construct a memento representation from an entity according to includes and exclude lists
 	 *
-	 * @includes The properties array or list to build the memento with alongside the default includes
-	 * @excludes The properties array or list to exclude from the memento alongside the default excludes
-	 * @mappers A struct of key-function pairs that will map properties to closures/lambadas to process the item value.  The closure will transform the item value.
-	 * @defaults A struct of key-value pairs that denotes the default values for properties if they are null, defaults for everything are a blank string.
+	 * @includes       The properties array or list to build the memento with alongside the default includes
+	 * @excludes       The properties array or list to exclude from the memento alongside the default excludes
+	 * @mappers        A struct of key-function pairs that will map properties to closures/lambadas to process the item value.  The closure will transform the item value.
+	 * @defaults       A struct of key-value pairs that denotes the default values for properties if they are null, defaults for everything are a blank string.
 	 * @ignoreDefaults If set to true, default includes and excludes will be ignored and only the incoming `includes` and `excludes` list will be used.
 	 * @trustedGetters If set to true, getters will not be checked for in the `this` scope before trying to invoke them.
-	 * @iso8601Format If set to true, will use the ISO 8601 standard for formatting dates
-	 * @dateMask The date mask to use when formatting datetimes. Only used if iso8601Format is false.
-	 * @timeMask The time mask to use when formatting datetimes. Only used if iso8601Format is false.
-	 * @profile The profile to use instead of the defaults
+	 * @iso8601Format  If set to true, will use the ISO 8601 standard for formatting dates
+	 * @dateMask       The date mask to use when formatting datetimes. Only used if iso8601Format is false.
+	 * @timeMask       The time mask to use when formatting datetimes. Only used if iso8601Format is false.
+	 * @profile        The profile to use instead of the defaults
 	 */
 	struct function getMemento(
 		includes               = "",
@@ -316,9 +308,7 @@ component {
 			// Verify Nullness
 			thisValue = isNull( thisValue ) ? (
 				arrayContainsNoCase( thisMemento.defaults.keyArray(), item ) ? (
-					isNull( thisMemento.defaults[ item ] ) ? javacast( "null", "" ) : thisMemento.defaults[
-						item
-					]
+					isNull( thisMemento.defaults[ item ] ) ? javacast( "null", "" ) : thisMemento.defaults[ item ]
 				) : variables.$mementifierSettings.nullDefaultValue
 			) : thisValue;
 
@@ -341,9 +331,7 @@ component {
 					// Iso Date?
 					if ( arguments.iso8601Format ) {
 						// we need to convert trailing Zulu time designations offset or JS libs like Moment will not know how to parse it
-						result[ thisAlias ] = this.$FORMATTER_ISO8601
-							.format( thisValue )
-							.replace( "Z", "+00:00" );
+						result[ thisAlias ] = this.$FORMATTER_ISO8601.format( thisValue ).replace( "Z", "+00:00" );
 					} else {
 						result[ thisAlias ] = customDateFormatter.format( thisValue );
 					}
@@ -436,10 +424,9 @@ component {
 				result[ item ] = thisMapper( result[ item ], result );
 			} else {
 				// Check for null values
-				result[ item ] = ( !result.keyExists( item ) || isNull( result[ item ] ) ) ? javacast(
-					"null",
-					""
-				) : result[ item ];
+				result[ item ] = ( !result.keyExists( item ) || isNull( result[ item ] ) ) ? javacast( "null", "" ) : result[
+					item
+				];
 			}
 		}
 
@@ -458,10 +445,7 @@ component {
 	function $buildNestedMementoList( required list, required root ){
 		return arguments.list
 			.filter( function( target ){
-				return listFirst( arguments.target, "." ) == root && listLen(
-					arguments.target,
-					"."
-				) > 1;
+				return listFirst( arguments.target, "." ) == root && listLen( arguments.target, "." ) > 1;
 			} )
 			.map( function( target ){
 				return listDeleteAt( arguments.target, 1, "." );
@@ -480,7 +464,7 @@ component {
 	 * Build a new memento mappers/defaults struct using the target list and a property root
 	 *
 	 * @struct The struct to use for construction
-	 * @root The root to filter out
+	 * @root   The root to filter out
 	 *
 	 * @return A struct of the new hiearchy to use
 	 */

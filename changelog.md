@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----
 
+## [2.8.0] => 2022-JAN-11
+
+### Added
+
+* Migration to github actions
+* CFFormatting Rules
+
+### Fixed
+
+* Composite keys and no default includes fails (https://github.com/coldbox-modules/mementifier/pull/24)
+* Fix mappers for keys not in memento (https://github.com/coldbox-modules/mementifier/pull/23)
+
+----
+
 ## [2.7.0] => 2021-JUN-07
 
 ### Added
@@ -59,7 +73,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Thanks to @elpete you can now add date/time formatting rules at the `getmemento()` level and the `this.memento` level. Please see the [readme](readme.md) for further information.
-  
+
 ----
 
 ## [2.2.1] => 2020-NOV-06
@@ -67,7 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Reverted missing `nestedIncludes.len()` for ignore defaults on nested hierarchies.
- 
+
 ----
 
 ## [2.2.0] => 2020-NOV-05

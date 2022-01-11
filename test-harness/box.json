@@ -9,8 +9,8 @@
         "cborm":"^3.0.0"
     },
     "devDependencies":{
-        "testbox":"^4.0.0",
-        "mockdatacfc":"^3.1.0+13"
+        "testbox":"*",
+        "mockdatacfc":"*"
     },
     "installPaths":{
         "coldbox":"coldbox/",
@@ -22,6 +22,9 @@
         "runner":"http://localhost:60299/tests/runner.cfm"
     },
     "scripts":{
-        "cleanMementifier":"rm modules/cborm/modules/mementifier --force --recurse"
+        "cleanMementifier":"rm modules/cborm/modules/mementifier --force --recurse",
+		"cfpm":"echo '\".engine/adobe2021/WEB-INF/cfusion/bin/cfpm.sh\"' | run",
+        "cfpm:install":"echo '\".engine/adobe2021/WEB-INF/cfusion/bin/cfpm.sh\" install ${1}' | run",
+        "install:2021":"run-script cfpm:install zip,debugger,orm,mysql,feed"
     }
 }
