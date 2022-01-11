@@ -222,7 +222,7 @@ component {
 			// Append primary keys
 			if ( entityMd.hasIdentifierProperty() ) {
 				arrayAppend( thisMemento.defaultIncludes, entityMd.getIdentifierPropertyName() );
-			} else if ( thisMemento.defaultIncludes.getIdentifierType().isComponentType() ) {
+			} else if ( entityMd.getIdentifierType().isComponentType() ) {
 				arrayAppend(
 					thisMemento.defaultIncludes,
 					listToArray( arrayToList( entityMd.getIdentifierType().getPropertyNames() ) ),
