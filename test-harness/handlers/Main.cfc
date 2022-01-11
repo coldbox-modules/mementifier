@@ -21,8 +21,6 @@
 			otherURL    : "www.luismajano.com"
 		};
 
-
-
 		var oUser = populateModel(
 			model                = userService.new(),
 			memento              = mockData,

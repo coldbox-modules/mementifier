@@ -13,6 +13,7 @@ component 	persistent="true"
 	property 	name="settingId"
 				fieldtype="id"
 				generator="uuid"
+				length   ="36"
 				ormtype="string";
 
 	property 	name="name"
