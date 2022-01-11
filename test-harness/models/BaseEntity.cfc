@@ -11,20 +11,17 @@ component mappedsuperclass="true" accessors="true"{
 				type="date"
 				ormtype="timestamp"
 				notnull="true"
-				update="false"
-				ndex="idx_createdDate";
+				update="false";
 
 	property 	name="updatedDate"
 				type="date"
 				ormtype="timestamp"
-				notnull="true"
-				index="idx_updatedDate";
+				notnull="true";
 
 	property 	name="isActive"
 				ormtype="boolean"
 				default="true"
-				notnull="true"
-				index="idx_active";
+				notnull="true";
 
 	/* *********************************************************************
 	**						PUBLIC FUNCTIONS

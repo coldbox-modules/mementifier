@@ -16,21 +16,24 @@ component 	persistent="true"
 				column="permission_id"
 				fieldtype="id"
 				generator="uuid"
+				length   ="36"
 				ormtype="string"
 				setter="false";
 
 	property 	name="permission"
 				notnull="true"
+				ormtype="string"
 				unique="true"
 				length="255"
-				default=""
-				index="idx_permissionName";
+				default="";
 
-	property 	name="description"
+	property
+				name   ="description"
+				column ="description"
+				ormtype="string"
 				notnull="false"
 				default=""
-				length="500"
-				db_html="textarea";
+				length ="500";
 
 	/* *********************************************************************
 	**							CALCULATED FIELDS

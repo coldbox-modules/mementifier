@@ -38,6 +38,7 @@ component 	persistent="true"
 				column="user_id"
 				fieldtype="id"
 				generator="uuid"
+				length   ="36"
 				ormtype="string";
 
 	property 	name="fname"
@@ -49,13 +50,11 @@ component 	persistent="true"
 	property 	name="email"
 				unique="true"
 				notnull="true"
-				index="idx_email,idx_byEmail"
 				db_display="false";
 
 	property 	name="username"
 				unique="true"
-				notnull="true"
-				index="idx_credentials";
+				notnull="true";
 
 	property 	name="password"
 				notnull="true"
@@ -64,8 +63,7 @@ component 	persistent="true"
 	property 	name="isConfirmed"
 				ormtype="boolean"
 				default="false"
-				notnull="true"
-				index="idx_byEmail,idx_confirmed,idx_credentials";
+				notnull="true";
 
 	property 	name="lastLogin"
 				notnull="false"
@@ -100,15 +98,13 @@ component 	persistent="true"
 				notnull="false"
 				length="255"
 				unique="true"
-				index="idx_apitokens"
 				default=""
 				db_display="false";
 
 	property 	name="addToMailingList"
 				ormtype="boolean"
 				default="false"
-				notnull="true"
-				index="idx_mailingList";
+				notnull="true";
 
 	/* *********************************************************************
 	**						RELATIONSHIPS

@@ -17,21 +17,24 @@ component 	persistent="true"
 				column="role_id"
 				fieldtype="id"
 				generator="uuid"
+				length   ="36"
 				ormtype="string"
 				setter="false";
 
 	property 	name="role"
 				notnull="true"
 				unique="true"
+				ormtype="string"
 				length="255"
-				default=""
-				index="idx_roleName";
+				default="";
 
-	property 	name="description"
+	property
+				name   ="description"
+				column ="description"
+				ormtype="string"
 				notnull="false"
-				db_html="textarea"
 				default=""
-				length="500";
+				length ="500";
 
 	/* *********************************************************************
 	**						RELATIONS
@@ -42,9 +45,9 @@ component 	persistent="true"
 				singularName="permission"
 				fieldtype="many-to-many"
 				type="array"
-				lazy="extra"
+				lazy="true"
 				orderby="permission"
-				cascade="all"
+				cascade="save-update"
 				cacheuse="read-write"
 			  	cfc="Permission"
 			  	fkcolumn="FK_roleID"
