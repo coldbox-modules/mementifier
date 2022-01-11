@@ -73,7 +73,7 @@
 
 	}
 
-	function afterAspectsLoad( event, interceptData ){
+	function afterModuleRegistrations( event, interceptData ){
 		controller.getModuleService()
 			.registerModule(
 				moduleName 		= request.MODULE_NAME,
