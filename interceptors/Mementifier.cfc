@@ -181,6 +181,7 @@ component {
 			var ORMService = new cborm.models.BaseORMService();
 
 			var entityMd = ORMService.getEntityMetadata( this );
+			var types = entityMd.getPropertyTypes();
 			var typeMap  = arrayReduce(
 				entityMd.getPropertyNames(),
 				function( mdTypes, propertyName, index ){
