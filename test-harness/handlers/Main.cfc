@@ -1,5 +1,6 @@
 ﻿component {
 
+	property name="postService"       inject="entityService:Post";
 	property name="userService"       inject="entityService:User";
 	property name="roleService"       inject="entityService:Role";
 	property name="settingService"    inject="entityService:Setting";
@@ -117,6 +118,22 @@
 		);
 
 		return result;
+	}
+
+	function post( event, rc, prc ){
+		var mockData = {
+			slug : "new-mementifier-release-wows-public",
+			title: "New Mementifier Release Wows Public",
+			teaser : "The new Mementifier release from Ortus Solutions impresses the public...",
+			createdBy : userService.new()
+		};
+
+		var oPost = populateModel(
+			model                = postService.new(),
+			memento              = mockData,
+			composeRelationships = true
+		);
+		return oPost.getMemento();
 	}
 
 	private function getNewSetting(){

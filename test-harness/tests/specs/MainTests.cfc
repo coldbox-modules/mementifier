@@ -141,6 +141,13 @@
 				var memento = deserializeJSON( event.getRenderedContent() );
 				expect( memento ).toHaveKey( "token,firstName,lastName" );
 			} );
+
+			it( "Will use default includes if none specified", function(){
+				var event   = this.request( route = "/main/post", params = {} );
+				var memento = deserializeJSON( event.getRenderedContent() );
+				expect( memento ).toHaveKey( "slug,title,teaser,isActive,createdDate,updatedDate,postId" );
+				expect( memento ).notToHaveKey( "createdBy" );
+			} );
 		} );
 	}
 
