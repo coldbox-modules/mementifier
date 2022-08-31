@@ -183,11 +183,8 @@ component {
 			var entityMd = ORMService.getEntityMetadata( this );
 			var typeMap  = arrayReduce(
 				entityMd.getPropertyNames(),
-				function( mdTypes, propertyName ){
-					var propertyType      = entityMd.getPropertyType( arguments.propertyName );
-					var propertyClassName = getMetadata( propertyType ).name;
-
-					arguments.mdTypes[ arguments.propertyName ] = propertyClassName;
+				function( mdTypes, propertyName, index ){
+					arguments.mdTypes[ arguments.propertyName ] = types[ index ].getClass().getName();
 					return arguments.mdTypes;
 				},
 				{}
