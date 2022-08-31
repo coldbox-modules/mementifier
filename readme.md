@@ -430,6 +430,17 @@ In order to collaborate on this project you will need to do a few things in orde
 
 Create a database called `mementifier` in any RDBMS you like. We have mostly used MySQL for the tests.
 
+This quick Docker command will get you started:
+
+```bash
+docker run --detach \
+	--publish 3306:3306 \
+	--name mementifier_mysql \
+	--env MYSQL_ROOT_PASSWORD=mysql \
+	--env MYSQL_DATABASE=mementifier \
+	mysql
+```
+
 ### Environment
 
 Copy the `.env.template` as `.env` and modify it accordingly so it can connect to your database.
