@@ -34,7 +34,7 @@ component extends="coldbox.system.testing.BaseInterceptorTest" interceptor="meme
 			otherURL    : "www.luismajano.com"
 		};
 
-		variables.testModel = entityNew( "User", mockData );
+		variables.testModel = getMockBox().prepareMock( entityNew( "User", mockData ) );
         variables.interceptor.afterInstanceCreation( { target : variables.testModel } );
     }
 
@@ -51,6 +51,16 @@ component extends="coldbox.system.testing.BaseInterceptorTest" interceptor="meme
 
                 expect( arrayLen( includesArray ) ).toBe( listLen( includesList ) );
                 expect( arrayLen( excludesArray ) ).toBe( listLen( excludesList ) );
+			} );
+			it( "Won't call the same getter twice", function(){
+                variables.testModel.$(
+                    method = "getBlogURL",
+                    returns = "https://michaelborn.me", 
+                    callLogging = true
+                );
+                var memento = variables.testModel.getMemento( "blogUrl" );
+
+                expect( variables.testModel.$once( "getBlogURL" ) ).toBeTrue();
 			} );
 			it( "Should include all items from defaultIncludes", function(){
                 var memento = variables.testModel.getMemento( "userId" );
