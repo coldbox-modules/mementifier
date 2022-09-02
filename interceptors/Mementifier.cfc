@@ -132,6 +132,8 @@ component {
 		if ( isSimpleValue( arguments.excludes ) ) {
 			arguments.excludes = listToArray( arguments.excludes );
 		}
+		arguments.includes = duplicate( arguments.includes );
+		arguments.excludes = duplicate( arguments.excludes );
 
 		// Param Default Memento Settings
 		// We do it here, because ACF caches crap!
