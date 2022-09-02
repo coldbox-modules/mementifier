@@ -266,8 +266,8 @@ component {
 				arguments.item
 			);
 		} );
-		arguments.includes = createObject("java", "java.util.HashSet").init( arguments.includes ).toArray();
-		arguments.excludes = createObject("java", "java.util.HashSet").init( arguments.excludes ).toArray();
+		arguments.includes = listToArray( arrayToList( createObject("java", "java.util.HashSet").init( arguments.includes ).toArray() ) );
+		arguments.excludes = listToArray( arrayToList( createObject("java", "java.util.HashSet").init( arguments.excludes ).toArray() ) );
 
 		// Process Includes
 		// Please keep at a traditional LOOP to avoid closure reference memory leaks and slowness on some engines.
