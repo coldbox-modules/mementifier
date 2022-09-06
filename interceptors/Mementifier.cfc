@@ -125,8 +125,8 @@ component {
 		string timeMask,
 		string profile = ""
 	){
-		var includes = duplicate( arguments.includes );
-		var excludes = duplicate( arguments.excludes );
+		local.includes = duplicate( arguments.includes );
+		local.excludes = duplicate( arguments.excludes );
 
 		// Inflate incoming lists, arrays are faster than lists
 		if ( isSimpleValue( local.includes ) ) {
