@@ -125,15 +125,16 @@ component {
 		string timeMask,
 		string profile = ""
 	){
+		var includes = duplicate( arguments.includes );
+		var excludes = duplicate( arguments.excludes );
+
 		// Inflate incoming lists, arrays are faster than lists
-		if ( isSimpleValue( arguments.includes ) ) {
-			arguments.includes = listToArray( arguments.includes );
+		if ( isSimpleValue( local.includes ) ) {
+			local.includes = listToArray( local.includes );
 		}
-		if ( isSimpleValue( arguments.excludes ) ) {
-			arguments.excludes = listToArray( arguments.excludes );
+		if ( isSimpleValue( local.excludes ) ) {
+			local.excludes = listToArray( local.excludes );
 		}
-		arguments.includes = duplicate( arguments.includes );
-		arguments.excludes = duplicate( arguments.excludes );
 
 		// Param Default Memento Settings
 		// We do it here, because ACF caches crap!
@@ -241,8 +242,8 @@ component {
 
 		// Incorporate Defaults if not ignored
 		if ( !arguments.ignoreDefaults ) {
-			arguments.includes.append( thisMemento.defaultIncludes, true );
-			arguments.excludes.append(
+			local.includes.append( thisMemento.defaultIncludes, true );
+			local.excludes.append(
 				thisMemento.defaultExcludes.filter( function( item ){
 					// Filter out if incoming includes was specified
 					return !includes.findNoCase( arguments.item );
@@ -260,18 +261,18 @@ component {
 		var mappersKeyArray = thisMemento.mappers.keyArray();
 
 		// Filter out exclude items and never include items
-		arguments.includes = arguments.includes.filter( function( item ){
+		local.includes = local.includes.filter( function( item ){
 			return !arrayFindNoCase( excludes, arguments.item ) && !arrayFindNoCase(
 				thisMemento.neverInclude,
 				arguments.item
 			);
 		} );
-		arguments.includes = listToArray( arrayToList( createObject("java", "java.util.HashSet").init( arguments.includes ).toArray() ) );
-		arguments.excludes = listToArray( arrayToList( createObject("java", "java.util.HashSet").init( arguments.excludes ).toArray() ) );
+		local.includes = listToArray( arrayToList( createObject("java", "java.util.HashSet").init( local.includes ).toArray() ) );
+		local.excludes = listToArray( arrayToList( createObject("java", "java.util.HashSet").init( local.excludes ).toArray() ) );
 
 		// Process Includes
 		// Please keep at a traditional LOOP to avoid closure reference memory leaks and slowness on some engines.
-		for ( var item in arguments.includes ) {
+		for ( var item in local.includes ) {
 			// writeDump( var="Processing: #item#" );abort;
 			var nestedIncludes = "";
 
