@@ -86,7 +86,7 @@ component extends="coldbox.system.testing.BaseInterceptorTest" interceptor="meme
 
 				variables.testModel.getMemento();
 				expect( variables.testModel.$never( "get" ) ).toBeTrue();
-			})
+			});
 		} );
 	}
 
