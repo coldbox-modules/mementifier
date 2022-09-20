@@ -81,6 +81,16 @@ component extends="coldbox.system.testing.BaseInterceptorTest" interceptor="meme
                 expect( memento ).toBeTypeOf( "struct" )
                                  .notToHaveKey( "password" );
 			} );
+			it( "should not process empty string include", function() {
+				variables.testModel.$( method = "get", callLogging = true );
+
+                var memento = variables.testModel.getMemento();
+				debug( memento );
+
+				debug( variables.testModel.$debug() );
+
+				expect( variables.testModel.$never( "get" ) ).toBeTrue();
+			})
 		} );
 	}
 

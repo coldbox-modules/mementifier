@@ -262,10 +262,12 @@ component {
 
 		// Filter out exclude items and never include items
 		local.includes = local.includes.filter( function( item ){
-			return !arrayFindNoCase( excludes, arguments.item ) && !arrayFindNoCase(
-				thisMemento.neverInclude,
-				arguments.item
-			);
+			return !arrayFindNoCase( excludes, arguments.item )
+				&& !arrayFindNoCase(
+					thisMemento.neverInclude,
+					arguments.item
+				)
+				&& arguments.item != "";
 		} );
 		local.includes = listToArray( arrayToList( createObject("java", "java.util.HashSet").init( local.includes ).toArray() ) );
 		local.excludes = listToArray( arrayToList( createObject("java", "java.util.HashSet").init( local.excludes ).toArray() ) );
