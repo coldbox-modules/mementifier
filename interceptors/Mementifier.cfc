@@ -269,13 +269,12 @@ component {
 				)
 				&& arguments.item != "";
 		} );
-		local.includes = listToArray( arrayToList( createObject("java", "java.util.HashSet").init( local.includes ).toArray() ) );
-		local.excludes = listToArray( arrayToList( createObject("java", "java.util.HashSet").init( local.excludes ).toArray() ) );
+		local.includes = arrayNew(1).append( createObject( "java", "java.util.Arrays" ).stream( local.includes ).distinct().toArray(), true );
+		local.excludes = arrayNew(1).append( createObject( "java", "java.util.Arrays" ).stream( local.excludes ).distinct().toArray(), true );
 
 		// Process Includes
 		// Please keep at a traditional LOOP to avoid closure reference memory leaks and slowness on some engines.
 		for ( var item in local.includes ) {
-			// writeDump( var="Processing: #item#" );abort;
 			var nestedIncludes = "";
 
 			// Is this a nested include?
