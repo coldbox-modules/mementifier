@@ -268,14 +268,14 @@ component {
 		} );
 		local.includes = arrayNew( 1 ).append(
 			createObject( "java", "java.util.Arrays" )
-				.stream(  javaCast( "java.lang.Object[]", local.includes ) )
+				.stream( javacast( "java.lang.Object[]", local.includes ) )
 				.distinct()
 				.toArray(),
 			true
 		);
 		local.excludes = arrayNew( 1 ).append(
 			createObject( "java", "java.util.Arrays" )
-				.stream(  javaCast( "java.lang.Object[]", local.excludes ) )
+				.stream( javacast( "java.lang.Object[]", local.excludes ) )
 				.distinct()
 				.toArray(),
 			true
