@@ -6,23 +6,27 @@ component extends="coldbox.system.testing.BaseInterceptorTest" interceptor="meme
 
 		variables.moduleSettings = {
 			// Turn on to use the ISO8601 date/time formatting on all processed date/time properites, else use the masks
-			iso8601Format = false,
+			iso8601Format     : false,
 			// The default date mask to use for date properties
-			dateMask      = "yyyy-MM-dd",
+			dateMask          : "yyyy-MM-dd",
 			// The default time mask to use for date properties
-			timeMask      = "HH:mm:ss",
+			timeMask          : "HH:mm:ss",
 			// Enable orm auto default includes: If true and an object doesn't have any `memento` struct defined
 			// this module will create it with all properties and relationships it can find for the target entity
 			// leveraging the cborm module.
-			ormAutoIncludes = true,
+			ormAutoIncludes   : true,
 			// The default value for getters which return null
-			nullDefaultValue = '',
+			nullDefaultValue  : "",
 			// Don't check for getters before invoking them
-			trustedGetters = false,
+			trustedGetters    : false,
 			// If not empty, convert all date/times to the specific timezone
-			convertToTimezone = ""
+			convertToTimezone : ""
 		};
-		variables.interceptor.$property( "settings", "variables", variables.moduleSettings );
+		variables.interceptor.$property(
+			"settings",
+			"variables",
+			variables.moduleSettings
+		);
 
 		var mockData = {
 			fname       : "testuser",
@@ -54,8 +58,8 @@ component extends="coldbox.system.testing.BaseInterceptorTest" interceptor="meme
 			} );
 			it( "Won't call the same getter twice", function(){
 				variables.testModel.$(
-					method = "getBlogURL",
-					returns = "https://michaelborn.me", 
+					method      = "getBlogURL",
+					returns     = "https://michaelborn.me",
 					callLogging = true
 				);
 				var memento = variables.testModel.getMemento( "blogUrl" );
@@ -65,28 +69,27 @@ component extends="coldbox.system.testing.BaseInterceptorTest" interceptor="meme
 			it( "Should include all items from defaultIncludes", function(){
 				var memento = variables.testModel.getMemento( "userId" );
 
-				expect( memento ).toBeTypeOf( "struct" )
-								 .toHaveKey( "userId,blogUrl,firstName,lastName" );
+				expect( memento ).toBeTypeOf( "struct" ).toHaveKey( "userId,blogUrl,firstName,lastName" );
 			} );
 			it( "Should exclude any explicit excludes", function(){
 				var memento = variables.testModel.getMemento( "APIToken", "userId,blogUrl,firstName,lastName" );
 
-				expect( memento ).toBeTypeOf( "struct" )
-								 .toHaveKey( "APIToken" )
-								 .nottoHaveKey( "userId,blogUrl,firstName,lastName" );
+				expect( memento )
+					.toBeTypeOf( "struct" )
+					.toHaveKey( "APIToken" )
+					.nottoHaveKey( "userId,blogUrl,firstName,lastName" );
 			} );
 			it( "Should not be possible to include neverIncludes", function(){
 				var memento = variables.testModel.getMemento( "password" );
 
-				expect( memento ).toBeTypeOf( "struct" )
-								 .notToHaveKey( "password" );
+				expect( memento ).toBeTypeOf( "struct" ).notToHaveKey( "password" );
 			} );
-			it( "should not process empty string include", function() {
+			it( "should not process empty string include", function(){
 				variables.testModel.$( method = "get", callLogging = true );
 
 				variables.testModel.getMemento();
 				expect( variables.testModel.$never( "get" ) ).toBeTrue();
-			});
+			} );
 		} );
 	}
 
