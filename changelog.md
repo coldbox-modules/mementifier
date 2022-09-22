@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----
 
+## [3.0.0] => 2022-SEP-22
+
+### Added
+
+* New github action workflows
+* New module template files
+
+### Changed
+
+* Dropped ACF2016
+
+----
+
 ## [2.8.0] => 2022-JAN-11
 
 ### Added

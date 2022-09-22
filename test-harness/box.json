@@ -23,9 +23,6 @@
     },
     "scripts":{
         "postInstall":"run-script cleanMementifier && echo 'Mementifier Cleaned'",
-        "cleanMementifier":"rm modules/cborm/modules/mementifier --force --recurse",
-        "cfpm":"echo '\".engine/adobe2021/WEB-INF/cfusion/bin/cfpm.sh\"' | run",
-        "cfpm:install":"echo '\".engine/adobe2021/WEB-INF/cfusion/bin/cfpm.sh\" install ${1}' | run",
-        "install:2021":"run-script cfpm:install zip,debugger,orm,mysql,feed"
+        "cleanMementifier":"rm modules/cborm/modules/mementifier --force --recurse"
     }
 }

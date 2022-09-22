@@ -453,9 +453,8 @@ Go into the root of `test-harness` and run a CommandBox shell: `box`.  Once in t
 
 Start a server, we have configured for you several CFML engines for you to test against, pick one from the list below:
 
-- `server start serverConfigFile=server-adobe@11.json`
-- `server start serverConfigFile=server-adobe@2016.json`
 - `server start serverConfigFile=server-adobe@2018.json`
+- - `server start serverConfigFile=server-adobe@2021.json`
 - `server start serverConfigFile=server-lucee@5.json`
 
 Then you can hit the test site app at http://localhost:60299.  This will create the database for you using the ColdFusion ORM.
