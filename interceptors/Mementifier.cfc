@@ -184,7 +184,7 @@ component {
 			var ORMService = new cborm.models.BaseORMService();
 
 			var entityMd = ORMService.getEntityMetadata( this );
-			var types = entityMd.getPropertyTypes();
+			var types    = entityMd.getPropertyTypes();
 			var typeMap  = arrayReduce(
 				entityMd.getPropertyNames(),
 				function( mdTypes, propertyName, index ){
@@ -263,15 +263,23 @@ component {
 		// Filter out exclude items and never include items
 		local.includes = local.includes.filter( function( item ){
 			return !arrayFindNoCase( excludes, arguments.item )
-				&& !arrayFindNoCase(
-					thisMemento.neverInclude,
-					arguments.item
-				)
-				&& arguments.item != "";
+			&& !arrayFindNoCase( thisMemento.neverInclude, arguments.item )
+			&& arguments.item != "";
 		} );
-
-		local.includes = arrayNew(1).append( createObject( "java", "java.util.Arrays" ).stream( javaCast( "java.lang.Object[]", local.includes ) ).distinct().toArray(), true );
-		local.excludes = arrayNew(1).append( createObject( "java", "java.util.Arrays" ).stream( javaCast( "java.lang.Object[]", local.excludes ) ).distinct().toArray(), true );
+		local.includes = arrayNew( 1 ).append(
+			createObject( "java", "java.util.Arrays" )
+				.stream(  javaCast( "java.lang.Object[]", local.includes ) )
+				.distinct()
+				.toArray(),
+			true
+		);
+		local.excludes = arrayNew( 1 ).append(
+			createObject( "java", "java.util.Arrays" )
+				.stream(  javaCast( "java.lang.Object[]", local.excludes ) )
+				.distinct()
+				.toArray(),
+			true
+		);
 
 		// Process Includes
 		// Please keep at a traditional LOOP to avoid closure reference memory leaks and slowness on some engines.
