@@ -269,8 +269,9 @@ component {
 				)
 				&& arguments.item != "";
 		} );
-		local.includes = arrayNew(1).append( createObject( "java", "java.util.Arrays" ).stream( local.includes ).distinct().toArray(), true );
-		local.excludes = arrayNew(1).append( createObject( "java", "java.util.Arrays" ).stream( local.excludes ).distinct().toArray(), true );
+
+		local.includes = arrayNew(1).append( createObject( "java", "java.util.Arrays" ).stream( javaCast( "java.lang.Object[]", local.includes ) ).distinct().toArray(), true );
+		local.excludes = arrayNew(1).append( createObject( "java", "java.util.Arrays" ).stream( javaCast( "java.lang.Object[]", local.excludes ) ).distinct().toArray(), true );
 
 		// Process Includes
 		// Please keep at a traditional LOOP to avoid closure reference memory leaks and slowness on some engines.
