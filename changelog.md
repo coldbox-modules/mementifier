@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * New github action workflows
 * New module template files
+* Faster approach to dealing with loading and processing of entities by eager loading Java classes that are used always
+
+### Fixed
+
+* Prevent argument modification and duplicate includes processing: https://github.com/coldbox-modules/mementifier/pull/26
 
 ### Changed
 

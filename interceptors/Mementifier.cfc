@@ -11,12 +11,15 @@ component {
 	 * Configure interceptor
 	 */
 	function configure(){
+		variables.jTimezone         = createObject( "java", "java.util.TimeZone" );
+		variables.jSimpleDateFormat = createObject( "java", "java.text.SimpleDateFormat" );
+		variables.jArrays           = createObject( "java", "java.util.Arrays" );
 	}
 
 	/*********************************** WIREBOX EVENTS ***********************************/
 
 	/**
-	 * Listen to object creations
+	 * Listen to object creations and attach ourselves into them
 	 */
 	function afterInstanceCreation( interceptData ){
 		// Only process struct based objects with the `memento` property
@@ -61,6 +64,7 @@ component {
 		// Verify we haven't mementified this object already
 		if ( !structKeyExists( arguments.entity, "$mementifierSettings" ) ) {
 			// systemOutput( "==> Injectin mementifier: #getMetadata( arguments.entity ).name# ", true );
+
 			// Inject utility
 			arguments.entity.$injectMixin = variables.$injectMixin;
 			// Inject Settings
@@ -79,23 +83,22 @@ component {
 			arguments.entity.$injectMixin( "$buildNestedMementoList", variables.$buildNestedMementoList );
 			arguments.entity.$injectMixin( "$buildNestedMementoStruct", variables.$buildNestedMementoStruct );
 			arguments.entity.$injectMixin( "$getDeepProperties", variables.$getDeepProperties );
+
 			// We do simple date formatters as they are faster than CFML methods
 			var dateMask                        = isNull( this.memento.dateMask ) ? variables.settings.dateMask : this.memento.dateMask;
 			var timeMask                        = isNull( this.memento.timeMask ) ? variables.settings.timeMask : this.memento.timeMask;
-			arguments.entity.$FORMATTER_ISO8601 = createObject( "java", "java.text.SimpleDateFormat" ).init(
-				"yyyy-MM-dd'T'HH:mm:ssXXX"
-			);
-			arguments.entity.$FORMATTER_CUSTOM = createObject( "java", "java.text.SimpleDateFormat" ).init(
-				"#dateMask# #timeMask#"
-			);
+			arguments.entity.$FORMATTER_ISO8601 = variables.jSimpleDateFormat.init( "yyyy-MM-dd'T'HH:mm:ssXXX" );
+			arguments.entity.$FORMATTER_CUSTOM  = variables.jSimpleDateFormat.init( "#dateMask# #timeMask#" );
+
 			// Do we set timezones?
 			if ( len( variables.settings.convertToTimezone ) ) {
-				var tz = createObject( "java", "java.util.TimeZone" ).getTimeZone(
-					variables.settings.convertToTimezone
-				);
+				var tz = variables.jTimezone.getTimeZone( variables.settings.convertToTimezone );
 				arguments.entity.$FORMATTER_ISO8601.setTimezone( tz );
 				arguments.entity.$FORMATTER_CUSTOM.setTimezone( tz );
 			}
+
+			// Inject our Array helpers
+			arguments.entity.$jARRAYS = variables.jArrays;
 		}
 	}
 
@@ -266,15 +269,17 @@ component {
 			&& !arrayFindNoCase( thisMemento.neverInclude, arguments.item )
 			&& arguments.item != "";
 		} );
+
+		// Make sure includes and excludes are unique
 		local.includes = arrayNew( 1 ).append(
-			createObject( "java", "java.util.Arrays" )
+			this.$jARRAYS
 				.stream( javacast( "java.lang.Object[]", local.includes ) )
 				.distinct()
 				.toArray(),
 			true
 		);
 		local.excludes = arrayNew( 1 ).append(
-			createObject( "java", "java.util.Arrays" )
+			this.$jARRAYS
 				.stream( javacast( "java.lang.Object[]", local.excludes ) )
 				.distinct()
 				.toArray(),
