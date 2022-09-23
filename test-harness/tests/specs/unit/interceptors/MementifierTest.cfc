@@ -2,6 +2,7 @@ component extends="coldbox.system.testing.BaseInterceptorTest" interceptor="meme
 
 	function beforeAll(){
 		super.beforeAll();
+
 		setup();
 
 		variables.moduleSettings = {
@@ -22,11 +23,14 @@ component extends="coldbox.system.testing.BaseInterceptorTest" interceptor="meme
 			// If not empty, convert all date/times to the specific timezone
 			convertToTimezone : ""
 		};
+
 		variables.interceptor.$property(
 			"settings",
 			"variables",
 			variables.moduleSettings
 		);
+
+		variables.interceptor.configure();
 
 		var mockData = {
 			fname       : "testuser",
