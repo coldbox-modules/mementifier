@@ -122,9 +122,9 @@
 
 	function post( event, rc, prc ){
 		var mockData = {
-			slug : "new-mementifier-release-wows-public",
-			title: "New Mementifier Release Wows Public",
-			teaser : "The new Mementifier release from Ortus Solutions impresses the public...",
+			slug      : "new-mementifier-release-wows-public",
+			title     : "New Mementifier Release Wows Public",
+			teaser    : "The new Mementifier release from Ortus Solutions impresses the public...",
 			createdBy : userService.new()
 		};
 
