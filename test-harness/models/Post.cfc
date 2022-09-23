@@ -1,9 +1,9 @@
 /**
- * A Setting
+ * A Post
  */
 component
 	persistent="true"
-	table     ="settings"
+	table     ="posts"
 	extends   ="BaseEntity"
 {
 
@@ -12,42 +12,52 @@ component
 	 ********************************************************************* */
 
 	property
-		name     ="settingId"
+		name     ="postId"
 		fieldtype="id"
 		generator="uuid"
 		length   ="36"
 		ormtype  ="string";
 
-	property name="name" notnull="true";
+	property
+		name   ="slug"
+		notnull="true"
+		unique ="true"
+		sqltype="varchar(255)";
+
+	property name="title" notnull="true";
 
 	property
-		name   ="description"
+		name   ="teaser"
 		default=""
 		notnull="false";
 
 	property
-		name   ="isConfirmed"
+		name   ="body"
+		default=""
+		notnull="false";
+
+	property
+		name   ="isPublished"
 		ormtype="boolean"
 		default="false"
 		notnull="false";
+
+	property
+		name     ="createdBy"
+		fieldtype="many-to-one"
+		lazy     ="true"
+		update   ="false"
+		cfc      ="User"
+		fkcolumn ="FK_creationUser";
 
 	/* *********************************************************************
 	 **						STATIC PROPERTIES & CONSTRAINTS
 	 ********************************************************************* */
 
 	// pk
-	this.pk = "settingId";
+	this.pk = "postId";
 
-	// Mementofication Settings
-	this.memento = {
-		// Default properties to serialize
-		defaultIncludes : [ "name", "isConfirmed", "description" ],
-		// Default Exclusions
-		defaultExcludes : [],
-		neverInclude    : [],
-		// Defaults
-		defaults        : {}
-	};
+	// Test default mementification settings
 
 	/**
 	 * Constructor

@@ -1,62 +1,65 @@
 ﻿/**
  * This is the base class for all persistent entities
  */
-component mappedsuperclass="true" accessors="true"{
+component mappedsuperclass="true" accessors="true" {
 
 	/* *********************************************************************
-	**							PROPERTIES
-	********************************************************************* */
+	 **							PROPERTIES
+	 ********************************************************************* */
 
-	property 	name="createdDate"
-				type="date"
-				ormtype="timestamp"
-				notnull="true"
-				update="false";
+	property
+		name   ="createdDate"
+		type   ="date"
+		ormtype="timestamp"
+		notnull="true"
+		update ="false";
 
-	property 	name="updatedDate"
-				type="date"
-				ormtype="timestamp"
-				notnull="true";
+	property
+		name   ="updatedDate"
+		type   ="date"
+		ormtype="timestamp"
+		notnull="true";
 
-	property 	name="isActive"
-				ormtype="boolean"
-				default="true"
-				notnull="true";
+	property
+		name   ="isActive"
+		ormtype="boolean"
+		default="true"
+		notnull="true";
 
 	/* *********************************************************************
-	**						PUBLIC FUNCTIONS
-	********************************************************************* */
+	 **						PUBLIC FUNCTIONS
+	 ********************************************************************* */
 
 	/**
-	* Constructor
-	*/
+	 * Constructor
+	 */
 	BaseEntity function init(){
-		variables.createdDate 	= now();
-		variables.updatedDate 	= now();
-		variables.isActive		= true;
+		variables.createdDate = now();
+		variables.updatedDate = now();
+		variables.isActive    = true;
 
 		return this;
 	}
 
 	/*
-	* pre insertion procedures
-	*/
+	 * pre insertion procedures
+	 */
 	void function preInsert(){
-		var now = now();
-		variables.createdDate 	= now;
-		variables.updatedDate 	= now;
+		var now               = now();
+		variables.createdDate = now;
+		variables.updatedDate = now;
 	}
 
 	/*
-	* pre update procedures
-	*/
+	 * pre update procedures
+	 */
 	void function preUpdate( struct oldData ){
-		variables.updatedDate 	= now();
+		variables.updatedDate = now();
 	}
 
 	/**
-	* Verify if entity is loaded or not
-	*/
+	 * Verify if entity is loaded or not
+	 */
 	boolean function isLoaded(){
 		return ( isNull( variables[ this.pk ] ) OR !len( variables[ this.pk ] ) ? false : true );
 	}

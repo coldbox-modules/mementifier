@@ -11,12 +11,15 @@ component {
 	 * Configure interceptor
 	 */
 	function configure(){
+		variables.jTimezone         = createObject( "java", "java.util.TimeZone" );
+		variables.jSimpleDateFormat = createObject( "java", "java.text.SimpleDateFormat" );
+		variables.jArrays           = createObject( "java", "java.util.Arrays" );
 	}
 
 	/*********************************** WIREBOX EVENTS ***********************************/
 
 	/**
-	 * Listen to object creations
+	 * Listen to object creations and attach ourselves into them
 	 */
 	function afterInstanceCreation( interceptData ){
 		// Only process struct based objects with the `memento` property
@@ -61,6 +64,7 @@ component {
 		// Verify we haven't mementified this object already
 		if ( !structKeyExists( arguments.entity, "$mementifierSettings" ) ) {
 			// systemOutput( "==> Injectin mementifier: #getMetadata( arguments.entity ).name# ", true );
+
 			// Inject utility
 			arguments.entity.$injectMixin = variables.$injectMixin;
 			// Inject Settings
@@ -79,23 +83,22 @@ component {
 			arguments.entity.$injectMixin( "$buildNestedMementoList", variables.$buildNestedMementoList );
 			arguments.entity.$injectMixin( "$buildNestedMementoStruct", variables.$buildNestedMementoStruct );
 			arguments.entity.$injectMixin( "$getDeepProperties", variables.$getDeepProperties );
+
 			// We do simple date formatters as they are faster than CFML methods
 			var dateMask                        = isNull( this.memento.dateMask ) ? variables.settings.dateMask : this.memento.dateMask;
 			var timeMask                        = isNull( this.memento.timeMask ) ? variables.settings.timeMask : this.memento.timeMask;
-			arguments.entity.$FORMATTER_ISO8601 = createObject( "java", "java.text.SimpleDateFormat" ).init(
-				"yyyy-MM-dd'T'HH:mm:ssXXX"
-			);
-			arguments.entity.$FORMATTER_CUSTOM = createObject( "java", "java.text.SimpleDateFormat" ).init(
-				"#dateMask# #timeMask#"
-			);
+			arguments.entity.$FORMATTER_ISO8601 = variables.jSimpleDateFormat.init( "yyyy-MM-dd'T'HH:mm:ssXXX" );
+			arguments.entity.$FORMATTER_CUSTOM  = variables.jSimpleDateFormat.init( "#dateMask# #timeMask#" );
+
 			// Do we set timezones?
 			if ( len( variables.settings.convertToTimezone ) ) {
-				var tz = createObject( "java", "java.util.TimeZone" ).getTimeZone(
-					variables.settings.convertToTimezone
-				);
+				var tz = variables.jTimezone.getTimeZone( variables.settings.convertToTimezone );
 				arguments.entity.$FORMATTER_ISO8601.setTimezone( tz );
 				arguments.entity.$FORMATTER_CUSTOM.setTimezone( tz );
 			}
+
+			// Inject our Array helpers
+			arguments.entity.$jARRAYS = variables.jArrays;
 		}
 	}
 
@@ -125,12 +128,15 @@ component {
 		string timeMask,
 		string profile = ""
 	){
+		local.includes = duplicate( arguments.includes );
+		local.excludes = duplicate( arguments.excludes );
+
 		// Inflate incoming lists, arrays are faster than lists
-		if ( isSimpleValue( arguments.includes ) ) {
-			arguments.includes = listToArray( arguments.includes );
+		if ( isSimpleValue( local.includes ) ) {
+			local.includes = listToArray( local.includes );
 		}
-		if ( isSimpleValue( arguments.excludes ) ) {
-			arguments.excludes = listToArray( arguments.excludes );
+		if ( isSimpleValue( local.excludes ) ) {
+			local.excludes = listToArray( local.excludes );
 		}
 
 		// Param Default Memento Settings
@@ -181,13 +187,11 @@ component {
 			var ORMService = new cborm.models.BaseORMService();
 
 			var entityMd = ORMService.getEntityMetadata( this );
+			var types    = entityMd.getPropertyTypes();
 			var typeMap  = arrayReduce(
 				entityMd.getPropertyNames(),
-				function( mdTypes, propertyName ){
-					var propertyType      = entityMd.getPropertyType( arguments.propertyName );
-					var propertyClassName = getMetadata( propertyType ).name;
-
-					arguments.mdTypes[ arguments.propertyName ] = propertyClassName;
+				function( mdTypes, propertyName, index ){
+					arguments.mdTypes[ arguments.propertyName ] = types[ index ].getClass().getName();
 					return arguments.mdTypes;
 				},
 				{}
@@ -241,8 +245,8 @@ component {
 
 		// Incorporate Defaults if not ignored
 		if ( !arguments.ignoreDefaults ) {
-			arguments.includes.append( thisMemento.defaultIncludes, true );
-			arguments.excludes.append(
+			local.includes.append( thisMemento.defaultIncludes, true );
+			local.excludes.append(
 				thisMemento.defaultExcludes.filter( function( item ){
 					// Filter out if incoming includes was specified
 					return !includes.findNoCase( arguments.item );
@@ -260,17 +264,31 @@ component {
 		var mappersKeyArray = thisMemento.mappers.keyArray();
 
 		// Filter out exclude items and never include items
-		arguments.includes = arguments.includes.filter( function( item ){
-			return !arrayFindNoCase( excludes, arguments.item ) && !arrayFindNoCase(
-				thisMemento.neverInclude,
-				arguments.item
-			);
+		local.includes = local.includes.filter( function( item ){
+			return !arrayFindNoCase( excludes, arguments.item )
+			&& !arrayFindNoCase( thisMemento.neverInclude, arguments.item )
+			&& arguments.item != "";
 		} );
+
+		// Make sure includes and excludes are unique
+		local.includes = arrayNew( 1 ).append(
+			this.$jARRAYS
+				.stream( javacast( "java.lang.Object[]", local.includes ) )
+				.distinct()
+				.toArray(),
+			true
+		);
+		local.excludes = arrayNew( 1 ).append(
+			this.$jARRAYS
+				.stream( javacast( "java.lang.Object[]", local.excludes ) )
+				.distinct()
+				.toArray(),
+			true
+		);
 
 		// Process Includes
 		// Please keep at a traditional LOOP to avoid closure reference memory leaks and slowness on some engines.
-		for ( var item in arguments.includes ) {
-			// writeDump( var="Processing: #item#" );abort;
+		for ( var item in local.includes ) {
 			var nestedIncludes = "";
 
 			// Is this a nested include?

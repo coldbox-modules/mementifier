@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----
 
+## [3.0.0] => 2022-SEP-22
+
+### Added
+
+* New github action workflows
+* New module template files
+* Faster approach to dealing with loading and processing of entities by eager loading Java classes that are used always
+
+### Fixed
+
+* Prevent argument modification and duplicate includes processing: https://github.com/coldbox-modules/mementifier/pull/26
+
+### Changed
+
+* Dropped ACF2016
+
+----
+
 ## [2.8.0] => 2022-JAN-11
 
 ### Added

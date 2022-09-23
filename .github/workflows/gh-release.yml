@@ -1,18 +1,13 @@
 name: Pull Requests
 
 on:
-  push:
-    branches-ignore:
-      - "main"
-      - "master"
-      - "development"
   pull_request:
     branches:
       - development
 
 jobs:
   tests:
-    uses: coldbox-modules/mementifier/.github/workflows/tests.yml@development
+    uses: coldbox-modules/MockDataCFC/.github/workflows/tests.yml@development
 
   # Format PR
   format:
