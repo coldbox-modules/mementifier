@@ -51,8 +51,6 @@ jobs:
 
       - name: Setup CommandBox CLI
         uses: Ortus-Solutions/setup-commandbox@main
-        with:
-          version: 5.4.2
 
       - name: Install Dependencies
         run: |

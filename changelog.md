@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----
 
+## [3.0.1] => 2022-OCT-18
+
+### Fixed
+
+* fix: Use `box:` namespace for CommandBox compatibility
+
+----
+
+
 ## [3.0.0] => 2022-SEP-22
 
 ### Added
