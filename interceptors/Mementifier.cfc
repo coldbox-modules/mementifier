@@ -5,7 +5,7 @@
 component {
 
 	// DI
-	property name="settings" inject="coldbox:moduleSettings:mementifier";
+	property name="settings" inject="box:moduleSettings:mementifier";
 
 	/**
 	 * Configure interceptor
