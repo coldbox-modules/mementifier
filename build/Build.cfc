@@ -204,7 +204,6 @@ component {
 		fileSystemUtil.createMapping( arguments.projectName, variables.cwd );
 		// Generate Docs
 		print.greenLine( "Generating API Docs, please wait..." ).toConsole();
-		directoryCreate( arguments.outputDir, true, true );
 
 		command( "docbox generate" )
 			.params(
