@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----
 
+## [3.1.0] => 2022-NOV-10
+
+### Added
+
+* Refactored the ORM includes to its own function
+* ORM Includes is only set to `true` if `cborm` has been registered
+
+----
+
 ## [3.0.1] => 2022-OCT-18
 
 ### Fixed

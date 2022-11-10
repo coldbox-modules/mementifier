@@ -80,6 +80,7 @@ component {
 			}
 
 			// Inject helper methods
+			arguments.entity.$injectMixin( "$buildOrmIncludes", variables.$buildOrmIncludes );
 			arguments.entity.$injectMixin( "$buildNestedMementoList", variables.$buildNestedMementoList );
 			arguments.entity.$injectMixin( "$buildNestedMementoStruct", variables.$buildNestedMementoStruct );
 			arguments.entity.$injectMixin( "$getDeepProperties", variables.$getDeepProperties );
@@ -178,53 +179,7 @@ component {
 
 		// Is orm auto inflate on and no memento defined? Build the default includes using this entity and Hibernate
 		if ( thisMemento.ormAutoIncludes && !arrayLen( thisMemento.defaultIncludes ) ) {
-			var thisName = isNull( variables.entityName ) ? "" : variables.entityName;
-			if ( !len( thisName ) ) {
-				var md   = getMetadata( this );
-				thisName = ( md.keyExists( "entityName" ) ? md.entityName : listLast( md.name, "." ) );
-			}
-
-			var ORMService = new cborm.models.BaseORMService();
-
-			var entityMd = ORMService.getEntityMetadata( this );
-			var types    = entityMd.getPropertyTypes();
-			var typeMap  = arrayReduce(
-				entityMd.getPropertyNames(),
-				function( mdTypes, propertyName, index ){
-					arguments.mdTypes[ arguments.propertyName ] = types[ index ].getClass().getName();
-					return arguments.mdTypes;
-				},
-				{}
-			);
-
-			thisMemento.defaultIncludes = typeMap
-				.keyArray()
-				.filter( function( propertyName ){
-					switch ( listLast( typeMap[ arguments.propertyName ], "." ) ) {
-						case "BagType":
-						case "OneToManyType":
-						case "ManyToManyType":
-						case "ManyToOneType":
-						case "OneToOneType":
-						case "BinaryType": {
-							return false;
-						}
-						default: {
-							return true;
-						}
-					}
-				} );
-
-			// Append primary keys
-			if ( entityMd.hasIdentifierProperty() ) {
-				arrayAppend( thisMemento.defaultIncludes, entityMd.getIdentifierPropertyName() );
-			} else if ( entityMd.getIdentifierType().isComponentType() ) {
-				arrayAppend(
-					thisMemento.defaultIncludes,
-					listToArray( arrayToList( entityMd.getIdentifierType().getPropertyNames() ) ),
-					true
-				);
-			}
+			thisMemento.defaultIncludes = $buildOrmIncludes();
 		}
 
 		// Do we have a * for auto includes of all properties in the object
@@ -450,6 +405,62 @@ component {
 
 		// Return memento
 		return result;
+	}
+
+	/**
+	 * This function builds automatic ORM entity includes
+	 *
+	 * @return The array of default includes for the ORM entity where this function is injected into
+	 */
+	array function $buildOrmIncludes(){
+		var thisName = isNull( variables.entityName ) ? "" : variables.entityName;
+		if ( !len( thisName ) ) {
+			var md   = getMetadata( this );
+			thisName = ( md.keyExists( "entityName" ) ? md.entityName : listLast( md.name, "." ) );
+		}
+
+		var ORMService = new cborm.models.BaseORMService();
+		var entityMd   = ORMService.getEntityMetadata( this );
+		var types      = entityMd.getPropertyTypes();
+		var typeMap    = arrayReduce(
+			entityMd.getPropertyNames(),
+			function( mdTypes, propertyName, index ){
+				arguments.mdTypes[ arguments.propertyName ] = types[ index ].getClass().getName();
+				return arguments.mdTypes;
+			},
+			{}
+		);
+
+		var defaultIncludes = typeMap
+			.keyArray()
+			.filter( function( propertyName ){
+				switch ( listLast( typeMap[ arguments.propertyName ], "." ) ) {
+					case "BagType":
+					case "OneToManyType":
+					case "ManyToManyType":
+					case "ManyToOneType":
+					case "OneToOneType":
+					case "BinaryType": {
+						return false;
+					}
+					default: {
+						return true;
+					}
+				}
+			} );
+
+		// Append primary keys
+		if ( entityMd.hasIdentifierProperty() ) {
+			arrayAppend( defaultIncludes, entityMd.getIdentifierPropertyName() );
+		} else if ( entityMd.getIdentifierType().isComponentType() ) {
+			arrayAppend(
+				defaultIncludes,
+				listToArray( arrayToList( entityMd.getIdentifierType().getPropertyNames() ) ),
+				true
+			);
+		}
+
+		return defaultIncludes;
 	}
 
 	/**
