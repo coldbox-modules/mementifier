@@ -345,10 +345,10 @@ component {
 							// cascade the ignore defaults down if specific nested includes are requested
 							ignoreDefaults: nestedIncludes.len() ? arguments.ignoreDefaults : false,
 							// cascade the rest of the request parameters to children
-							trustedGetters: arguments.trustedGetters,
-							iso8601Format : arguments.iso8601Format,
-							dateMask      : arguments.dateMask,
-							timeMask      : arguments.timeMask,
+							trustedGetters: thisMemento.trustedGetters,
+							iso8601Format : thisMemento.iso8601Format,
+							dateMask      : thisMemento.dateMask,
+							timeMask      : thisMemento.timeMask,
 							profile       : arguments.profile
 						);
 					} else {
@@ -374,10 +374,10 @@ component {
 					// cascade the ignore defaults down if specific nested includes are requested
 					ignoreDefaults: nestedIncludes.len() ? arguments.ignoreDefaults : false,
 					// cascade the rest of the request parameters to children
-					trustedGetters: arguments.trustedGetters,
-					iso8601Format : arguments.iso8601Format,
-					dateMask      : arguments.dateMask,
-					timeMask      : arguments.timeMask,
+					trustedGetters: thisMemento.trustedGetters,
+					iso8601Format : thisMemento.iso8601Format,
+					dateMask      : thisMemento.dateMask,
+					timeMask      : thisMemento.timeMask,
 					profile       : arguments.profile
 				);
 
