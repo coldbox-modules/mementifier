@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----
 
+## [3.2.0] => 2023-JAN-19
+
+### Fixed
+
+* Issue occurs where the `iso8601Format` flag is only being applied to the top level object properties and does not cascade, resulting in child date properties not being properly formatted. https://github.com/coldbox-modules/mementifier/pull/33
+* `datemask` and `timeMask` arguments where not being params by default
+* `gh-release` action had the wrong code
+
+### Improvements
+
+* Updated all the GHA actions to newest levels and compatible Java builds.
+
+----
+
 ## [3.1.0] => 2022-NOV-10
 
 ### Added
