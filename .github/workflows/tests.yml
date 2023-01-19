@@ -73,7 +73,7 @@ jobs:
           ls -lR test-harness/tests
 
       - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           files: test-harness/tests/results/**/*.xml
