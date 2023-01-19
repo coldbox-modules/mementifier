@@ -104,7 +104,8 @@ component {
 	}
 
 	/**
-	 * Construct a memento representation from an entity according to includes and exclude lists
+	 * Construct a memento representation from an entity according to it's defined this.memento properties.
+	 * You can also override those properties defined in a class by using the arguments in this method.
 	 *
 	 * @includes       The properties array or list to build the memento with alongside the default includes
 	 * @excludes       The properties array or list to exclude from the memento alongside the default excludes
@@ -155,8 +156,11 @@ component {
 			"timeMask"        : isNull( this.memento.timeMask ) ? variables.$mementifierSettings.timeMask : this.memento.timeMask,
 			"profiles"        : isNull( this.memento.profiles ) ? {} : this.memento.profiles
 		};
+		// Param arguments according to instance > settings chain precedence
 		param arguments.trustedGetters = thisMemento.trustedGetters;
 		param arguments.iso8601Format  = thisMemento.iso8601Format;
+		param arguments.dateMask       = thisMemento.dateMask;
+		param arguments.timeMask       = thisMemento.timeMask;
 
 		// Choose a profile
 		if ( len( arguments.profile ) && thisMemento.profiles.keyExists( arguments.profile ) ) {
@@ -167,12 +171,10 @@ component {
 			);
 		}
 
-		// Customize date formatting tools
+		// Default formatter or customize it if passed arguments are different than settings.
 		var customDateFormatter = this.$FORMATTER_CUSTOM;
-		if ( !isNull( arguments.dateMask ) || !isNull( arguments.timeMask ) ) {
-			param arguments.dateMask = thisMemento.dateMask;
-			param arguments.timeMask = thisMemento.timeMask;
-			customDateFormatter      = createObject( "java", "java.text.SimpleDateFormat" ).init(
+		if ( arguments.dateMask != thisMemento.dateMask || arguments.timeMask != thisMemento.timeMask ) {
+			customDateFormatter = createObject( "java", "java.text.SimpleDateFormat" ).init(
 				"#arguments.dateMask# #arguments.timeMask#"
 			);
 		}
@@ -344,8 +346,12 @@ component {
 							defaults      : $buildNestedMementoStruct( defaults, item ),
 							// cascade the ignore defaults down if specific nested includes are requested
 							ignoreDefaults: nestedIncludes.len() ? arguments.ignoreDefaults : false,
-							// Cascade the profile to children
-							profile       : arguments.profile
+							// Cascade the arguments to the children
+							profile       : arguments.profile,
+							trustedGetters: arguments.trustedGetters,
+							iso8601Format : arguments.iso8601Format,
+							dateMask      : arguments.dateMask,
+							timeMask      : arguments.timeMask
 						);
 					} else {
 						result[ thisAlias ][ thisIndex ] = thisValue[ thisIndex ];
@@ -369,8 +375,12 @@ component {
 					defaults      : $buildNestedMementoStruct( defaults, item ),
 					// cascade the ignore defaults down if specific nested includes are requested
 					ignoreDefaults: nestedIncludes.len() ? arguments.ignoreDefaults : false,
-					// Cascade the profile to children
-					profile       : arguments.profile
+					// Cascade the arguments to the children
+					profile       : arguments.profile,
+					trustedGetters: arguments.trustedGetters,
+					iso8601Format : arguments.iso8601Format,
+					dateMask      : arguments.dateMask,
+					timeMask      : arguments.timeMask
 				);
 
 				// Do we have a root already for this guy?

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Issue occurs where the `iso8601Format` flag is only being applied to the top level object properties and does not cascade, resulting in child date properties not being properly formatted. https://github.com/coldbox-modules/mementifier/pull/33
+* `datemask` and `timeMask` arguments where not being params by default
 * `gh-release` action had the wrong code
 
 ### Improvements
