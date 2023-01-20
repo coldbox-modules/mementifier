@@ -122,6 +122,17 @@ string function getAvatarLink( numeric size=40 ){
 	return variables.avatar.generateLink( getEmail(), arguments.size );
 }
 ```
+##### Includes Aliasing
+
+You may also wish to alias properties or getters in your components to a different name in the generated memento.  You may do this by using a colon with the left hand side as the name of the property or getter ( without the `get` ) and the right hand side as the alias. For example let's say we had a getter of `getLastLoginTime` but we wanted to reference it as `lastLogin` in the memento.  We can do this with aliasing.
+
+```js
+defaultIncludes = [
+	"firstName",
+	"lastName",
+	"avatarLink",
+	"lastLoginTime:lastLogin"
+]
 
 ##### Nested Includes
 
