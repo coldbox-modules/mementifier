@@ -133,6 +133,7 @@ defaultIncludes = [
 	"avatarLink",
 	"lastLoginTime:lastLogin"
 ]
+```
 
 ##### Nested Includes
 
