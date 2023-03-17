@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----
 
+## [3.3.0] => 2023-MAR-17
+
+### Added
+
+* New global settings `autoCastBooleans` which allows you to turn this feature on or off.  By default we inspect if a value is not numeric and `isBoolean` and auto cast it to Java `Boolean` so it translated to a boolean in json.
+* New `this.memento.autoCastBooleans` so you can turn on/off this feature at an entity level.
+* New `autoCastBooleans` argument to the `getMemento()` to turn on/off this feature for that call only.
+
+----
+
 ## [3.2.0] => 2023-JAN-19
 
 ### Fixed

@@ -117,6 +117,7 @@ component {
 	 * @dateMask       The date mask to use when formatting datetimes. Only used if iso8601Format is false.
 	 * @timeMask       The time mask to use when formatting datetimes. Only used if iso8601Format is false.
 	 * @profile        The profile to use instead of the defaults
+	 * @autoCastBooleans Auto cast boolean values if they are not numeric and isBoolean().
 	 */
 	struct function getMemento(
 		includes               = "",
@@ -128,7 +129,8 @@ component {
 		boolean iso8601Format,
 		string dateMask,
 		string timeMask,
-		string profile = ""
+		string profile = "",
+		boolean autoCastBooleans = true
 	){
 		local.includes = duplicate( arguments.includes );
 		local.excludes = duplicate( arguments.excludes );
@@ -144,23 +146,25 @@ component {
 		// Param Default Memento Settings
 		// We do it here, because ACF caches crap!
 		var thisMemento = {
+			"autoCastBooleans" : isNull( this.memento.autoCastBooleans ) ? variables.$mementifierSettings.autoCastBooleans : this.memento.autoCastBooleans,
+			"dateMask"        : isNull( this.memento.dateMask ) ? variables.$mementifierSettings.dateMask : this.memento.dateMask,
+			"defaults"        : isNull( this.memento.defaults ) ? {} : this.memento.defaults,
 			"defaultIncludes" : isNull( this.memento.defaultIncludes ) ? [] : this.memento.defaultIncludes,
 			"defaultExcludes" : isNull( this.memento.defaultExcludes ) ? [] : this.memento.defaultExcludes,
-			"neverInclude"    : isNull( this.memento.neverInclude ) ? [] : this.memento.neverInclude,
-			"mappers"         : isNull( this.memento.mappers ) ? {} : this.memento.mappers,
-			"defaults"        : isNull( this.memento.defaults ) ? {} : this.memento.defaults,
-			"trustedGetters"  : isNull( this.memento.trustedGetters ) ? variables.$mementifierSettings.trustedGetters : this.memento.trustedGetters,
-			"ormAutoIncludes" : isNull( this.memento.ormAutoIncludes ) ? variables.$mementifierSettings.ormAutoIncludes : this.memento.ormAutoIncludes,
 			"iso8601Format"   : isNull( this.memento.iso8601Format ) ? variables.$mementifierSettings.iso8601Format : this.memento.iso8601Format,
-			"dateMask"        : isNull( this.memento.dateMask ) ? variables.$mementifierSettings.dateMask : this.memento.dateMask,
+			"mappers"         : isNull( this.memento.mappers ) ? {} : this.memento.mappers,
+			"neverInclude"    : isNull( this.memento.neverInclude ) ? [] : this.memento.neverInclude,
+			"ormAutoIncludes" : isNull( this.memento.ormAutoIncludes ) ? variables.$mementifierSettings.ormAutoIncludes : this.memento.ormAutoIncludes,
+			"profiles"        : isNull( this.memento.profiles ) ? {} : this.memento.profiles,
 			"timeMask"        : isNull( this.memento.timeMask ) ? variables.$mementifierSettings.timeMask : this.memento.timeMask,
-			"profiles"        : isNull( this.memento.profiles ) ? {} : this.memento.profiles
+			"trustedGetters"  : isNull( this.memento.trustedGetters ) ? variables.$mementifierSettings.trustedGetters : this.memento.trustedGetters
 		};
 		// Param arguments according to instance > settings chain precedence
-		param arguments.trustedGetters = thisMemento.trustedGetters;
-		param arguments.iso8601Format  = thisMemento.iso8601Format;
-		param arguments.dateMask       = thisMemento.dateMask;
-		param arguments.timeMask       = thisMemento.timeMask;
+		param arguments.trustedGetters 		= thisMemento.trustedGetters;
+		param arguments.iso8601Format  		= thisMemento.iso8601Format;
+		param arguments.dateMask       		= thisMemento.dateMask;
+		param arguments.timeMask       		= thisMemento.timeMask;
+		param arguments.autoCastBooleans 	= thisMemento.autoCastBooleans;
 
 		// Choose a profile
 		if ( len( arguments.profile ) && thisMemento.profiles.keyExists( arguments.profile ) ) {
@@ -280,6 +284,7 @@ component {
 				continue;
 			}
 
+
 			// Verify Nullness
 			thisValue = isNull( thisValue ) ? (
 				arrayContainsNoCase( thisMemento.defaults.keyArray(), item ) ? (
@@ -290,6 +295,7 @@ component {
 			if ( isNull( thisValue ) ) {
 				result[ thisAlias ] = javacast( "null", "" );
 			}
+
 			// Match timestamps + date/time objects
 			else if (
 				isSimpleValue( thisValue )
@@ -314,14 +320,17 @@ component {
 					result[ thisAlias ] = thisValue;
 				}
 			}
+
 			// Strict Type Boolean Values
-			else if ( !isNumeric( thisValue ) && isBoolean( thisValue ) ) {
+			else if ( arguments.autoCastBooleans && !isNumeric( thisValue ) && isBoolean( thisValue ) ) {
 				result[ thisAlias ] = javacast( "Boolean", thisValue );
 			}
+
 			// Simple Values
 			else if ( isSimpleValue( thisValue ) ) {
 				result[ thisAlias ] = thisValue;
 			}
+
 			// Array Collections
 			else if ( isArray( thisValue ) ) {
 				// Map Items into result object
@@ -351,7 +360,8 @@ component {
 							trustedGetters: arguments.trustedGetters,
 							iso8601Format : arguments.iso8601Format,
 							dateMask      : arguments.dateMask,
-							timeMask      : arguments.timeMask
+							timeMask      : arguments.timeMask,
+							autoCastBooleans : arguments.autoCastBooleans
 						);
 					} else {
 						result[ thisAlias ][ thisIndex ] = thisValue[ thisIndex ];
@@ -369,18 +379,19 @@ component {
 
 				// Process the item memento
 				var thisItemMemento = thisValue.getMemento(
-					includes      : nestedIncludes,
-					excludes      : $buildNestedMementoList( excludes, item ),
-					mappers       : $buildNestedMementoStruct( mappers, item ),
-					defaults      : $buildNestedMementoStruct( defaults, item ),
+					includes      	: nestedIncludes,
+					excludes      	: $buildNestedMementoList( excludes, item ),
+					mappers       	: $buildNestedMementoStruct( mappers, item ),
+					defaults      	: $buildNestedMementoStruct( defaults, item ),
 					// cascade the ignore defaults down if specific nested includes are requested
-					ignoreDefaults: nestedIncludes.len() ? arguments.ignoreDefaults : false,
+					ignoreDefaults	: nestedIncludes.len() ? arguments.ignoreDefaults : false,
 					// Cascade the arguments to the children
-					profile       : arguments.profile,
-					trustedGetters: arguments.trustedGetters,
-					iso8601Format : arguments.iso8601Format,
-					dateMask      : arguments.dateMask,
-					timeMask      : arguments.timeMask
+					profile       		: arguments.profile,
+					trustedGetters		: arguments.trustedGetters,
+					iso8601Format 		: arguments.iso8601Format,
+					dateMask      		: arguments.dateMask,
+					timeMask      		: arguments.timeMask,
+					autoCastBooleans : arguments.autoCastBooleans
 				);
 
 				// Do we have a root already for this guy?
@@ -389,8 +400,11 @@ component {
 				} else {
 					result[ thisAlias ] = thisItemMemento;
 				}
-			} else {
-				// we don't know what to do with this item so we return as-is
+			} 
+
+
+			// we don't know what to do with this item so we return as-is
+			else {
 				result[ thisAlias ] = thisValue;
 			}
 		}

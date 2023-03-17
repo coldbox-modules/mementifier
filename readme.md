@@ -8,7 +8,7 @@ You can combine this module with `cffractal` (https://forgebox.io/view/cffractal
 
 ## Module Settings
 
-Just open your `config/Coldbox.cfc` and add the following settings into the `moduleSettings` struct under the `mementifier` key:
+Just open your `config/Coldbox.cfc` and add the following settings into the `moduleSettings` struct under the `mementifier` key or create a new `config/modules/mementifier.cfc` in ColdBox 7:
 
 ```js
 // module settings - stored in modules.name.settings
@@ -29,7 +29,9 @@ moduleSettings = {
         // Don't check for getters before invoking them
         trustedGetters = false,
 		// If not empty, convert all date/times to the specific timezone
-		convertToTimezone = ""
+		convertToTimezone = "",
+		// Verifies if values are not numeric and isBoolean() and do auto casting to Java Boolean
+		autoCastBooleans : true
 	}
 }
 ```
@@ -74,7 +76,9 @@ this.memento = {
 			mappers = {}
 			...
 		}
-	}
+	},
+	// Auto cast boolean strings to Java boolean
+	autoCastBooleans = true
 }
 ```
 
@@ -121,6 +125,18 @@ defaultIncludes = [
 string function getAvatarLink( numeric size=40 ){
 	return variables.avatar.generateLink( getEmail(), arguments.size );
 }
+```
+##### Includes Aliasing
+
+You may also wish to alias properties or getters in your components to a different name in the generated memento.  You may do this by using a colon with the left hand side as the name of the property or getter ( without the `get` ) and the right hand side as the alias. For example let's say we had a getter of `getLastLoginTime` but we wanted to reference it as `lastLogin` in the memento.  We can do this with aliasing.
+
+```js
+defaultIncludes = [
+	"firstName",
+	"lastName",
+	"avatarLink",
+	"lastLoginTime:lastLogin"
+]
 ```
 
 ##### Nested Includes
@@ -217,7 +233,8 @@ struct function getMemento(
 	boolean iso8601Format,
 	string dateMask,
 	string timeMask,
-	string profile = ""
+	string profile = "",
+	boolean autoCastBooleans = true
 )
 ```
 
@@ -339,7 +356,8 @@ struct function getMemento(
 	boolean iso8601Format,
 	string dateMask,
 	string timeMask,
-	string profile = ""
+	string profile = "",
+	boolean autoCastBooleans = true
 ){
 	// Call mementifier
 	var memento	= this.$getMemento( argumentCollection=arguments );
@@ -422,46 +440,26 @@ function process(
 ){}
 ```
 
-## Running The Test Suites
+## Auto Cast Booleans
 
-In order to collaborate on this project you will need to do a few things in order to get the test harness ready for execution.  The `test-harness` folder is where the ColdBox test app exists that consumes the module for testing.  The `test-harness/tests/specs` is where all the specs for testing are located.
+By default, mementifier will evaluate if the incoming value is not numeric and `isBoolean()` and if so, convert it to a Java `Boolean` so when marshalled it will be a `true` or `false=` in the output json.  However we understand this can be annoying or too broad of a stroke, so you can optionally disable it in different levels:
 
-### Database
+1. Global Setting
+1. Entity Level
+1. `getMemento()` Level
 
-Create a database called `mementifier` in any RDBMS you like. We have mostly used MySQL for the tests.
+### Global Setting
 
-This quick Docker command will get you started:
+You can set the `autoCastBooleans` global setting in the mementifier settings.
 
-```bash
-docker run --detach \
-	--publish 3306:3306 \
-	--name mementifier_mysql \
-	--env MYSQL_ROOT_PASSWORD=mysql \
-	--env MYSQL_DATABASE=mementifier \
-	mysql
-```
+### Entity Level
 
-### Environment
+You can set the `autoCastBooleans` property in the `this.memento` struct.
 
-Copy the `.env.template` as `.env` and modify it accordingly so it can connect to your database.
+### `getMemento()` Level
 
-### Dependencies
+You can pass in the `autoCastBooleans` argument to the `getMemento()` and use that as the default.
 
-Go into the root of `test-harness` and run a CommandBox shell: `box`.  Once in the shell install the dependencies `install`.
-
-### Start a Server
-
-Start a server, we have configured for you several CFML engines for you to test against, pick one from the list below:
-
-- `server start serverConfigFile=server-adobe@2018.json`
-- - `server start serverConfigFile=server-adobe@2021.json`
-- `server start serverConfigFile=server-lucee@5.json`
-
-Then you can hit the test site app at http://localhost:60299.  This will create the database for you using the ColdFusion ORM.
-
-### Running Tests
-
-You can then run the tests at http://localhost:60299/tests/runner.cfm
 
 ********************************************************************************
 Copyright Since 2005 ColdBox Framework by Luis Majano and Ortus Solutions, Corp

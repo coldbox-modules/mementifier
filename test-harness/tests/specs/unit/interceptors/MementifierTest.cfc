@@ -21,7 +21,9 @@ component extends="coldbox.system.testing.BaseInterceptorTest" interceptor="meme
 			// Don't check for getters before invoking them
 			trustedGetters    : false,
 			// If not empty, convert all date/times to the specific timezone
-			convertToTimezone : ""
+			convertToTimezone : "",
+			// Verifies if values are not numeric and isBoolean() and do auto casting to Java Boolean
+			autoCastBooleans : true
 		};
 
 		variables.interceptor.$property(
