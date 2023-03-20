@@ -130,7 +130,7 @@ component {
 		string dateMask,
 		string timeMask,
 		string profile = "",
-		boolean autoCastBooleans = true
+		boolean autoCastBooleans
 	){
 		local.includes = duplicate( arguments.includes );
 		local.excludes = duplicate( arguments.excludes );
