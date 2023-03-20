@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----
 
+## [3.3.1] => 2023-MAR-20
+
+### Fixed
+
+* `autoCastBooleans` on `getMemento()` was always set to `true`.
+
+----
+
 ## [3.3.0] => 2023-MAR-17
 
 ### Added
