@@ -23,7 +23,7 @@ component extends="coldbox.system.testing.BaseInterceptorTest" interceptor="meme
 			// If not empty, convert all date/times to the specific timezone
 			convertToTimezone : "",
 			// Verifies if values are not numeric and isBoolean() and do auto casting to Java Boolean
-			autoCastBooleans : true
+			autoCastBooleans  : true
 		};
 
 		variables.interceptor.$property(
