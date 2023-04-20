@@ -54,19 +54,19 @@ jobs:
         uses: Ortus-Solutions/setup-commandbox@v2.0.1
 
       - name: Setup Environment For Testing Process
-       working-directory: ./test-harness
-       run: |
-         # Setup .env
-         touch .env
-         # ENV
-         printf "DB_HOST=localhost\n" >> .env
-         printf "DB_DATABASE=mementifier\n" >> .env
-         printf "DB_DRIVER=MySQL\n" >> .env
-         printf "DB_USER=${{ env.DB_USER }}\n" >> .env
-         printf "DB_PASSWORD=${{ env.DB_PASSWORD }}\n" >> .env
-         printf "DB_CLASS=com.mysql.cj.jdbc.Driver\n" >> .env
-         printf "DB_BUNDLEVERSION=8.0.19\n" >> .env
-         printf "DB_BUNDLENAME=com.mysql.cj\n" >> .env
+        working-directory: ./test-harness
+        run: |
+          # Setup .env
+          touch .env
+          # ENV
+          printf "DB_HOST=localhost\n" >> .env
+          printf "DB_DATABASE=mementifier\n" >> .env
+          printf "DB_DRIVER=MySQL\n" >> .env
+          printf "DB_USER=${{ env.DB_USER }}\n" >> .env
+          printf "DB_PASSWORD=${{ env.DB_PASSWORD }}\n" >> .env
+          printf "DB_CLASS=com.mysql.cj.jdbc.Driver\n" >> .env
+          printf "DB_BUNDLEVERSION=8.0.19\n" >> .env
+          printf "DB_BUNDLENAME=com.mysql.cj\n" >> .env
 
       - name: Install Test Harness with ColdBox ${{ matrix.coldboxVersion }}
         run: |
