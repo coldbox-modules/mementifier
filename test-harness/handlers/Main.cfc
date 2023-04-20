@@ -23,9 +23,9 @@
 		};
 
 		var oUser = populateModel(
-			model                = userService.new(),
-			memento              = mockData,
-			composeRelationships = true
+			model                : userService.new( { userId : createUUID() } ),
+			memento              : mockData,
+			composeRelationships : true
 		);
 		oUser.setRole( roleService.new( { role : "Admin", description : "Awesome Admin" } ) );
 		oUser
@@ -46,6 +46,7 @@
 			getNewSetting(),
 			getNewSetting()
 		] );
+
 
 		var result = oUser.getMemento(
 			includes       = rc.includes,
