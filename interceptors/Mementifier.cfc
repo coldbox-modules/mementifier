@@ -160,11 +160,21 @@ component {
 			"trustedGetters"   : isNull( this.memento.trustedGetters ) ? variables.$mementifierSettings.trustedGetters : this.memento.trustedGetters
 		};
 		// Param arguments according to instance > settings chain precedence
-		param arguments.trustedGetters   = thisMemento.trustedGetters;
-		param arguments.iso8601Format    = thisMemento.iso8601Format;
-		param arguments.dateMask         = thisMemento.dateMask;
-		param arguments.timeMask         = thisMemento.timeMask;
-		param arguments.autoCastBooleans = thisMemento.autoCastBooleans;
+		if(not isDefined(arguments.trustedGetters)){
+			arguments.trustedGetters = thisMemento.trustedGetters;
+		}
+		if(not isDefined(arguments.iso8601Format)){
+			arguments.iso8601Format = thisMemento.iso8601Format;
+		}
+		if(not isDefined(arguments.dateMask)){
+			arguments.dateMask = thisMemento.dateMask;
+		}
+		if(not isDefined(arguments.timeMask)){
+			arguments.timeMask = thisMemento.timeMask;
+		}
+		if(not isDefined(arguments.autoCastBooleans)){
+			arguments.autoCastBooleans = thisMemento.autoCastBooleans;
+		}
 
 		// Choose a profile
 		if ( len( arguments.profile ) && thisMemento.profiles.keyExists( arguments.profile ) ) {
