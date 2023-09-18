@@ -5,13 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-----
+* * *
 
 ## [Unreleased]
 
+## [3.4.0] - 2023-09-18
+
 ### Fixed
 
-- Full null support `cfproperty` doesn't work on lucee. https://github.com/coldbox-modules/mementifier/pull/38
+- Full null support `cfproperty` doesn't work on lucee. <https://github.com/coldbox-modules/mementifier/pull/38>
 
 ### Added
 
@@ -39,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Issue occurs where the `iso8601Format` flag is only being applied to the top level object properties and does not cascade, resulting in child date properties not being properly formatted. https://github.com/coldbox-modules/mementifier/pull/33
+- Issue occurs where the `iso8601Format` flag is only being applied to the top level object properties and does not cascade, resulting in child date properties not being properly formatted. <https://github.com/coldbox-modules/mementifier/pull/33>
 - `datemask` and `timeMask` arguments where not being params by default
 - `gh-release` action had the wrong code
 
@@ -60,7 +62,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - fix: Use `box:` namespace for CommandBox compatibility
 
-
 ## [3.0.0] => 2022-SEP-22
 
 ### Added
@@ -71,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Prevent argument modification and duplicate includes processing: https://github.com/coldbox-modules/mementifier/pull/26
+- Prevent argument modification and duplicate includes processing: <https://github.com/coldbox-modules/mementifier/pull/26>
 
 ### Changed
 
@@ -86,8 +87,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Composite keys and no default includes fails (https://github.com/coldbox-modules/mementifier/pull/24)
-- Fix mappers for keys not in memento (https://github.com/coldbox-modules/mementifier/pull/23)
+- Composite keys and no default includes fails (<https://github.com/coldbox-modules/mementifier/pull/24>)
+- Fix mappers for keys not in memento (<https://github.com/coldbox-modules/mementifier/pull/23>)
 
 ## [2.7.0] => 2021-JUN-07
 
@@ -110,7 +111,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - When using orm with composite keys and no default includes it should look at the metdata for the identifier type not the includes
-
 
 ## [2.4.0] => 2021-MAR-22
 
@@ -159,7 +159,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
-- Enabled wildcard default includes (*) to retrieve inherited object properties instead of doing wacky things for inherited defaults to work.
+- Enabled wildcard default includes (\*) to retrieve inherited object properties instead of doing wacky things for inherited defaults to work.
 - New setting to chose a default value to expose when getters return `null`: `nullDefaultValue`
 - ORM Auto includes now ONLY includes properties to avoid bi-directional recursive exceptions.  This is also a compatiblity, where before EVERYTHING was included.  Now, only properties are included.
 
@@ -227,3 +227,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0]
 
 - First iteration of this module
+
+[Unreleased]: https://github.com/coldbox-modules/mementifier/compare/v3.4.0...HEAD
+
+[3.4.0]: https://github.com/coldbox-modules/mementifier/compare/4493ce21379f1dbe045c897b70193cea56c2da22...v3.4.0
