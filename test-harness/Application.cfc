@@ -13,7 +13,7 @@ component {
 	this.sessionManagement = true;
 	this.sessionTimeout    = createTimespan( 0, 0, 15, 0 );
 	this.setClientCookies  = true;
-	this.enableNullSupport = true;
+	// this.enableNullSupport = true;
 
 	/**************************************
 	 **************************************/
