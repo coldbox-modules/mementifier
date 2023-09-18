@@ -148,6 +148,23 @@
 				expect( memento ).toHaveKey( "slug,title,teaser,isActive,createdDate,updatedDate,postId" );
 				expect( memento ).notToHaveKey( "createdBy" );
 			} );
+
+
+			it( "can correctly do ignore defaults with nested includes", function(){
+				var event = this.request(
+					route  = "/",
+					params = {
+						ignoreDefaults : true,
+						includes       : "fname,lname,settings,settings.latestValue"
+					}
+				);
+				var memento = deserializeJSON( event.getRenderedContent() );
+				expect( memento.settings ).toBeArray().notToBeEmpty();
+				expect( memento.settings[ 1 ] )
+					.toBeStruct()
+					.toHaveKey( "latestValue" )
+					.toHaveDeepKey( "description" );
+			} );
 		} );
 	}
 

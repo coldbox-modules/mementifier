@@ -5,6 +5,7 @@
 	property name="roleService"       inject="entityService:Role";
 	property name="settingService"    inject="entityService:Setting";
 	property name="permissionService" inject="entityService:Permission";
+	property name="recentValueService" inject="entityService:RecentValue";
 
 	function index( event, rc, prc ){
 		param rc.ignoreDefaults = false;
@@ -138,11 +139,17 @@
 	}
 
 	private function getNewSetting(){
+		var description = "Hola!!! from #createUUID()#";
+
 		return settingService.new( {
 			name        : "setting-#createUUID()#",
-			description : "Hola!!!",
+			description : description,
 			isConfirmed : randRange( 0, 1 )
-		} );
+		} ).setLatestValue(
+			recentValueService.new( {
+				description : description
+			} )
+		);
 	}
 
 	function resultMap( event, rc, prc ){
