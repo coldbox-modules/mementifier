@@ -9,8 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Full null support `cfproperty` doesn't work on lucee. https://github.com/coldbox-modules/mementifier/pull/38
+
 ### Added
 
+- Ortus ORM extension
 - Github actions update
 - ColdBox 7 Auto testing
 
