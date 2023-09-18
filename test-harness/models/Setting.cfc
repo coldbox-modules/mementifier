@@ -31,6 +31,13 @@ component
 		default="false"
 		notnull="false";
 
+	property
+		name     ="latestValue"
+		fieldtype="one-to-one"
+		cfc      ="RecentValue"
+		fkcolumn ="recentValueId";
+
+
 	/* *********************************************************************
 	 **						STATIC PROPERTIES & CONSTRAINTS
 	 ********************************************************************* */
@@ -41,7 +48,12 @@ component
 	// Mementofication Settings
 	this.memento = {
 		// Default properties to serialize
-		defaultIncludes : [ "name", "isConfirmed", "description" ],
+		defaultIncludes : [
+			"settingId",
+			"name",
+			"isConfirmed",
+			"description"
+		],
 		// Default Exclusions
 		defaultExcludes : [],
 		neverInclude    : [],

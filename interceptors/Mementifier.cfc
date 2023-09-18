@@ -107,16 +107,16 @@ component {
 	 * Construct a memento representation from an entity according to it's defined this.memento properties.
 	 * You can also override those properties defined in a class by using the arguments in this method.
 	 *
-	 * @includes       The properties array or list to build the memento with alongside the default includes
-	 * @excludes       The properties array or list to exclude from the memento alongside the default excludes
-	 * @mappers        A struct of key-function pairs that will map properties to closures/lambadas to process the item value.  The closure will transform the item value.
-	 * @defaults       A struct of key-value pairs that denotes the default values for properties if they are null, defaults for everything are a blank string.
-	 * @ignoreDefaults If set to true, default includes and excludes will be ignored and only the incoming `includes` and `excludes` list will be used.
-	 * @trustedGetters If set to true, getters will not be checked for in the `this` scope before trying to invoke them.
-	 * @iso8601Format  If set to true, will use the ISO 8601 standard for formatting dates
-	 * @dateMask       The date mask to use when formatting datetimes. Only used if iso8601Format is false.
-	 * @timeMask       The time mask to use when formatting datetimes. Only used if iso8601Format is false.
-	 * @profile        The profile to use instead of the defaults
+	 * @includes         The properties array or list to build the memento with alongside the default includes
+	 * @excludes         The properties array or list to exclude from the memento alongside the default excludes
+	 * @mappers          A struct of key-function pairs that will map properties to closures/lambadas to process the item value.  The closure will transform the item value.
+	 * @defaults         A struct of key-value pairs that denotes the default values for properties if they are null, defaults for everything are a blank string.
+	 * @ignoreDefaults   If set to true, default includes and excludes will be ignored and only the incoming `includes` and `excludes` list will be used.
+	 * @trustedGetters   If set to true, getters will not be checked for in the `this` scope before trying to invoke them.
+	 * @iso8601Format    If set to true, will use the ISO 8601 standard for formatting dates
+	 * @dateMask         The date mask to use when formatting datetimes. Only used if iso8601Format is false.
+	 * @timeMask         The time mask to use when formatting datetimes. Only used if iso8601Format is false.
+	 * @profile          The profile to use instead of the defaults
 	 * @autoCastBooleans Auto cast boolean values if they are not numeric and isBoolean().
 	 */
 	struct function getMemento(
@@ -147,24 +147,25 @@ component {
 		// We do it here, because ACF caches crap!
 		var thisMemento = {
 			"autoCastBooleans" : isNull( this.memento.autoCastBooleans ) ? variables.$mementifierSettings.autoCastBooleans : this.memento.autoCastBooleans,
-			"dateMask"        : isNull( this.memento.dateMask ) ? variables.$mementifierSettings.dateMask : this.memento.dateMask,
-			"defaults"        : isNull( this.memento.defaults ) ? {} : this.memento.defaults,
-			"defaultIncludes" : isNull( this.memento.defaultIncludes ) ? [] : this.memento.defaultIncludes,
-			"defaultExcludes" : isNull( this.memento.defaultExcludes ) ? [] : this.memento.defaultExcludes,
-			"iso8601Format"   : isNull( this.memento.iso8601Format ) ? variables.$mementifierSettings.iso8601Format : this.memento.iso8601Format,
-			"mappers"         : isNull( this.memento.mappers ) ? {} : this.memento.mappers,
-			"neverInclude"    : isNull( this.memento.neverInclude ) ? [] : this.memento.neverInclude,
-			"ormAutoIncludes" : isNull( this.memento.ormAutoIncludes ) ? variables.$mementifierSettings.ormAutoIncludes : this.memento.ormAutoIncludes,
-			"profiles"        : isNull( this.memento.profiles ) ? {} : this.memento.profiles,
-			"timeMask"        : isNull( this.memento.timeMask ) ? variables.$mementifierSettings.timeMask : this.memento.timeMask,
-			"trustedGetters"  : isNull( this.memento.trustedGetters ) ? variables.$mementifierSettings.trustedGetters : this.memento.trustedGetters
+			"dateMask"         : isNull( this.memento.dateMask ) ? variables.$mementifierSettings.dateMask : this.memento.dateMask,
+			"defaults"         : isNull( this.memento.defaults ) ? {} : this.memento.defaults,
+			"defaultIncludes"  : isNull( this.memento.defaultIncludes ) ? [] : this.memento.defaultIncludes,
+			"defaultExcludes"  : isNull( this.memento.defaultExcludes ) ? [] : this.memento.defaultExcludes,
+			"iso8601Format"    : isNull( this.memento.iso8601Format ) ? variables.$mementifierSettings.iso8601Format : this.memento.iso8601Format,
+			"mappers"          : isNull( this.memento.mappers ) ? {} : this.memento.mappers,
+			"neverInclude"     : isNull( this.memento.neverInclude ) ? [] : this.memento.neverInclude,
+			"ormAutoIncludes"  : isNull( this.memento.ormAutoIncludes ) ? variables.$mementifierSettings.ormAutoIncludes : this.memento.ormAutoIncludes,
+			"profiles"         : isNull( this.memento.profiles ) ? {} : this.memento.profiles,
+			"timeMask"         : isNull( this.memento.timeMask ) ? variables.$mementifierSettings.timeMask : this.memento.timeMask,
+			"trustedGetters"   : isNull( this.memento.trustedGetters ) ? variables.$mementifierSettings.trustedGetters : this.memento.trustedGetters
 		};
+
 		// Param arguments according to instance > settings chain precedence
-		param arguments.trustedGetters 		= thisMemento.trustedGetters;
-		param arguments.iso8601Format  		= thisMemento.iso8601Format;
-		param arguments.dateMask       		= thisMemento.dateMask;
-		param arguments.timeMask       		= thisMemento.timeMask;
-		param arguments.autoCastBooleans 	= thisMemento.autoCastBooleans;
+		arguments.trustedGetters   = isNull( arguments.trustedGetters ) ? thisMemento.trustedGetters : arguments.trustedGetters;
+		arguments.iso8601Format    = isNull( arguments.iso8601Format ) ? thisMemento.iso8601Format : arguments.iso8601Format;
+		arguments.dateMask         = isNull( arguments.dateMask ) ? thisMemento.dateMask : arguments.dateMask;
+		arguments.timeMask         = isNull( arguments.timeMask ) ? thisMemento.timeMask : arguments.timeMask;
+		arguments.autoCastBooleans = isNull( arguments.autoCastBooleans ) ? thisMemento.autoCastBooleans : arguments.autoCastBooleans;
 
 		// Choose a profile
 		if ( len( arguments.profile ) && thisMemento.profiles.keyExists( arguments.profile ) ) {
@@ -349,19 +350,19 @@ component {
 
 						// Process the item memento
 						result[ thisAlias ][ thisIndex ] = thisValue[ thisIndex ].getMemento(
-							includes      : nestedIncludes,
-							excludes      : $buildNestedMementoList( excludes, item ),
-							mappers       : $buildNestedMementoStruct( mappers, item ),
-							defaults      : $buildNestedMementoStruct( defaults, item ),
+							includes        : nestedIncludes,
+							excludes        : $buildNestedMementoList( excludes, item ),
+							mappers         : $buildNestedMementoStruct( mappers, item ),
+							defaults        : $buildNestedMementoStruct( defaults, item ),
 							// cascade the ignore defaults down if specific nested includes are requested
-							ignoreDefaults: nestedIncludes.len() ? arguments.ignoreDefaults : false,
+							ignoreDefaults  : nestedIncludes.len() ? arguments.ignoreDefaults : false,
 							// Cascade the arguments to the children
-							profile       : arguments.profile,
-							trustedGetters: arguments.trustedGetters,
-							iso8601Format : arguments.iso8601Format,
-							dateMask      : arguments.dateMask,
-							timeMask      : arguments.timeMask,
-							autoCastBooleans : arguments.autoCastBooleans
+							profile         : arguments.profile,
+							trustedGetters  : arguments.trustedGetters,
+							iso8601Format   : arguments.iso8601Format,
+							dateMask        : arguments.dateMask,
+							timeMask        : arguments.timeMask,
+							autoCastBooleans: arguments.autoCastBooleans
 						);
 					} else {
 						result[ thisAlias ][ thisIndex ] = thisValue[ thisIndex ];
@@ -379,19 +380,19 @@ component {
 
 				// Process the item memento
 				var thisItemMemento = thisValue.getMemento(
-					includes      	: nestedIncludes,
-					excludes      	: $buildNestedMementoList( excludes, item ),
-					mappers       	: $buildNestedMementoStruct( mappers, item ),
-					defaults      	: $buildNestedMementoStruct( defaults, item ),
+					includes        : nestedIncludes,
+					excludes        : $buildNestedMementoList( excludes, item ),
+					mappers         : $buildNestedMementoStruct( mappers, item ),
+					defaults        : $buildNestedMementoStruct( defaults, item ),
 					// cascade the ignore defaults down if specific nested includes are requested
-					ignoreDefaults	: nestedIncludes.len() ? arguments.ignoreDefaults : false,
+					ignoreDefaults  : nestedIncludes.len() ? arguments.ignoreDefaults : false,
 					// Cascade the arguments to the children
-					profile       		: arguments.profile,
-					trustedGetters		: arguments.trustedGetters,
-					iso8601Format 		: arguments.iso8601Format,
-					dateMask      		: arguments.dateMask,
-					timeMask      		: arguments.timeMask,
-					autoCastBooleans : arguments.autoCastBooleans
+					profile         : arguments.profile,
+					trustedGetters  : arguments.trustedGetters,
+					iso8601Format   : arguments.iso8601Format,
+					dateMask        : arguments.dateMask,
+					timeMask        : arguments.timeMask,
+					autoCastBooleans: arguments.autoCastBooleans
 				);
 
 				// Do we have a root already for this guy?
@@ -400,7 +401,7 @@ component {
 				} else {
 					result[ thisAlias ] = thisItemMemento;
 				}
-			} 
+			}
 
 
 			// we don't know what to do with this item so we return as-is
