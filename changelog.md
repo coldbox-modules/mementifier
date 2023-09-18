@@ -15,9 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- ColdBox BE Auto Testing
+- Adobe 2023 Certification
 - Ortus ORM extension
 - Github actions update
-- ColdBox 7 Auto testing
+- ColdBox 6, 7 Auto testing
 
 ## [3.3.1] => 2023-MAR-20
 
