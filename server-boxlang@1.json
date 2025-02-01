@@ -31,6 +31,6 @@
         "BOXLANG_DEBUG":true
     },
     "scripts":{
-        "onServerInitialInstall":"install bx-compat-cfml@be,bx-orm,bx-mysql,bx-esapi --noSave"
+        "onServerInitialInstall":"install bx-compat-cfml@be,bx-orm@be,bx-mysql,bx-esapi --noSave"
     }
 }
