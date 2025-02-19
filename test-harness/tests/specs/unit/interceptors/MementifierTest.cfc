@@ -62,6 +62,7 @@ component extends="coldbox.system.testing.BaseInterceptorTest" interceptor="meme
 				expect( arrayLen( includesArray ) ).toBe( listLen( includesList ) );
 				expect( arrayLen( excludesArray ) ).toBe( listLen( excludesList ) );
 			} );
+
 			it( "Won't call the same getter twice", function(){
 				variables.testModel.$(
 					method      = "getBlogURL",
@@ -72,11 +73,13 @@ component extends="coldbox.system.testing.BaseInterceptorTest" interceptor="meme
 
 				expect( variables.testModel.$once( "getBlogURL" ) ).toBeTrue();
 			} );
+
 			it( "Should include all items from defaultIncludes", function(){
 				var memento = variables.testModel.getMemento( "userId" );
 
 				expect( memento ).toBeTypeOf( "struct" ).toHaveKey( "userId,blogUrl,firstName,lastName" );
 			} );
+
 			it( "Should exclude any explicit excludes", function(){
 				var memento = variables.testModel.getMemento( "APIToken", "userId,blogUrl,firstName,lastName" );
 
@@ -85,11 +88,13 @@ component extends="coldbox.system.testing.BaseInterceptorTest" interceptor="meme
 					.toHaveKey( "APIToken" )
 					.nottoHaveKey( "userId,blogUrl,firstName,lastName" );
 			} );
+
 			it( "Should not be possible to include neverIncludes", function(){
 				var memento = variables.testModel.getMemento( "password" );
 
 				expect( memento ).toBeTypeOf( "struct" ).notToHaveKey( "password" );
 			} );
+
 			it( "should not process empty string include", function(){
 				variables.testModel.$( method = "get", callLogging = true );
 

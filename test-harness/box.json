@@ -13,6 +13,10 @@
         "cbMockData":"*"
     },
     "installPaths":{
+        "coldbox":"coldbox/",
+        "cborm":"modules/cborm/",
+        "testbox":"testbox/",
+        "cbMockData":"modules/cbMockData/"
     },
     "testbox":{
         "runner":"http://localhost:60299/tests/runner.cfm"
