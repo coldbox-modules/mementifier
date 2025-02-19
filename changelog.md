@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- BoxLang certification
+- BoxLang certification, pending ORM updates
 - Updated scripts
 
 ## [3.4.0] - 2023-09-18
