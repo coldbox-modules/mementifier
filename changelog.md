@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Excludes not working on property aliases
+
+### Added
+
+- BoxLang certification, pending ORM updates
+- Updated scripts
+
+## [3.4.0] - 2023-09-18
+
+### Fixed
+
 - Full null support `cfproperty` doesn't work on lucee. <https://github.com/coldbox-modules/mementifier/pull/38>
 
 ### Added

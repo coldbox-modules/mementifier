@@ -17,7 +17,7 @@
 
 # Mementifier : The State Maker!
 
-Welcome to the `mementifier` module.  This module will transform your business objects into native ColdFusion (CFML) data structures with :rocket: speed.  It will inject itself into ORM objects and/or business objects alike and give them a nice `getMemento()` function to transform their properties and relationships (state) into a consumable structure or array of structures.  It can even detect ORM entities and you don't even have to write the default includes manually, it will auto-detect all properties.  No more building transformations by hand! No more inconsistencies! No more repeating yourself!
+Welcome to the `mementifier` module.  This module will transform your business objects into native BoxLang or CFML data structures with :rocket: speed.  It will inject itself into ORM objects and/or business objects alike and give them a nice `getMemento()` function to transform their properties and relationships (state) into a consumable structure or array of structures.  It can even detect ORM entities and you don't even have to write the default includes manually, it will auto-detect all properties.  No more building transformations by hand! No more inconsistencies! No more repeating yourself!
 
 > Memento pattern is used to restore state of an object to a previous state or to produce the state of the object.
 

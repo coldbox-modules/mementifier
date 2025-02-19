@@ -154,7 +154,7 @@
 
 	function resultMap( event, rc, prc ){
 		// mock 10 users
-		var aObjects = getInstance( "MockData@mockdatacfc" )
+		var aObjects = getInstance( "MockData@cbMockData" )
 			.mock(
 				userID      = "uuid",
 				fname       = "fname",

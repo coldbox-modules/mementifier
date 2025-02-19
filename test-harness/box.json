@@ -10,13 +10,13 @@
     },
     "devDependencies":{
         "testbox":"*",
-        "mockdatacfc":"*"
+        "cbMockData":"*"
     },
     "installPaths":{
         "coldbox":"coldbox/",
-        "testbox":"testbox/",
         "cborm":"modules/cborm/",
-        "mockdatacfc":"modules/mockdatacfc/"
+        "testbox":"testbox/",
+        "cbMockData":"modules/cbMockData/"
     },
     "testbox":{
         "runner":"http://localhost:60299/tests/runner.cfm"

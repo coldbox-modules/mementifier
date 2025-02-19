@@ -227,10 +227,14 @@ component {
 
 		// Filter out exclude items and never include items
 		local.includes = local.includes.filter( function( item ){
-			return !arrayFindNoCase( excludes, arguments.item )
-			&& !arrayFindNoCase( thisMemento.neverInclude, arguments.item )
-			&& arguments.item != "";
+			// We do this, as it could have an alias.
+			var targetItem = listLast( arguments.item, ":" );
+			return !arrayFindNoCase( excludes, targetItem )
+			&& !arrayFindNoCase( thisMemento.neverInclude, targetItem )
+			&& targetItem != "";
 		} );
+
+		writeDump( var=local.includes, top = 10, showUDFs = false );
 
 		// Make sure includes and excludes are unique
 		local.includes = arrayNew( 1 ).append(
