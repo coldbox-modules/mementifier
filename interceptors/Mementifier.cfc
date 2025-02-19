@@ -234,7 +234,7 @@ component {
 			&& targetItem != "";
 		} );
 
-		writeDump( var=local.includes, top = 10, showUDFs = false );
+		// writeDump( var=local.includes, top = 10, showUDFs = false );
 
 		// Make sure includes and excludes are unique
 		local.includes = arrayNew( 1 ).append(
