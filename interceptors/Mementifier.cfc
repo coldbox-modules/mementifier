@@ -300,29 +300,33 @@ component {
 			if ( isNull( thisValue ) ) {
 				result[ thisAlias ] = javacast( "null", "" );
 			}
-
 			// Match timestamps + date/time objects
 			else if (
 				isSimpleValue( thisValue )
 				&&
 				(
-					reFind( "^\{ts ([^\}])*\}", thisValue ) // Lucee date format
+					reFind( "^\{ts ([^\}])*\}", thisValue ) // Lucee and BoxLang default date string format
 					||
 					reFind( "^\d{4}-\d{2}-\d{2}", thisValue ) // ACF date format begins with YYYY-MM-DD
 				)
 			) {
+
+				var dateInstance = server.keyExists( "boxlang" )
+									? parseDateTime( thisValue ).toDate()
+									: thisValue;
+
 				try {
 					// Date Test just in case
-					thisValue.getTime();
+					dateInstance.getTime();
 					// Iso Date?
 					if ( arguments.iso8601Format ) {
 						// we need to convert trailing Zulu time designations offset or JS libs like Moment will not know how to parse it
-						result[ thisAlias ] = this.$FORMATTER_ISO8601.format( thisValue ).replace( "Z", "+00:00" );
+						result[ thisAlias ] = this.$FORMATTER_ISO8601.format( dateInstance ).replace( "Z", "+00:00" );
 					} else {
-						result[ thisAlias ] = customDateFormatter.format( thisValue );
+						result[ thisAlias ] = customDateFormatter.format( dateInstance );
 					}
 				} catch ( any e ) {
-					result[ thisAlias ] = thisValue;
+					result[ thisAlias ] = dateInstance;
 				}
 			}
 
