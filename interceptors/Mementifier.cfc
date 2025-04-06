@@ -312,7 +312,7 @@ component {
 			) {
 
 				var dateInstance = server.keyExists( "boxlang" )
-									? thisValue.toDate()
+									? parseDateTime( thisValue ).toDate()
 									: thisValue;
 
 				try {
