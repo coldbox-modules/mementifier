@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added 2025 tests
+- Added BoxLang BE tests
+- Added stupid Adobe argument collection JVM argument collection fix
+- Updated build processes
+
 ## [3.6.1] - 2025-04-06
 
 ## [3.6.0] - 2025-02-19
