@@ -16,6 +16,11 @@
             "/moduleroot/mementifier":"../"
         }
     },
+	"JVM":{
+		"heapSize":"768",
+		"javaVersion":"openjdk11_jre",
+        "args":"-Dcoldfusion.runtime.remotemethod.matchArguments=false"
+    },
     "openBrowser":"false",
 	"cfconfig":{
         "file":".cfconfig.json"
