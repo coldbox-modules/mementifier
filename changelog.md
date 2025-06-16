@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.7.0] - 2025-06-16
+
 ### Added
 
 - Added 2025 tests
@@ -252,7 +254,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First iteration of this module
 
-[unreleased]: https://github.com/coldbox-modules/mementifier/compare/v3.6.1...HEAD
+[unreleased]: https://github.com/coldbox-modules/mementifier/compare/v3.7.0...HEAD
+[3.7.0]: https://github.com/coldbox-modules/mementifier/compare/v3.6.1...v3.7.0
 [3.6.1]: https://github.com/coldbox-modules/mementifier/compare/v3.6.0...v3.6.1
 [3.6.0]: https://github.com/coldbox-modules/mementifier/compare/v3.5.0...v3.6.0
 [3.5.0]: https://github.com/coldbox-modules/mementifier/compare/v3.4.0...v3.5.0
