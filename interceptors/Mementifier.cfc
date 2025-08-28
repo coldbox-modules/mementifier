@@ -161,11 +161,13 @@ component {
 		};
 
 		// Param arguments according to instance > settings chain precedence
-		arguments.trustedGetters   = isNull( arguments.trustedGetters ) ? thisMemento.trustedGetters : arguments.trustedGetters;
-		arguments.iso8601Format    = isNull( arguments.iso8601Format ) ? thisMemento.iso8601Format : arguments.iso8601Format;
-		arguments.dateMask         = isNull( arguments.dateMask ) ? thisMemento.dateMask : arguments.dateMask;
-		arguments.timeMask         = isNull( arguments.timeMask ) ? thisMemento.timeMask : arguments.timeMask;
-		arguments.autoCastBooleans = isNull( arguments.autoCastBooleans ) ? thisMemento.autoCastBooleans : arguments.autoCastBooleans;
+		var flags = {
+			"trustedGetters"   = isNull( arguments.trustedGetters ) ? thisMemento.trustedGetters : arguments.trustedGetters,
+			"iso8601Format"    = isNull( arguments.iso8601Format ) ? thisMemento.iso8601Format : arguments.iso8601Format,
+			"dateMask"         = isNull( arguments.dateMask ) ? thisMemento.dateMask : arguments.dateMask,
+			"timeMask"         = isNull( arguments.timeMask ) ? thisMemento.timeMask : arguments.timeMask,
+			"autoCastBooleans" = isNull( arguments.autoCastBooleans ) ? thisMemento.autoCastBooleans : arguments.autoCastBooleans,
+		};
 
 		// Choose a profile
 		if ( len( arguments.profile ) && thisMemento.profiles.keyExists( arguments.profile ) ) {
@@ -178,9 +180,9 @@ component {
 
 		// Default formatter or customize it if passed arguments are different than settings.
 		var customDateFormatter = this.$FORMATTER_CUSTOM;
-		if ( arguments.dateMask != thisMemento.dateMask || arguments.timeMask != thisMemento.timeMask ) {
+		if ( flags.dateMask != thisMemento.dateMask || flags.timeMask != thisMemento.timeMask ) {
 			customDateFormatter = createObject( "java", "java.text.SimpleDateFormat" ).init(
-				"#arguments.dateMask# #arguments.timeMask#"
+				"#flags.dateMask# #flags.timeMask#"
 			);
 		}
 
@@ -275,12 +277,12 @@ component {
 				var thisAlias = item;
 			}
 
-			if ( arguments.trustedGetters || structKeyExists( this, "get#item#" ) ) {
+			if ( flags.trustedGetters || structKeyExists( this, "get#item#" ) ) {
 				try {
 					thisValue = invoke( this, "get#item#" );
 				} catch ( any e ) {
 					// Unless trusted getters is on and there is a mapper for this item rethrow the exception.
-					if ( !arguments.trustedGetters || !structKeyExists( arguments.mappers, item ) ) {
+					if ( !flags.trustedGetters || !structKeyExists( arguments.mappers, item ) ) {
 						rethrow;
 					}
 				}
@@ -319,7 +321,7 @@ component {
 					// Date Test just in case
 					dateInstance.getTime();
 					// Iso Date?
-					if ( arguments.iso8601Format ) {
+					if ( flags.iso8601Format ) {
 						// we need to convert trailing Zulu time designations offset or JS libs like Moment will not know how to parse it
 						result[ thisAlias ] = this.$FORMATTER_ISO8601.format( dateInstance ).replace( "Z", "+00:00" );
 					} else {
@@ -331,7 +333,7 @@ component {
 			}
 
 			// Strict Type Boolean Values
-			else if ( arguments.autoCastBooleans && !isNumeric( thisValue ) && isBoolean( thisValue ) ) {
+			else if ( flags.autoCastBooleans && !isNumeric( thisValue ) && isBoolean( thisValue ) ) {
 				result[ thisAlias ] = javacast( "Boolean", thisValue );
 			}
 
@@ -366,11 +368,11 @@ component {
 							ignoreDefaults  : nestedIncludes.len() ? arguments.ignoreDefaults : false,
 							// Cascade the arguments to the children
 							profile         : arguments.profile,
-							trustedGetters  : arguments.trustedGetters,
-							iso8601Format   : arguments.iso8601Format,
-							dateMask        : arguments.dateMask,
-							timeMask        : arguments.timeMask,
-							autoCastBooleans: arguments.autoCastBooleans
+							trustedGetters  : isNull( arguments.trustedGetters ) ? javacast( "null", "" ) : arguments.trustedGetters,
+							iso8601Format   : isNull( arguments.iso8601Format ) ? javacast( "null", "" ) : arguments.iso8601Format,
+							dateMask        : isNull( arguments.dateMask ) ? javacast( "null", "" ) : arguments.dateMask,
+							timeMask        : isNull( arguments.timeMask ) ? javacast( "null", "" ) : arguments.timeMask,
+							autoCastBooleans: isNull( arguments.autoCastBooleans ) ? javacast( "null", "" ) : arguments.autoCastBooleans
 						);
 					} else {
 						result[ thisAlias ][ thisIndex ] = thisValue[ thisIndex ];
@@ -396,11 +398,11 @@ component {
 					ignoreDefaults  : nestedIncludes.len() ? arguments.ignoreDefaults : false,
 					// Cascade the arguments to the children
 					profile         : arguments.profile,
-					trustedGetters  : arguments.trustedGetters,
-					iso8601Format   : arguments.iso8601Format,
-					dateMask        : arguments.dateMask,
-					timeMask        : arguments.timeMask,
-					autoCastBooleans: arguments.autoCastBooleans
+					trustedGetters  : isNull( arguments.trustedGetters ) ? javacast( "null", "" ) : arguments.trustedGetters,
+					iso8601Format   : isNull( arguments.iso8601Format ) ? javacast( "null", "" ) : arguments.iso8601Format,
+					dateMask        : isNull( arguments.dateMask ) ? javacast( "null", "" ) : arguments.dateMask,
+					timeMask        : isNull( arguments.timeMask ) ? javacast( "null", "" ) : arguments.timeMask,
+					autoCastBooleans: isNull( arguments.autoCastBooleans ) ? javacast( "null", "" ) : arguments.autoCastBooleans
 				);
 
 				// Do we have a root already for this guy?

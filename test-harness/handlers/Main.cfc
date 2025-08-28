@@ -45,7 +45,7 @@
 			getNewSetting(),
 			getNewSetting(),
 			getNewSetting(),
-			getNewSetting()
+			getNewSetting( name = "Yes" )
 		] );
 
 
@@ -138,16 +138,20 @@
 		return oPost.getMemento();
 	}
 
-	private function getNewSetting(){
-		var description = "Hola!!! from #createUUID()#";
+	private function getNewSetting(
+		string name,
+		string description,
+	){
+		param arguments.name = "setting-#createUUID()#";
+		param arguments.description = "Hola!!! from #arguments.name#";
 
 		return settingService.new( {
-			name        : "setting-#createUUID()#",
-			description : description,
+			name        : arguments.name,
+			description : arguments.description,
 			isConfirmed : randRange( 0, 1 )
 		} ).setLatestValue(
 			recentValueService.new( {
-				description : description
+				description : arguments.description
 			} )
 		);
 	}
