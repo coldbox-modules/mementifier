@@ -166,7 +166,7 @@ component {
 			"iso8601Format"    = isNull( arguments.iso8601Format ) ? thisMemento.iso8601Format : arguments.iso8601Format,
 			"dateMask"         = isNull( arguments.dateMask ) ? thisMemento.dateMask : arguments.dateMask,
 			"timeMask"         = isNull( arguments.timeMask ) ? thisMemento.timeMask : arguments.timeMask,
-			"autoCastBooleans" = isNull( arguments.autoCastBooleans ) ? thisMemento.autoCastBooleans : arguments.autoCastBooleans,
+			"autoCastBooleans" = isNull( arguments.autoCastBooleans ) ? thisMemento.autoCastBooleans : arguments.autoCastBooleans
 		};
 
 		// Choose a profile

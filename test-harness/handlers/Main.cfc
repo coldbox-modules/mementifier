@@ -140,7 +140,7 @@
 
 	private function getNewSetting(
 		string name,
-		string description,
+		string description
 	){
 		param arguments.name = "setting-#createUUID()#";
 		param arguments.description = "Hola!!! from #arguments.name#";
