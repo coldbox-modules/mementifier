@@ -311,9 +311,7 @@ component {
 				)
 			) {
 
-				var dateInstance = server.keyExists( "boxlang" )
-									? parseDateTime( thisValue ).toDate()
-									: thisValue;
+				var dateInstance = thisValue;
 
 				try {
 					// Date Test just in case
