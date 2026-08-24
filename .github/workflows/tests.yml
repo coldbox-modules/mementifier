@@ -48,6 +48,12 @@ jobs:
           mkdir -p test-harness/mementifier
           ln -s .. test-harness/mementifier/test-harness
 
+      - name: Create Adobe ORM Component Alias
+        if: ${{ startsWith( matrix.cfengine, 'adobe@' ) }}
+        run: |
+          mkdir -p test-harness/mementifier
+          ln -s .. test-harness/mementifier/test-harness
+
       - name: Setup Database and Fixtures
         run: |
           sudo systemctl start mysql.service
