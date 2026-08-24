@@ -50,6 +50,12 @@ component extends="coldbox.system.testing.BaseInterceptorTest" interceptor="meme
 
 	function run(){
 		describe( "Mementifier", function(){
+			it( "supports partial memento settings with full null support", function(){
+				var model = getWireBox().getInstance( "PartialMemento" );
+
+				expect( model.getMemento() ).toBeStruct().toHaveKey( "id" );
+			} );
+
 			it( "Won't modify includes/excludes arrays", function(){
 				var includesList = "userId,blogUrl,fname:firstName,lname:lastName";
 				var excludesList = "userId,blogUrl,fname:firstName,lname:lastName";

@@ -86,8 +86,21 @@ component {
 			arguments.entity.$injectMixin( "$getDeepProperties", variables.$getDeepProperties );
 
 			// We do simple date formatters as they are faster than CFML methods
-			var dateMask                        = isNull( this.memento.dateMask ) ? variables.settings.dateMask : this.memento.dateMask;
-			var timeMask                        = isNull( this.memento.timeMask ) ? variables.settings.timeMask : this.memento.timeMask;
+			var entityMemento = (
+				structKeyExists( arguments.entity, "memento" ) && isStruct( arguments.entity.memento )
+				 ? arguments.entity.memento
+				 : {}
+			);
+			var dateMask = (
+				structKeyExists( entityMemento, "dateMask" ) && !isNull( entityMemento.dateMask )
+				 ? entityMemento.dateMask
+				 : variables.settings.dateMask
+			);
+			var timeMask = (
+				structKeyExists( entityMemento, "timeMask" ) && !isNull( entityMemento.timeMask )
+				 ? entityMemento.timeMask
+				 : variables.settings.timeMask
+			);
 			arguments.entity.$FORMATTER_ISO8601 = variables.jSimpleDateFormat.init( "yyyy-MM-dd'T'HH:mm:ssXXX" );
 			arguments.entity.$FORMATTER_CUSTOM  = variables.jSimpleDateFormat.init( "#dateMask# #timeMask#" );
 
@@ -145,19 +158,30 @@ component {
 
 		// Param Default Memento Settings
 		// We do it here, because ACF caches crap!
-		var thisMemento = {
-			"autoCastBooleans" : isNull( this.memento.autoCastBooleans ) ? variables.$mementifierSettings.autoCastBooleans : this.memento.autoCastBooleans,
-			"dateMask"         : isNull( this.memento.dateMask ) ? variables.$mementifierSettings.dateMask : this.memento.dateMask,
-			"defaults"         : isNull( this.memento.defaults ) ? {} : this.memento.defaults,
-			"defaultIncludes"  : isNull( this.memento.defaultIncludes ) ? [] : this.memento.defaultIncludes,
-			"defaultExcludes"  : isNull( this.memento.defaultExcludes ) ? [] : this.memento.defaultExcludes,
-			"iso8601Format"    : isNull( this.memento.iso8601Format ) ? variables.$mementifierSettings.iso8601Format : this.memento.iso8601Format,
-			"mappers"          : isNull( this.memento.mappers ) ? {} : this.memento.mappers,
-			"neverInclude"     : isNull( this.memento.neverInclude ) ? [] : this.memento.neverInclude,
-			"ormAutoIncludes"  : isNull( this.memento.ormAutoIncludes ) ? variables.$mementifierSettings.ormAutoIncludes : this.memento.ormAutoIncludes,
-			"profiles"         : isNull( this.memento.profiles ) ? {} : this.memento.profiles,
-			"timeMask"         : isNull( this.memento.timeMask ) ? variables.$mementifierSettings.timeMask : this.memento.timeMask,
-			"trustedGetters"   : isNull( this.memento.trustedGetters ) ? variables.$mementifierSettings.trustedGetters : this.memento.trustedGetters
+		var entityMemento = structKeyExists( this, "memento" ) && isStruct( this.memento ) ? this.memento : {};
+		var thisMemento   = {
+			"autoCastBooleans" : entityMemento.keyExists( "autoCastBooleans" ) && !isNull(
+				entityMemento.autoCastBooleans
+			) ? entityMemento.autoCastBooleans : variables.$mementifierSettings.autoCastBooleans,
+			"dateMask"        : entityMemento.keyExists( "dateMask" ) && !isNull( entityMemento.dateMask ) ? entityMemento.dateMask : variables.$mementifierSettings.dateMask,
+			"defaults"        : entityMemento.keyExists( "defaults" ) && !isNull( entityMemento.defaults ) ? entityMemento.defaults : {},
+			"defaultIncludes" : entityMemento.keyExists( "defaultIncludes" ) && !isNull(
+				entityMemento.defaultIncludes
+			) ? entityMemento.defaultIncludes : [],
+			"defaultExcludes" : entityMemento.keyExists( "defaultExcludes" ) && !isNull(
+				entityMemento.defaultExcludes
+			) ? entityMemento.defaultExcludes : [],
+			"iso8601Format"   : entityMemento.keyExists( "iso8601Format" ) && !isNull( entityMemento.iso8601Format ) ? entityMemento.iso8601Format : variables.$mementifierSettings.iso8601Format,
+			"mappers"         : entityMemento.keyExists( "mappers" ) && !isNull( entityMemento.mappers ) ? entityMemento.mappers : {},
+			"neverInclude"    : entityMemento.keyExists( "neverInclude" ) && !isNull( entityMemento.neverInclude ) ? entityMemento.neverInclude : [],
+			"ormAutoIncludes" : entityMemento.keyExists( "ormAutoIncludes" ) && !isNull(
+				entityMemento.ormAutoIncludes
+			) ? entityMemento.ormAutoIncludes : variables.$mementifierSettings.ormAutoIncludes,
+			"profiles"       : entityMemento.keyExists( "profiles" ) && !isNull( entityMemento.profiles ) ? entityMemento.profiles : {},
+			"timeMask"       : entityMemento.keyExists( "timeMask" ) && !isNull( entityMemento.timeMask ) ? entityMemento.timeMask : variables.$mementifierSettings.timeMask,
+			"trustedGetters" : entityMemento.keyExists( "trustedGetters" ) && !isNull(
+				entityMemento.trustedGetters
+			) ? entityMemento.trustedGetters : variables.$mementifierSettings.trustedGetters
 		};
 
 		// Param arguments according to instance > settings chain precedence
@@ -310,7 +334,6 @@ component {
 					reFind( "^\d{4}-\d{2}-\d{2}", thisValue ) // ACF date format begins with YYYY-MM-DD
 				)
 			) {
-
 				var dateInstance = thisValue;
 
 				try {
@@ -319,7 +342,9 @@ component {
 					// Iso Date?
 					if ( arguments.iso8601Format ) {
 						// we need to convert trailing Zulu time designations offset or JS libs like Moment will not know how to parse it
-						result[ thisAlias ] = this.$FORMATTER_ISO8601.format( dateInstance ).replace( "Z", "+00:00" );
+						result[ thisAlias ] = this.$FORMATTER_ISO8601
+							.format( dateInstance )
+							.replace( "Z", "+00:00" );
 					} else {
 						result[ thisAlias ] = customDateFormatter.format( dateInstance );
 					}
@@ -444,7 +469,9 @@ component {
 	 * @return The array of default includes for the ORM entity where this function is injected into
 	 */
 	array function $buildOrmIncludes(){
-		var thisName = isNull( variables.entityName ) ? "" : variables.entityName;
+		var thisName = (
+			structKeyExists( variables, "entityName" ) && !isNull( variables.entityName ) ? variables.entityName : ""
+		);
 		if ( !len( thisName ) ) {
 			var md   = getMetadata( this );
 			thisName = ( md.keyExists( "entityName" ) ? md.entityName : listLast( md.name, "." ) );
