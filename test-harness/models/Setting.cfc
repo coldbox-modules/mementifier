@@ -55,10 +55,11 @@ component
 			"description"
 		],
 		// Default Exclusions
-		defaultExcludes : [],
-		neverInclude    : [],
+		defaultExcludes  : [],
+		neverInclude     : [],
 		// Defaults
-		defaults        : {}
+		defaults         : {},
+		autoCastBooleans : false
 	};
 
 	/**

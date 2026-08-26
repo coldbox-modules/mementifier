@@ -27,9 +27,12 @@
         "commandbox-cfformat":"*",
         "commandbox-docbox":"*",
         "commandbox-dotenv":"*",
-        "commandbox-cfconfig":"*"
+        "commandbox-cfconfig":"*",
+        "cbMockData":"^4.1.0+3"
     },
-    "installPaths":{},
+    "installPaths":{
+        "cbMockData":"modules/cbMockData/"
+    },
     "ignore":[
         "**/.*",
         "build/**",

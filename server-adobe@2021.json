@@ -11,21 +11,21 @@
         "rewrites":{
             "enable":"true"
         },
-		"webroot":"test-harness",
+        "webroot":"test-harness",
         "aliases":{
             "/moduleroot/mementifier":"../"
         }
     },
-	"JVM":{
-		"heapSize":"768",
-		"javaVersion":"openjdk11_jre",
+    "JVM":{
+        "heapSize":"768",
+        "javaVersion":"openjdk11_jre",
         "args":"-Dcoldfusion.runtime.remotemethod.matchArguments=false"
     },
     "openBrowser":"false",
-	"cfconfig":{
+    "cfconfig":{
         "file":".cfconfig.json"
     },
-	"scripts" : {
+    "scripts":{
         "onServerInstall":"cfpm install zip,debugger,orm,mysql,postgresql,sqlserver,feed,chart"
     }
 }

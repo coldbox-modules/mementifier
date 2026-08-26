@@ -165,6 +165,17 @@
 					.toHaveKey( "latestValue" )
 					.toHaveDeepKey( "description" );
 			} );
+
+			it( "lets nested items figure out their own default settings unless the settings were explicitly passed in arguments", function(){
+				var event = this.request(
+					route  = "/",
+					params = { ignoreDefaults : true, includes : "fname,lname,settings" }
+				);
+				var memento = deserializeJSON( event.getRenderedContent() );
+				expect( memento.settings ).toBeArray().notToBeEmpty();
+				expect( arrayLast( memento.settings ) ).toHaveKey( "name" );
+				expect( arrayLast( memento.settings ).name ).toBeWithCase( "Yes" );
+			} );
 		} );
 	}
 
